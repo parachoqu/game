@@ -25,6 +25,9 @@ import { generateCell, CELL } from '../src/world/ground-cover.js';
 import { LOD_FIELDS, updateLODFields, activeCount, setLODBands, LOD_BANDS } from '../src/engine/lod-field.js';
 import { ENCOUNTERS, CANTEIRO, PASSAGE_PROPS, GUARD_POSTS } from '../src/game/layout.js';
 import { SHELTER } from '../src/game/zones.js';
+import { EXTRA_SPOTS, EXTRA_DEFS } from '../src/world/extra-spots.js';
+import { REPLACEMENTS, replacedVolume } from '../src/world/extra-props.js';
+import EXTRA_MANIFEST from '../assets/extra-props/extra-props-manifest.json';
 
 
 const results = [];
@@ -961,6 +964,73 @@ test('caminhada: na Turbulenta, da entrada ao objetivo e às duas saídas', () =
     const res = walk(a, b, { maxSteps: 30000 });
     assert(res.ok, `Turbulenta, ${nome}: não chegou (faltavam ${res.dist?.toFixed(1)} m)`);
   }
+});
+
+// ---------------------------------------------------------------- assets extras
+test('extras: os seis acréscimos em chão livre, fora das rotas, dos volumes e da coleta', () => {
+  planRegionInstances({ seed: 713337 });
+  assert(EXTRA_SPOTS.length === EXTRA_DEFS.length, `${EXTRA_SPOTS.length} de ${EXTRA_DEFS.length} acréscimos posicionados`);
+  for (const s of EXTRA_SPOTS) {
+    const d = EXTRA_DEFS.find((q) => q.id === s.id);
+    assert(!isWaterCell(s.x, s.z), `${s.id} na água`);
+    assert(routeDistance(s.x, s.z) >= d.road + d.foot - 0.01, `${s.id} a ${routeDistance(s.x, s.z).toFixed(1)} m da estrada`);
+    for (const p of PLACEMENTS) {
+      const gx = Math.abs(s.x - p.plan[0]) - p.half[0], gz = Math.abs(s.z - PLAN_Z_SIGN * p.plan[1]) - p.half[1];
+      assert(Math.max(gx, gz) >= d.foot + 3 - 0.01, `${s.id} encostado em ${p.name}`);
+    }
+    for (const n of FUNCTIONAL.nodes) assert(Math.hypot(n.x - s.x, n.z - s.z) >= d.r + 4 - 0.01, `${s.id} sobre um ponto de coleta`);
+    for (const o of EXTRA_SPOTS) if (o !== s) assert(Math.hypot(o.x - s.x, o.z - s.z) > o.r + s.r, `${s.id} encostado em ${o.id}`);
+    assert(WORLD_COLLIDERS.some((c) => c.name === s.id), `${s.id} sem colisor`);
+  }
+  // o sorteio da coleta não mudou: continua depois dos pontos de jogo e antes dos acréscimos
+  assert(FUNCTIONAL.nodes.length === 82, `${FUNCTIONAL.nodes.length} pontos de coleta`);
+});
+
+test('extras: trocas só visuais — colisores e tabuleiro das pontes iguais ao manifesto', () => {
+  for (const r of REPLACEMENTS) {
+    const p = placement(r.volume);
+    assert(p, `volume ${r.volume} fora do manifesto`);
+    assert(replacedVolume(`${r.volume}_Roof`) === r.volume || replacedVolume(r.volume) === r.volume, `${r.volume} não reconhecido`);
+    const x = p.plan[0], z = PLAN_Z_SIGN * p.plan[1];
+    if (p.bridge) {
+      const b = WORLD_BRIDGES.find((q) => q.name === r.volume);
+      assert(b && Math.abs(b.y - (p.deck_final ?? p.deck)) < 1e-6 && Math.abs(b.x - x) < 1e-6 && Math.abs(b.z - z) < 1e-6, `${r.volume}: tabuleiro mudou`);
+      continue;
+    }
+    const c = WORLD_COLLIDERS.find((q) => q.name === r.volume);
+    if (p.collider === false) { assert(!c, `${r.volume}: ganhou colisor`); continue; }   // a doca não tem colisor
+    if (!c) {
+      // volume cortado pelo corredor da estrada: colisores redondos só na parte fora da pista, dentro da caixa
+      const parts = WORLD_COLLIDERS.filter((q) => q.name.startsWith(`${r.volume}#`));
+      assert(parts.length && parts.every((q) => Math.abs(q.x - x) <= p.half[0] + 1e-6 && Math.abs(q.z - z) <= p.half[1] + 1e-6), `${r.volume}: colisor mudou`);
+      continue;
+    }
+    assert(c && Math.abs(c.x - x) < 1e-6 && Math.abs(c.z - z) < 1e-6, `${r.volume}: colisor mudou de lugar`);
+    if (c.r != null) assert(Math.abs(c.r - Math.max(0.35, Math.min(p.half[0], p.half[1]) * 0.92)) < 1e-6, `${r.volume}: raio mudou`);
+    else assert(Math.abs(c.hw - p.half[0]) < 1e-6 && Math.abs(c.hd - p.half[1]) < 1e-6, `${r.volume}: caixa mudou`);
+  }
+});
+
+test('extras: nenhuma construção antiga à vista — todo prédio, ruína, ponte, torre e doca tem troca', () => {
+  const kinds = new Set(['building', 'ruin', 'bridge', 'tower', 'dock']);
+  const old = PLACEMENTS.filter((p) => kinds.has(p.kind) && !REPLACEMENTS.some((r) => r.volume === p.name)).map((p) => p.name);
+  assert(old.length === 0, `sem troca: ${old.join(', ')}`);
+  assert(replacedVolume('POI_RegionalObservatory') === null && replacedVolume('Mine_Rock_00') === null, 'POI ou rocha trocado');
+  assert(new Set(REPLACEMENTS.map((r) => r.volume)).size === REPLACEMENTS.length, 'volume trocado duas vezes');
+});
+
+test('extras: manifesto de origem completo, com licença e hash em cada derivado', () => {
+  const ids = EXTRA_MANIFEST.assets.map((a) => a.id);
+  assert(new Set(ids).size === ids.length && ids.length === 30, `${ids.length} derivados`);
+  for (const a of EXTRA_MANIFEST.assets) {
+    assert(/^[0-9a-f]{64}$/.test(a.source.sha256) && a.source.file, `${a.id}: origem incompleta`);
+    assert(a.license && a.license.length > 5, `${a.id}: sem licença`);
+    assert(a.triangles > 0 && a.size.every((v) => v > 0), `${a.id}: derivado vazio`);
+    if (/Pigcraft/.test(a.author || '')) assert(/CC-BY-4\.0/.test(a.license) && a.url, `${a.id}: atribuição CC-BY incompleta`);
+    if (/kenney/.test(a.source.file)) assert(/CC0/.test(a.license) && /Kenney/.test(a.author), `${a.id}: crédito Kenney incompleto`);
+  }
+  for (const r of REPLACEMENTS) assert(ids.includes(r.asset), `troca sem derivado: ${r.asset}`);
+  for (const d of EXTRA_DEFS) assert(ids.includes(d.asset), `acréscimo sem derivado: ${d.asset}`);
 });
 
 // ---------------------------------------------------------------- relatório

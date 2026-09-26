@@ -14,6 +14,7 @@ import { LOC, zoneAt, HALF, CANTEIRO, PASSAGE_PROPS, ENCOUNTERS } from './layout
 import { placement } from '../world/runtime-manifest.js';
 import { PLAN_Z_SIGN } from '../world/coordinates.js';
 import { isClearGround } from '../world/world-colliders.js';
+import { extraModel } from '../world/extra-props.js';
 import { FUNCTIONAL } from '../world/functional-areas.js';
 import { addNpc, initTravelers } from './npcs.js';
 import { defineGroup } from './enemies.js';
@@ -110,7 +111,9 @@ function buildAlto() {
   const base = { x: (tower.x + house.x) / 2, z: (tower.z + house.z) / 2 };
   stallCloths.forEach((c, i) => {
     const x = base.x + (i - 0.5) * 11, z = base.z + 7;
-    place(PR.stall(c), x, z, 0, { hw: 1.6, hd: 1.3 });
+    // banca do kit Kenney com o telhado na cor do tecido; sem o modelo, a barraca procedural
+    const banca = extraModel('banca', { w: 3.3, d: 2.5, tint: c });
+    place(banca || PR.stall(c), x, z, 0, { hw: 1.6, hd: 1.3 }, !!banca);
     addNpc({ x, z: z - 1.6, yaw: 0, race: ['elfo', 'humano'][i % 2], cloth: c, role: 'merchant', face: true });
   });
   interactable('market', base.x, base.z + 10, 9, 'Negociar no Mercado do Alto', 'alto');
@@ -139,7 +142,10 @@ function buildCanteiro() {
 function buildPassage() {
   for (const b of PASSAGE_PROPS.banners) place(PR.banner(ZONES.fronteira.color, 'diamond'), b.x, b.z, 0);
   const v = LOC.vigia;
-  place(PR.watchtowerRuin(), v.x, v.z, Math.PI / 2, { hw: 2.2, hd: 2.2 });
+  // torre com escombros no lugar da ruína procedural (mesmo colisor); os modelos texturizados ficam
+  // fora da junção de malhas estáticas, que só guarda posição, normal e cor
+  const torre = extraModel('torre_escombros', { w: 4.4, d: 4.4, fit: 'redonda' });
+  place(torre || PR.watchtowerRuin(), v.x, v.z, Math.PI / 2, { hw: 2.2, hd: 2.2 }, !!torre);
   interactable('vigia', v.x + 3.4, v.z, 3.4, 'Registrar o movimento na Passagem');
 
   // destroços na subida da garganta

@@ -26,6 +26,23 @@ for (const [dir, cmd, files] of required) {
     }
   }
 }
+// Assets extras (pontes, construções, marcos, criatura, armas): o registro importa todos os do manifesto.
+const extraManifest = join(root, 'assets/extra-props/extra-props-manifest.json');
+if (!existsSync(extraManifest)) { console.error('pacote incompleto: falta assets/extra-props/\nRode: node tools/build-extra-assets.mjs'); process.exit(1); }
+for (const a of JSON.parse(readFileSync(extraManifest, 'utf8')).assets) {
+  if (!existsSync(join(root, 'assets/extra-props', a.glb))) {
+    console.error(`pacote incompleto: falta assets/extra-props/${a.glb}\nRode: node tools/build-extra-assets.mjs`);
+    process.exit(1);
+  }
+}
+// Lote Mixamo de combate: os 20 derivados são obrigatórios (o registro do runtime importa todos).
+const { COMBAT_2026_09_26 } = await import('./tools/combat-manifest.mjs');
+for (const e of COMBAT_2026_09_26) {
+  if (!existsSync(join(root, 'assets', e.glb))) {
+    console.error(`lote de combate incompleto: falta assets/${e.glb}\nRode: node tools/process-animations.mjs --combat`);
+    process.exit(1);
+  }
+}
 const candidateEsbuilds = [
   process.env.ESBUILD_BIN,
   '/home/https/.npm/_npx/7f657307477966ff/node_modules/esbuild/bin/esbuild',

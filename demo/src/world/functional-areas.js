@@ -20,6 +20,7 @@ import {
 } from '../game/layout.js';
 import { SHELTER } from '../game/zones.js';
 import { rng } from './noise.js';
+import { planExtraSpots } from './extra-spots.js';
 
 const STEP = 2, N = 513, FAR = 60;
 const solidGap = new Float32Array(N * N);   // distância até sair do núcleo sem sólidos (≤ 0: dentro)
@@ -182,6 +183,14 @@ export function buildFunctionalAreas() {
   FUNCTIONAL.nodes = planResourceNodes();
   for (const n of FUNCTIONAL.nodes) {
     const a = { tag: 'coleta', x: n.x, z: n.z, r: 0, solid: 4.3, low: 1.5, ring: 5, ringK: 0.8 };
+    areas.push(a);
+    stamp(a);
+    LOW_AREAS.push(a);
+  }
+  // acréscimos de cena (poços, moinho, árvores-marco, ponte em ruína): escolhidos depois dos nós de
+  // coleta, que assim não mudam, e antes da vegetação, que passa a desviar deles
+  for (const s of planExtraSpots({ solidGapAt, nodes: FUNCTIONAL.nodes })) {
+    const a = { tag: `extra:${s.id}`, x: s.x, z: s.z, r: s.r, solid: 1.2, low: 0.2, ring: 4, ringK: 0.6 };
     areas.push(a);
     stamp(a);
     LOW_AREAS.push(a);

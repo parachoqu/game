@@ -18,6 +18,7 @@ import { resolveWorldMaterial } from './world-materials.js';
 import { vnoise } from './noise.js';
 import { forestDensity } from './vegetation-fields.js';
 import { loadWorldGLB } from './runtime-loader.js';
+import { replacedVolume, loadExtraReplacements, EXTRA_STATUS } from './extra-props.js';
 import regionPropsBin from '../../assets/world-runtime/region-props.glb';
 import regionWaterBin from '../../assets/world-runtime/region-water.glb';
 import turbulentPropsBin from '../../assets/world-runtime/turbulent-props.glb';
@@ -109,6 +110,14 @@ function regionWeights(x, z, h, ny) {
     const d = Math.hypot(x - p.x, z - p.z);
     if (d < p.r1) toward(p.layer, (1 - sstep(p.r0, p.r1, d)) * p.k);
   }
+}
+
+// Quanto do chão em (x, z) é pintado de grama viva (camada 0), 0…1. A grama de campo só nasce
+// onde o terreno já é verde: fora das estradas, praças, campos cultivados, rocha, margem e Ermos.
+const NRM = [0, 0, 0];
+export function greenGroundAt(x, z) {
+  regionWeights(x, z, regionHeightAt(x, z), normalAt(regionHeightAt, x, z, NRM));
+  return W10[0];
 }
 
 const TW10 = new Float32Array(10);
@@ -328,14 +337,20 @@ const DROPPED_WATER = /^REGION_(MainRiver|IrrigationCanal_\d+)$/;
 const LIFTS = new Map(PLACEMENTS.filter((p) => p.lift).map((p) => [p.name, p.lift]));
 
 export async function loadRegionProps(scene) {
+  const replacedNodes = new Map();
   const { root } = await loadWorldGLB(regionPropsBin, {
     resolveMaterial: resolveWorldMaterial,
-    onNode: (name, node) => { const lift = LIFTS.get(name); if (lift) node.position.y += lift; },
+    onNode: (name, node) => {
+      const lift = LIFTS.get(name); if (lift) node.position.y += lift;
+      // troca só visual (`extra-props.js`): o nó some, a colisão do manifesto continua
+      if (replacedVolume(name)) { node.visible = false; replacedNodes.set(name, node); EXTRA_STATUS.hidden++; }
+    },
   });
   root.name = 'region-props';
   root.updateMatrixWorld(true);
   scene.add(root);
   WORLD_SCENE.props = root;
+  await loadExtraReplacements(scene, replacedNodes);
   const water = await loadWorldGLB(regionWaterBin, { resolveMaterial: resolveWorldMaterial, cast: false });
   // A lâmina plana de 1 km do rio (a 10,1 m, duplicada sob o rio refeito) e os dois canais retos de
   // irrigação, que flutuavam sobre o relevo e entravam numa casa do Vale, saem da cena. A exportação

@@ -3,7 +3,8 @@ import * as THREE from 'three';
 import { G, emit, clamp, lerp, angleDiff, stat } from '../state.js';
 import { input, down, hit, releaseLook } from '../engine/input.js';
 import { groundHeight, waterAt } from '../engine/terrain.js';
-import { makeHumanoid, animateHumanoid } from '../engine/characters.js';
+import { makeHumanoid, animateHumanoid, standingDodgeFits } from '../engine/characters.js';
+import { toLocal, dodgeClip, DODGE_FACING } from '../engine/anim-select.js';
 import { OCC } from '../engine/props.js';
 import { telegraph, floatText, burst } from '../engine/fx.js';
 import { sfx } from '../engine/audio.js';
@@ -874,6 +875,10 @@ export function updatePlayer(dt) {
           P.state = 'dodge'; P.stateT = 0;
           // andando: na direção do passo; parado: na direção do cursor
           P.dodgeYaw = moving ? Math.atan2(mx, mz) : P.aimYaw;
+          // clipe escolhido uma vez, pelo sentido do passo em relação a para onde o corpo estava virado
+          const d = toLocal(P.yaw, Math.sin(P.dodgeYaw), Math.cos(P.dodgeYaw));
+          P.dodgeKey = dodgeClip(d.fwd, d.left, (k) => !!P.model.actions?.[k], standingDodgeFits(weaponFamily(P)));
+          P.dodgeVis = P.dodgeYaw - (DODGE_FACING[P.dodgeKey] || 0);
           P.yaw = P.dodgeYaw; P.cmd = null; sfx('dodge');
         }
       } else if (P.cmd && P.cmd.type === 'attack' && P.cmd.inRange) { basicAttack(P); P.aimLock = 0.6; }
@@ -943,7 +948,13 @@ export function updatePlayer(dt) {
   const r = P.model.root;
   r.position.copy(P.pos);
   if (P.mounted && G.mount) r.position.y += G.mount.model.seatY - P.model.hipsY;   // quadril do cavaleiro sobre a sela
-  r.rotation.y = P.yaw;
+  // Esquiva direcional: o corpo fica virado de forma que o clipe (de lado, para trás) mostre o mesmo
+  // sentido do deslocamento, que segue P.dodgeYaw; depois volta a P.yaw em ~0,25 s. Só o modelo gira.
+  if (P.state === 'dodge') P.visHold = 0.25;
+  else P.visHold = Math.max(0, (P.visHold || 0) - dt);
+  const visTarget = P.state === 'dodge' && P.dodgeVis != null ? P.dodgeVis : P.yaw;
+  P.visYaw = P.visHold > 0 ? lerpAngle(P.visYaw ?? P.yaw, visTarget, dt * 22) : P.yaw;
+  r.rotation.y = P.visYaw;
   let attack = -1, kind = 'swing';
   if (P.state === 'attack') { attack = Math.min(1, P.stateT / (P.act.windup + P.act.recover)); kind = P.act.kind; }
   if (P.state === 'skill') {
@@ -974,12 +985,14 @@ export function updatePlayer(dt) {
   }
   let fwd = 1, strafe = 0;
   if (moving) {
-    fwd = mx * Math.sin(P.yaw) + mz * Math.cos(P.yaw);
-    strafe = mx * Math.cos(P.yaw) - mz * Math.sin(P.yaw);
+    fwd = mx * Math.sin(P.visYaw) + mz * Math.cos(P.visYaw);
+    strafe = mx * Math.cos(P.visYaw) - mz * Math.sin(P.visYaw);
   }
   animateHumanoid(P.model, {
     dt, mps: P.mounted ? 0 : v, attack, kind, mounted: P.mounted,
     dodge: P.state === 'dodge' ? Math.min(1, P.stateT / 0.42) : -1, aim: P.aimT,
+    dodgeKey: P.state === 'dodge' ? P.dodgeKey : null,
+    hit: P.hitAt != null && G.time - P.hitAt < 3 ? { side: P.hitDir, t: G.time - P.hitAt } : null,
     aimPitch: P.aimPitch || 0,
     fwd, strafe, moveDir: moving ? [mx, mz] : null,
     down: P.state === 'down' || P.state === 'dead', channel: P.state === 'channel' && P.channel && P.channel.anim,

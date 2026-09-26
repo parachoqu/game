@@ -1,0 +1,158 @@
+{
+  "schema": "1.0.0",
+  "generated_by": "tools/build-meadow-grass.mjs",
+  "source": {
+    "asset": "Poly Haven — Grass Medium 01 (CC0)",
+    "file": "modelos 3d animados/texturas/terreno/sparse_grass/grass_medium_01_2k.fbx",
+    "scale": 2.4
+  },
+  "texture": {
+    "file": "meadow.webp",
+    "size": 1024,
+    "bytes": 397236,
+    "sha256": "d8458dc74a77058c12a2418a61a4814679609b880f9d145e389948c7a6fc73f4"
+  },
+  "model": {
+    "file": "meadow-grass.glb",
+    "bytes": 157492,
+    "sha256": "51c750e677298ca11b69e3a843df5f418c90596f9d4809fba2b1580259371abf"
+  },
+  "types": {
+    "meadow": {
+      "variants": 8,
+      "items": [
+        {
+          "source": "large_a",
+          "width": 0.784,
+          "height": 0.334,
+          "triangles": [
+            6422,
+            1926,
+            110
+          ]
+        },
+        {
+          "source": "large_b",
+          "width": 0.682,
+          "height": 0.345,
+          "triangles": [
+            4626,
+            1387,
+            110
+          ]
+        },
+        {
+          "source": "large_c",
+          "width": 0.669,
+          "height": 0.29,
+          "triangles": [
+            5945,
+            1783,
+            110
+          ]
+        },
+        {
+          "source": "mid_a",
+          "width": 0.531,
+          "height": 0.468,
+          "triangles": [
+            2287,
+            686,
+            110
+          ]
+        },
+        {
+          "source": "mid_b",
+          "width": 0.482,
+          "height": 0.419,
+          "triangles": [
+            1257,
+            377,
+            110
+          ]
+        },
+        {
+          "source": "mid_c",
+          "width": 0.487,
+          "height": 0.296,
+          "triangles": [
+            1466,
+            439,
+            110
+          ]
+        },
+        {
+          "source": "small_a",
+          "width": 0.444,
+          "height": 0.331,
+          "triangles": [
+            833,
+            249,
+            110
+          ]
+        },
+        {
+          "source": "small_b",
+          "width": 0.456,
+          "height": 0.221,
+          "triangles": [
+            653,
+            195,
+            110
+          ]
+        }
+      ],
+      "card": {
+        "images": [
+          "A",
+          "B",
+          "D"
+        ],
+        "triangles": 6
+      }
+    },
+    "meadowTall": {
+      "variants": 3,
+      "items": [
+        {
+          "source": "tall_a",
+          "width": 0.386,
+          "height": 0.761,
+          "triangles": [
+            290,
+            159,
+            60
+          ]
+        },
+        {
+          "source": "tall_b",
+          "width": 0.36,
+          "height": 0.681,
+          "triangles": [
+            310,
+            170,
+            60
+          ]
+        },
+        {
+          "source": "tall_c",
+          "width": 0.367,
+          "height": 0.553,
+          "triangles": [
+            340,
+            187,
+            60
+          ]
+        }
+      ],
+      "card": {
+        "images": [
+          "E",
+          "C",
+          "E"
+        ],
+        "triangles": 6
+      }
+    }
+  }
+}

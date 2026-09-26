@@ -252,7 +252,7 @@ export function updateEnemies(dt) {
       e.burnTick = (e.burnTick || 0) + dt;
       if (e.burnTick >= 0.5) {
         e.burnTick = 0;
-        hurtEnemy(e, 5, { byPlayer: true, burstColor: '#ff6b35' });
+        hurtEnemy(e, 5, { byPlayer: true, burstColor: '#ff6b35', dot: true });
       }
     }
     if (e.curseT > 0) e.curseT = Math.max(0, e.curseT - dt);
@@ -264,23 +264,40 @@ export function updateEnemies(dt) {
   separate();
 }
 
+// Estado entregue ao animador. Criaturas seguem o animador próprio (derrubada genérica); só os
+// humanoides recebem a reação ao golpe e a morte direcional, separada de `down` (a derrubada
+// recuperável, que os inimigos não têm).
+export function enemyAnimState(e, v, dt) {
+  if (e.model.kind === 'beast') {
+    return {
+      animator: 'beast',
+      s: {
+        dt, mps: v, down: !e.alive, stun: e.state === 'stun',
+        windup: e.state === 'windup' ? Math.min(1, e.t / e.cfg.windup) : -1,
+        attack: e.state === 'recover' && e.atk >= 0 ? e.atk : -1,
+      },
+    };
+  }
+  const ranged = e.cfg.ranged || e.cfg.weapon === 'arco';
+  let attack = -1, kind = 'swing';
+  if (e.state === 'windup') { attack = ranged ? Math.min(1, e.t / e.cfg.windup) : Math.min(0.34, e.t / e.cfg.windup * 0.34); kind = ranged ? 'bow' : 'swing'; }
+  else if (e.atk >= 0) { attack = ranged ? -1 : 0.35 + e.atk * 0.65; }
+  return {
+    animator: 'human',
+    s: {
+      dt, mps: v, down: false, attack, kind, channel: false, dodge: -1,
+      death: e.alive ? null : { fall: e.deathDir || 'backward', t: e.t },
+      hit: e.alive && e.hitAt != null && G.time - e.hitAt < 3 ? { side: e.hitDir, t: G.time - e.hitAt } : null,
+    },
+  };
+}
+
 function animate(e, v, dt) {
   const r = e.model.m.root;
   r.position.copy(e.pos);
   r.rotation.y = e.yaw;
   const k = 1 + e.hurtT * 0.5; r.scale.setScalar(k);
-  const speed = Math.min(1, v / Math.max(1, e.cfg.speed));
-  if (e.model.kind === 'beast') {
-    animateBeast(e.model.m, {
-      dt, mps: v, down: !e.alive, stun: e.state === 'stun',
-      windup: e.state === 'windup' ? Math.min(1, e.t / e.cfg.windup) : -1,
-      attack: e.state === 'recover' && e.atk >= 0 ? e.atk : -1,
-    });
-  } else {
-    const ranged = e.cfg.ranged || e.cfg.weapon === 'arco';
-    let attack = -1, kind = 'swing';
-    if (e.state === 'windup') { attack = ranged ? Math.min(1, e.t / e.cfg.windup) : Math.min(0.34, e.t / e.cfg.windup * 0.34); kind = ranged ? 'bow' : 'swing'; }
-    else if (e.atk >= 0) { attack = ranged ? -1 : 0.35 + e.atk * 0.65; }
-    animateHumanoid(e.model.m, { dt, mps: v, down: !e.alive, attack, kind, channel: false, dodge: -1 });
-  }
+  const { animator, s } = enemyAnimState(e, v, dt);
+  if (animator === 'beast') animateBeast(e.model.m, s);
+  else animateHumanoid(e.model.m, s);
 }

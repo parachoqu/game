@@ -11,6 +11,15 @@ import { moveEntity, testPoint } from './collide.js';
 import { knockDown, stagger, dismount, cancelChannel } from './player.js';
 import { createLootBag } from './zones.js';
 import { toast } from '../ui/hud.js';
+import { hitSide, deathFall } from '../engine/anim-select.js';
+
+// Reação visual a um golpe (só o animador lê): lado de onde veio, no referencial da vítima, e o
+// instante. Um golpe novo em menos de 0,35 s não reinicia a reação que acabou de começar.
+function markHit(v, yaw, from) {
+  if (v.hitAt != null && G.time - v.hitAt < 0.35) return;
+  v.hitDir = hitSide(yaw, v.pos.x, v.pos.z, from);
+  v.hitAt = G.time;
+}
 
 export const inCombat = () => G.time - G.player.lastCombat < 5;
 
@@ -31,6 +40,7 @@ export function hurtPlayer(dmg, src) {
   if (P.mounted) { dismount(P, true); toast('Você foi derrubado da montaria.', 'warn'); stagger(P, 0.5); }
   cancelChannel(P, 'Interrompido');
   P.hp -= d;
+  if (d > 0) markHit(P, P.yaw, src);
   wear(P.equip.armor, 1.2);
   if (d > 0) {
     sfx('hurt');
@@ -45,6 +55,9 @@ export function hurtEnemy(e, dmg, opts = {}) {
   if (!e.alive) return false;
   if (e.curseT > 0) dmg *= 1.35;
   dmg = Math.round(dmg);
+  // lado do golpe medido antes do empurrão; dano contínuo (queimadura) não faz o corpo reagir
+  if (!opts.dot) markHit(e, e.yaw, opts.from);
+  if (e.hp - dmg <= 0) e.deathDir = deathFall(e.yaw, e.pos.x, e.pos.z, opts.from);
   e.hp -= dmg; e.hurtT = 0.18; showBar(e);
   floatText(e.pos.x, e.pos.y + (e.barY || 2.4), e.pos.z, String(dmg), opts.big ? 'crit' : 'dmg');
   burst(e.pos.x, e.pos.y + 1.1, e.pos.z, opts.burstColor || (e.faction === 'shadow' ? '#b48cff' : '#e8c070'), 6, 4);

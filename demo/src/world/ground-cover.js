@@ -12,6 +12,8 @@
 //   cogumelos colônias no chão da mata
 //   seixos    margens, beira de estrada e chão de rocha
 //   galhos    chão da mata e Ermos
+//   campo     grama de campo (Poly Haven) no chão verde entre as manchas, onde antes só havia a
+//             textura do terreno; touceiras altas com pendão em colônias
 // Nada nasce na água, na pista, no tabuleiro e na rampa das pontes, na pegada das construções, no
 // calçamento das praças nem nos pontos de interação e coleta.
 import * as THREE from 'three';
@@ -20,12 +22,15 @@ import { U } from '../engine/materials.js';
 import { regionHeightAt, biomeAt, isWaterCell, wetnessAt, waterLevelAt } from './heightfield.js';
 import { lowGapExact, ringAt, routeEdgeAt } from './functional-areas.js';
 import { forestDensity, grassPatch, inWastes, slopeHere } from './vegetation-fields.js';
+import { greenGroundAt } from './scene-world.js';
 import { rng, hash2, vnoise, fbm2, smoothstep, lerp } from './noise.js';
 
 export const CELL = 32;
 const NC = 1024 / CELL;
-const KINDS = ['grass', 'flower', 'mushroom', 'pebble', 'branch'];
-const CAP = { grass: 1500, flower: 260, mushroom: 110, pebble: 240, branch: 80 };
+const KINDS = ['grass', 'flower', 'mushroom', 'pebble', 'branch', 'meadow', 'meadowTall'];
+const CAP = { grass: 1500, flower: 260, mushroom: 110, pebble: 240, branch: 80, meadow: 1300, meadowTall: 220 };
+// tipos com uma variante sorteada por célula (a vizinha usa outra)
+const VARIANTS = { pebble: 5, meadow: 8, meadowTall: 3 };
 
 export const COVER = { radius: 84, density: 1, scene: null, seeds: null, cells: new Map(), pool: [], generated: 0, ms: 0 };
 
@@ -50,7 +55,8 @@ function seedBoost(x, z) {
 export function generateCell(ci, cj) {
   const R = rng((hash2(ci, cj, 7771) * 4294967296) | 0);
   const x0 = -512 + ci * CELL, z0 = -512 + cj * CELL;
-  const out = { grass: [], flower: [], mushroom: [], pebble: [], branch: [], pebbleVariant: Math.floor(hash2(ci, cj, 91) * 5) };
+  const out = { grass: [], flower: [], mushroom: [], pebble: [], branch: [], meadow: [], meadowTall: [], variant: {} };
+  for (const [k, n] of Object.entries(VARIANTS)) out.variant[k] = Math.floor(hash2(ci, cj, 91 + n) * n);
   // densidade de mata numa grade de 4 m (a mais cara das consultas), amostrada por bilinear
   const S = 4, M = CELL / S + 1;
   const Fg = new Float32Array(M * M);
@@ -66,16 +72,19 @@ export function generateCell(ci, cj) {
   const free = (x, z, road = 0.25, low = 0.3) => inRegion(x, z) && !isWaterCell(x, z) && routeEdgeAt(x, z) > road && lowGapExact(x, z) > low;
   const tone = (base, j) => base.map((v) => v * (1 + (R() - 0.5) * j));
 
+  // limiar das manchas de grama: abaixo dele o campo de manchas não chega a formar touceira
+  const patchT = (x, z, b, f, wet) => 0.37 + 0.05 * smoothstep(0.55, 0.95, f) - 0.07 * wet + (b === 4 ? 0.05 : 0)
+    + (b === 2 ? 0.13 : 0) + (inWastes(x, z) ? 0.17 : 0) - 0.07 * ringAt(x, z) - (routeEdgeAt(x, z) < 2.5 ? 0.06 : 0);
+
   // grama: touceiras de 3–5 tufos
   const GS = 1.1;
   for (let gz = 0; gz < CELL / GS; gz++) for (let gx = 0; gx < CELL / GS; gx++) {
     const x = x0 + (gx + R()) * GS, z = z0 + (gz + R()) * GS;
     const roll = R();
     if (!free(x, z)) continue;
-    const b = biomeAt(x, z), f = F(x, z), wet = wetnessAt(x, z), ring = ringAt(x, z), edge = routeEdgeAt(x, z);
+    const b = biomeAt(x, z), f = F(x, z), wet = wetnessAt(x, z);
     const dry = b === 4 || inWastes(x, z);
-    let t = 0.37 + 0.05 * smoothstep(0.55, 0.95, f) - 0.07 * wet + (b === 4 ? 0.05 : 0) + (b === 2 ? 0.13 : 0)
-      + (inWastes(x, z) ? 0.17 : 0) - 0.07 * ring - (edge < 2.5 ? 0.06 : 0);
+    const t = patchT(x, z, b, f, wet);
     const g = grassPatch(x, z) + seedBoost(x, z);
     // entre as manchas, uma franja esparsa de touceiras: o chão nunca fica liso
     if (g < t - 0.09) continue;
@@ -95,6 +104,31 @@ export function generateCell(ci, cj) {
         sy: s * (lush > 0.5 ? 1.5 + R() * 0.4 : 0.85 + R() * 0.35), rot: R() * Math.PI * 2, c: tone(base, 0.16),
       });
     }
+  }
+
+  // grama de campo: preenche o chão verde entre as manchas (e rareia dentro delas, onde a grama do
+  // kit já cobre). Nada no chão batido, no calçamento, na rocha, na margem nem sob a mata fechada.
+  const MG = 0.9;
+  for (let gz = 0; gz < CELL / MG; gz++) for (let gx = 0; gx < CELL / MG; gx++) {
+    const x = x0 + (gx + R()) * MG, z = z0 + (gz + R()) * MG;
+    const roll = R(), pick = R();
+    if (!free(x, z, 0.8, 0.5)) continue;
+    const b = biomeAt(x, z);
+    if (b === 2 || b === 4 || inWastes(x, z)) continue;
+    const f = F(x, z), wet = wetnessAt(x, z);
+    const g = grassPatch(x, z) + seedBoost(x, z);
+    const t = patchT(x, z, b, f, wet);
+    const gap = 1 - smoothstep(t - 0.12, t + 0.01, g);
+    const dens = 0.9 * gap * (1 - 0.85 * smoothstep(0.45, 0.85, f)) * (1 - smoothstep(0.3, 0.6, wet));
+    if (roll > dens) continue;
+    const green = greenGroundAt(x, z);
+    if (green < 0.55 || roll > dens * smoothstep(0.55, 0.8, green) || slopeHere(x, z) > 1.1) continue;
+    const tall = pick < 0.4 && vnoise(x / 9, z / 9, 89) > 0.6;
+    const s = tall ? 0.8 + R() * 0.4 : 0.75 + R() * 0.55;
+    const base = [0.9 + 0.1 * vnoise(x / 30, z / 30, 97), 0.95, 0.84];
+    (tall ? out.meadowTall : out.meadow).push({
+      x, y: regionHeightAt(x, z) - 0.03, z, s, sy: s * (0.85 + R() * 0.3), rot: R() * Math.PI * 2, c: tone(base, 0.14),
+    });
   }
 
   // flores em colônias
@@ -177,8 +211,10 @@ function makeCell() {
   const kinds = {};
   for (const k of KINDS) {
     const mat = attr(CAP[k], 16), col = attr(CAP[k], 3);
-    const lv = {};
-    for (const [key, level] of [['near', 1], ['far', 2]]) {
+    const lv = { near: [], far: [] };
+    // sem a grama de campo carregada, os tipos dela ficam sem malha (e nada é desenhado)
+    const have = !k.startsWith('meadow') || PR.KIT.has?.(k);
+    for (const [key, level] of have ? [['near', 1], ['far', 2]] : []) {
       lv[key] = PR.levelParts(k, 0, level).map(([geo, material]) => {
         const im = new THREE.InstancedMesh(geo, material, CAP[k]);
         im.instanceMatrix = mat; im.instanceColor = col;
@@ -209,10 +245,10 @@ function fill(cell, ci, cj) {
     });
     slot.n = list.length;
     for (const a of [slot.mat, slot.col]) { a.clearUpdateRanges(); a.addUpdateRange(0, Math.max(1, list.length) * a.itemSize); a.needsUpdate = true; }
-    if (k === 'pebble' && data.pebbleVariant !== slot.variant) {
-      slot.variant = data.pebbleVariant;
+    if (VARIANTS[k] && data.variant[k] !== slot.variant) {
+      slot.variant = data.variant[k];
       for (const [key, level] of [['near', 1], ['far', 2]]) {
-        const parts = PR.levelParts('pebble', slot.variant, level);
+        const parts = PR.levelParts(k, slot.variant, level);
         slot.lv[key].forEach((im, p) => { if (parts[p]) im.geometry = parts[p][0]; });
       }
     }

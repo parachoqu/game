@@ -43,6 +43,27 @@ solta a corda no instante em que a flecha sai; andando, o tronco e os braços se
 caminhada. Ao trocar algum desses arquivos: `node tools/process-animations.mjs --extra` e
 `node build.mjs`. Sem os arquivos, as mecânicas continuam funcionando com a pose normal.
 
+**Movimento e reações de combate.** Um lote de 20 clipes do Mixamo (`modelos 3d animados/animacoes/
+mixamo-combate-2026-09-26`, listado em `tools/combat-manifest.mjs`) dá aos três humanos (Paladina,
+Kachujin e Eve) e aos inimigos e guardas humanoides:
+- **Passo direcional:** mirando ou em luta, andar para trás e de lado usa passos próprios; nas
+  diagonais os dois passos vizinhos se misturam, na mesma fase do pé.
+- **Esquiva (C) direcional:** o corpo continua virado para o alvo e o clipe mostra o passo para
+  frente, para trás ou de lado. Esses clipes foram gravados segurando um arco: valem com arco, sem
+  arma e com besta; com as outras armas a esquiva é o rolamento de sempre. A física da esquiva (0,34 s
+  de deslocamento, invulnerável até 0,28 s, fim em 0,42 s) não mudou.
+- **Reação ao golpe e morte:** a reação vem pelo lado de onde veio o golpe (frente, trás, esquerda,
+  direita), sem mudar dano, empurrão nem atordoamento. Inimigos humanoides caem para trás quando
+  atingidos pela frente e para frente quando atingidos por trás. As criaturas seguem com a animação
+  própria.
+- **Agachar e levantar parado:** toca a transição de postura sem atrasar o controle.
+
+Ficam carregados e validados, mas sem uso, os quatro clipes de espada e escudo (o jogo não tem
+escudo) e o levantar (`getUp`): a pose de derrubado atual não é deitada, então ele começaria
+com um salto. Para reconverter o lote: `node tools/process-animations.mjs --combat`. O comando só
+escreve quando as 20 conversões passam na validação e sai com erro se faltar ou mudar uma fonte.
+Depois vem `node build.mjs`. Os testes do lote: `node tools/run-animation-tests.mjs`.
+
 A interface usa um desenho de peças forjadas — molduras de ferro com fio de bronze, rebites nos cantos, placas gravadas e barras em canaleta —, e o Livro continua em velino, agora com cantoneiras de metal. O mundo é montado numa tela de carregamento própria, que mostra as cinco fases, o avanço e as regras das zonas enquanto trabalha; a tela inicial só aparece quando tudo está pronto.
 
 ## Gráficos
@@ -144,6 +165,37 @@ Ele lê o `.unitypackage` sem alterá-lo, converte os modelos com o FBX2glTF, mo
 detalhe por tipo, recomprime as texturas em WebP e reduz o HDRI do céu. A opção `--no-sky` pula a
 redução do HDRI, que é o passo lento.
 
+Os assets extras vêm dos originais em `../modelos 3d animados/extras-2026-09-26/`:
+- **Trocas só visuais:** toda construção do cenário (prédios, ruínas, pontes, torres e doca) usa um modelo novo. O nó original fica invisível e o modelo novo entra na mesma caixa; colisão, tabuleiro, rampas e parapeitos continuam os do manifesto. A lista está em `REPLACEMENTS` (`src/world/extra-props.js`):
+  - pontes principal e secundária: a ponte de pedra, com a pista nivelada ao tabuleiro;
+  - Vale: casas do conjunto 32 e a casa de pedra do conjunto de moinhos, o prédio de pedra e madeira no armazém, a ferraria na oficina, a casa de palha no estábulo, bancas do kit Kenney no mercado e um cais do mesmo kit na doca;
+  - Entreposto Alto: as casas de palha; torres de posto: as torres de castelo;
+  - Ermos: muros do kit Kenney nas ruínas 01 e 02 e a torre com escombros na 03.
+- **Objetos montados pelo jogo:** as barracas do Alto viram bancas do kit Kenney e a ruína de vigia da Passagem vira a torre com escombros (`extraModel` em `src/world/extra-props.js`). Sem o modelo, o jogo volta à peça procedural; colisores, vendedores e pontos de interação não mudam.
+- **Acréscimos:** um poço em cada entreposto, o moinho nos campos do Sul, a ponte em ruína nos Ermos e duas árvores-marco (Bosque das Forjas e margem do rio). Os pontos são escolhidos em `src/world/extra-spots.js`, longe das estradas, dos objetos de jogo e da coleta.
+- **Garras:** usam o corpo do cão do vazio, que flutua por animação procedural; vida, dano, IA e pele não mudaram.
+- **Armas:** 15 famílias usam os modelos do pacote PurePoly, com as cores planas das armas antigas; maça, besta e metamorfose seguem procedurais.
+
+Quando algum original mudar (precisa do Blender em `PATH` ou em `BLENDER_BIN`):
+
+```bash
+node demo/tools/build-extra-assets.mjs
+```
+
+A ferramenta extrai cada original num temporário, converte (FBX2glTF; Blender para `.blend` e para reduzir as malhas geradas por IA; o leitor USD do three.js para o USDZ), reduz texturas a WebP e grava `assets/extra-props/` com o manifesto de origem (arquivo, sha256, autor, licença) e o registro `src/engine/extra-assets.js`.
+
+A grama de campo que cobre o chão verde entre as manchas de grama do kit vem do **Grass Medium 01**
+do Poly Haven (`../modelos 3d animados/texturas/terreno/sparse_grass/grass_medium_01_2k.fbx`, que
+na verdade é o ZIP do download). Quando ele mudar:
+
+```bash
+node demo/tools/build-meadow-grass.mjs
+```
+
+A ferramenta gera 11 touceiras em três níveis (lâminas, lâminas maiores e cartões cruzados com as
+fotos do próprio atlas) e um atlas em cinza de detalhe; o tom vem do material, na mesma família de
+verde da grama do kit.
+
 Ele valida o manifesto de origem, confere o heightfield contra os 16 blocos exportados e grava
 `assets/world-runtime/` (manifesto compacto, heightfields, máscaras e GLB otimizados com meshopt).
 Nunca escreve em `blender-world/`. Os testes dos contratos do mundo rodam com:
@@ -175,11 +227,20 @@ cd demo/tools && npm install && node build-assets.mjs
 
 O pipeline converte os FBX com FBX2glTF e otimiza com glTF-Transform, meshoptimizer e sharp (ver `tools/build-assets.mjs`). O build do jogo embute os GLBs no HTML.
 
+**Atenção:** `build-assets.mjs` apaga `demo/assets/` inteiro antes de escrever, inclusive
+`world-runtime/`, `nature-kit/`, `meadow-grass/` e as animações geradas pelos outros comandos. Para
+animações use `tools/process-animations.mjs` (com `--extra` ou `--combat` para um grupo só).
+
 Adicionar `?debug=1` ao endereço expõe `window.__demo` (teleporte, itens, forçar portal, noite, estrelas, câmera livre e estado do mundo) e desenha os limites, âncoras, rotas e colisores do cenário.
 
 ## Créditos dos modelos 3D
 
 - Natureza do cenário (árvores, arbustos, grama, flores, cogumelos, pedras, penhascos, troncos, tocos, camadas do terreno, água e o HDRI do céu): **Ultimate Nature – Starter**, de [Innerverse Interactive](https://tinyurl.com/InnerverseInteractive), distribuído pela Unity Asset Store. Os arquivos originais não são alterados nem redistribuídos; o que entra no HTML são derivados convertidos e recomprimidos. O uso fora da Unity depende da licença adquirida.
+- Grama de campo: **Grass Medium 01**, do [Poly Haven](https://polyhaven.com/a/grass_medium_01), licença CC0.
+- Poço: **Medieval Stone Well - Game Prop**, de [Pigcraft](https://sketchfab.com/s8819296), [Sketchfab](https://sketchfab.com/3d-models/medieval-stone-well-game-prop-a0ca279889b84afb9f24b88bff9c6860), licença [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/). Malha reduzida e texturas recomprimidas.
+- Ponte em ruína: **Ruined Stone Bridge, Broken Arch**, de [Pigcraft](https://sketchfab.com/s8819296), [Sketchfab](https://sketchfab.com/3d-models/ruined-stone-bridge-broken-arch-57fa861b90ff4793bccf7930a43c8bd0), licença [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/). Malha reduzida e texturas recomprimidas.
+- Bancas, cais e muros: peças do **Retro Fantasy Kit**, de [Kenney](https://kenney.nl), licença [CC0](https://creativecommons.org/publicdomain/zero/1.0/) (crédito voluntário).
+- Com direito de uso informado pelo usuário em 26/09/2026 (licença a confirmar na página de origem de cada um): **Stone Bridge**; **Medieval Straw House**; **The Blacksmiths**; **Free Fantasy Castle Towers**; **Free Windmills Set**; **Fantasy Architecture Set 32**; **HighPoly Tree Model**, de [Next Spring](https://www.fab.com/sellers/Next%20Spring) (Fab); **Void Hound** (Fab); **Free Fantasy RPG Weapons**, da PurePoly. Autor, arquivo e hash de cada derivado ficam em `assets/extra-props/extra-props-manifest.json`.
 - Materiais fotográficos de terreno, rochas, cascas e folhagens: [Poly Haven](https://polyhaven.com), licença [CC0](https://creativecommons.org/publicdomain/zero/1.0/). A relação de arquivos, URLs de origem e hashes fica em `../modelos 3d animados/texturas/manifesto.json`.
 - “Kachujin G Rosales”, “Eve By J.Gonzales” e a animação “Unarmed Walk Forward”: [Mixamo](https://www.mixamo.com) (Adobe).
 - “HORSE - Realistic 3D Model (DEMO FREE)” e “LIONESS - Realistic 3D Model (DEMO FREE)”: [WildMesh 3D](https://sketchfab.com/WildMesh_3D), licença [CC BY-NC 4.0](http://creativecommons.org/licenses/by-nc/4.0/). Uso não comercial, com crédito ao autor. Os modelos foram reduzidos e comprimidos para esta demo.

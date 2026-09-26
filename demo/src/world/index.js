@@ -12,10 +12,11 @@ import { decoderReady } from './runtime-loader.js';
 import { installNatureKit, KIT_STATUS } from './nature-kit.js';
 import { bakeImpostors, IMPOSTOR_STATUS } from './impostors.js';
 import { RIVER } from './heightfield.js';
+import { loadExtraAdditions, EXTRA_STATUS } from './extra-props.js';
 
 export const WORLD_STATUS = {
   loaded: false, layoutVersion: WORLD.world_layout_version,
-  colliders: 0, bridges: 0, instances: null, kit: null, timings: {},
+  colliders: 0, bridges: 0, instances: null, kit: null, timings: {}, extras: EXTRA_STATUS,
 };
 
 const tick = () => new Promise((r) => setTimeout(r, 0));
@@ -62,6 +63,12 @@ export async function loadWorldScene(scene, progress, { density = 1, debug = fal
   progress?.('vegetação instanciada');
   buildRegionInstances(scene, { density });
   mark('instances', t);
+  await tick();
+
+  t = performance.now();
+  progress?.('marcos e acréscimos');
+  await loadExtraAdditions(scene);
+  mark('extras', t);
   await tick();
 
   t = performance.now();

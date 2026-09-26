@@ -1,25 +1,46 @@
-// Processa animações Mixamo FBX em GLBs otimizados
-import { execFileSync } from 'node:child_process';
-import { mkdirSync, statSync, rmSync, existsSync, writeFileSync } from 'node:fs';
+// Processa animações Mixamo FBX em GLBs otimizados.
+//
+//   node tools/process-animations.mjs            biblioteca principal + clipes opcionais (gera src/engine/extra-clips.js)
+//   node tools/process-animations.mjs --extra    só os clipes opcionais (gera src/engine/extra-clips.js)
+//   node tools/process-animations.mjs --combat   só o lote COMBAT_2026_09_26 (gera src/engine/combat-clips.js)
+//   ... --dry-run                                converte e valida sem escrever em assets/, glb/ nem src/
+//
+// Os modos são exclusivos. Qualquer falha termina com código diferente de zero; no modo --combat nada
+// é escrito enquanto as 20 conversões não passarem todas na validação, então um GLB antigo nunca fica
+// no lugar de um que falhou.
+import { mkdirSync, statSync, rmSync, existsSync, writeFileSync, copyFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, dirname } from 'node:path';
+import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { resample, prune, dedup, meshopt } from '@gltf-transform/functions';
 import { MeshoptEncoder, MeshoptDecoder } from 'meshoptimizer';
+import {
+  FBX2GLTF, fbx, dur, dropEmptyAnimations, removeMeshes, stripToSkeleton, dropStaticChannels,
+  inPlace, lockHipsXZ, motionWindow, capFps, dropOrphans, airborne, validateClipDoc, clipFingerprint, sha256, sha256File, hipsRestY,
+} from './anim-pipeline.mjs';
+import { COMBAT_2026_09_26, COMBAT_BATCH, COMBAT_DIR } from './combat-manifest.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const SRC_ANIM = join(HERE, '../../modelos 3d animados/animacoes');
-const OUT_GLB_LIB = join(HERE, '../../modelos 3d animados/animacoes/glb');
-const OUT_ASSETS = join(HERE, '../assets');
+// ANIM_SRC_DIR troca a pasta das fontes (usado pelos testes, sempre junto de --dry-run)
+const SRC_ANIM = process.env.ANIM_SRC_DIR ? resolve(process.env.ANIM_SRC_DIR) : join(HERE, '../../modelos 3d animados/animacoes');
 const TMP = join(tmpdir(), 'rpg-anims-tmp');
 
-const FBX2GLTF = join(HERE, 'node_modules/fbx2gltf/bin', process.platform === 'win32' ? 'Windows_NT' : process.platform === 'darwin' ? 'Darwin' : 'Linux', process.platform === 'win32' ? 'FBX2glTF.exe' : 'FBX2glTF');
+// ---------------------------------------------------------------- argumentos
+const KNOWN = new Set(['--extra', '--combat', '--dry-run']);
+const args = process.argv.slice(2);
+const unknown = args.filter((a) => !KNOWN.has(a));
+if (unknown.length) { console.error(`process-animations: opção desconhecida: ${unknown.join(' ')}`); process.exit(2); }
+const onlyExtra = args.includes('--extra'), combat = args.includes('--combat'), dryRun = args.includes('--dry-run');
+if (onlyExtra && combat) { console.error('process-animations: --extra e --combat são exclusivos'); process.exit(2); }
+if (process.env.ANIM_SRC_DIR && !dryRun) { console.error('process-animations: ANIM_SRC_DIR só vale com --dry-run'); process.exit(2); }
 
-mkdirSync(OUT_GLB_LIB, { recursive: true });
-mkdirSync(OUT_ASSETS, { recursive: true });
-mkdirSync(TMP, { recursive: true });
+const OUT_GLB_LIB = dryRun ? join(TMP, 'dry-glb') : join(HERE, '../../modelos 3d animados/animacoes/glb');
+const OUT_ASSETS = dryRun ? join(TMP, 'dry-assets') : join(HERE, '../assets');
+const OUT_SRC = dryRun ? join(TMP, 'dry-src') : join(HERE, '../src/engine');
+if (!existsSync(FBX2GLTF)) { console.error(`process-animations: FBX2glTF não encontrado em ${FBX2GLTF} (rode: cd tools && npm install)`); process.exit(1); }
+for (const d of [OUT_GLB_LIB, OUT_ASSETS, OUT_SRC, TMP]) mkdirSync(d, { recursive: true });
 
 await MeshoptEncoder.ready;
 await MeshoptDecoder.ready;
@@ -28,128 +49,27 @@ const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies(
   'meshopt.decoder': MeshoptDecoder
 });
 
-function fbx(file, name) {
-  const out = join(TMP, name);
-  if (existsSync(out + '.glb')) rmSync(out + '.glb');
-  execFileSync(FBX2GLTF, ['--binary', '--input', file, '--output', out], { stdio: 'ignore' });
-  return out + '.glb';
+async function optimize(doc) {
+  capFps(doc, 30);
+  await doc.transform(resample({ tolerance: 2e-4 }), dedup(), prune({ keepLeaves: true }));
+  dropOrphans(doc);
+  await doc.transform(meshopt({ encoder: MeshoptEncoder, level: 'medium', quantizationVolume: 'mesh' }));
+  dropOrphans(doc);
 }
 
-const dur = (a) => Math.max(0, ...a.listSamplers().map((s) => s.getInput().getMax([])[0]));
-
-function disposeAnim(a) {
-  for (const c of a.listChannels()) c.dispose();
-  for (const s of a.listSamplers()) s.dispose();
-  a.dispose();
-}
-function dropEmptyAnimations(doc) {
-  for (const a of doc.getRoot().listAnimations()) if (dur(a) <= 0) disposeAnim(a);
-}
-
-function removeMeshes(doc) {
-  for (const n of doc.getRoot().listNodes()) {
-    n.setMesh(null);
-    n.setSkin(null);
-  }
-}
-
-function dropStaticChannels(doc, { keepTranslation = /./, dropScale = true } = {}) {
-  let n = 0;
-  for (const a of doc.getRoot().listAnimations()) for (const c of a.listChannels()) {
-    const node = c.getTargetNode(), path = c.getTargetPath(), s = c.getSampler();
-    if (!node) continue;
-    if (path === 'scale' && dropScale) { c.dispose(); n++; continue; }
-    if (path === 'translation' && !keepTranslation.test(node.getName())) { c.dispose(); n++; continue; }
-    const v = s.getOutput().getArray(), k = s.getOutput().getElementSize();
-    const rest = path === 'rotation' ? node.getRotation() : path === 'translation' ? node.getTranslation() : path === 'scale' ? node.getScale() : null;
-    if (!rest) continue;
-    let flat = true;
-    for (let i = k; i < v.length && flat; i++) if (Math.abs(v[i] - v[i % k]) > 1e-4) flat = false;
-    if (!flat) continue;
-    let same = true;
-    for (let j = 0; j < k; j++) if (Math.abs(v[j] - rest[j]) > 1e-4 && !(path === 'rotation' && Math.abs(v[j] + rest[j]) < 1e-4)) same = false;
-    if (same) { c.dispose(); n++; }
-  }
-  for (const a of doc.getRoot().listAnimations()) for (const s of a.listSamplers()) if (!a.listChannels().some((c) => c.getSampler() === s)) s.dispose();
-  return n;
-}
-
-function sample(s, t) {
-  const ti = s.getInput().getArray(), v = s.getOutput().getArray(), k = s.getOutput().getElementSize();
-  let i = 0; while (i < ti.length - 1 && ti[i + 1] < t) i++;
-  const j = Math.min(i + 1, ti.length - 1), f = ti[j] > ti[i] ? Math.min(1, Math.max(0, (t - ti[i]) / (ti[j] - ti[i]))) : 0;
-  const out = new Array(k);
-  let dot = 0; if (k === 4) for (let c = 0; c < 4; c++) dot += v[i * 4 + c] * v[j * 4 + c];
-  const sgn = k === 4 && dot < 0 ? -1 : 1;
-  for (let c = 0; c < k; c++) out[c] = v[i * k + c] * (1 - f) + v[j * k + c] * f * sgn;
-  if (k === 4) { const l = Math.hypot(...out); for (let c = 0; c < 4; c++) out[c] /= l; }
-  return out;
-}
-
-function crop(doc, anim, a, b, fps = 30) {
-  const n = Math.round((b - a) * fps) + 1;
-  for (const s of anim.listSamplers()) {
-    const k = s.getOutput().getElementSize(), times = new Float32Array(n), vals = new Float32Array(n * k);
-    for (let i = 0; i < n; i++) { const t = a + (b - a) * i / (n - 1); times[i] = t - a; vals.set(sample(s, t), i * k); }
-    s.setInput(doc.createAccessor().setType('SCALAR').setArray(times).setBuffer(s.getInput().getBuffer()));
-    s.setOutput(doc.createAccessor().setType(k === 4 ? 'VEC4' : 'VEC3').setArray(vals).setBuffer(s.getOutput().getBuffer()));
-    s.setInterpolation('LINEAR');
-  }
-}
-
-function inPlace(anim, rootRe) {
-  for (const c of anim.listChannels()) {
-    if (c.getTargetPath() !== 'translation' || !rootRe.test(c.getTargetNode().getName())) continue;
-    const s = c.getSampler(), t = s.getInput().getArray(), v = s.getOutput().getArray().slice(), T = t[t.length - 1] || 1;
-    const last = t.length - 1, dx = v[last * 3] - v[0], dz = v[last * 3 + 2] - v[2];
-    for (let i = 0; i < t.length; i++) { v[i * 3] -= dx * t[i] / T; v[i * 3 + 2] -= dz * t[i] / T; }
-    s.getOutput().setArray(v);
-  }
-}
-
-function capFps(doc, fps = 30) {
-  for (const a of doc.getRoot().listAnimations()) {
-    const d = dur(a), keys = Math.max(...a.listSamplers().map((s) => s.getInput().getCount()));
-    if (d > 0 && keys / d > fps * 1.2) crop(doc, a, 0, d, fps);
-  }
-}
-
-function dropOrphans(doc) {
-  for (const a of doc.getRoot().listAccessors()) if (a.listParents().every((p) => p === doc.getRoot())) a.dispose();
-}
-
-// Pulo: só o trecho no ar interessa (a subida e a queda vêm da física do jogo). A decolagem e o pouso
-// são os instantes em que o quadril passa 4 % acima da altura em pé; depois disso a altura do quadril
-// é fixada na de pé, para o corpo não subir duas vezes (clipe + física). O que sobra é a pose: pernas
-// recolhidas, braços e tronco.
-function airborne(doc, anim) {
-  const ch = anim.listChannels().find((c) => c.getTargetPath() === 'translation' && /Hips$/.test(c.getTargetNode().getName()));
-  if (!ch) return null;
-  const node = ch.getTargetNode(), rest = node.getTranslation()[1];
-  const s = ch.getSampler(), t = s.getInput().getArray(), v = s.getOutput().getArray();
-  let a = -1, b = -1;
-  for (let i = 0; i < t.length; i++) if (v[i * 3 + 1] > rest * 1.04) { if (a < 0) a = t[i]; b = t[i]; }
-  if (a < 0 || b <= a) return null;
-  const T = dur(anim);
-  crop(doc, anim, Math.max(0, a - 0.05), Math.min(T, b + 0.05));
-  const out = s.getOutput().getArray().slice();
-  for (let i = 0; i < out.length / 3; i++) out[i * 3 + 1] = rest;
-  s.getOutput().setArray(out);
-  return { takeoff: a, landing: b };
-}
-
+// ---------------------------------------------------------------- biblioteca e opcionais
 async function convertClip(srcFile, destName, clipName, opts = {}) {
   const fullSrc = join(SRC_ANIM, srcFile);
-  if (opts.optional && !existsSync(fullSrc)) { console.log(`- ${clipName.padEnd(12)} (sem ${srcFile}: pulado)`); return false; }
-  const tmpGlb = fbx(fullSrc, destName);
+  if (!existsSync(fullSrc)) {
+    if (opts.optional) { console.log(`- ${clipName.padEnd(12)} (sem ${srcFile}: pulado)`); return false; }
+    throw new Error(`fonte ausente: ${srcFile}`);
+  }
+  const tmpGlb = fbx(fullSrc, TMP, destName);
   const doc = await io.read(tmpGlb);
   dropEmptyAnimations(doc);
   removeMeshes(doc);
   const anims = doc.getRoot().listAnimations();
-  if (!anims.length) {
-    console.error('Sem animações em:', srcFile);
-    return;
-  }
+  if (!anims.length) throw new Error(`sem animações em ${srcFile}`);
   const anim = anims[0];
   anim.setName(clipName);
   dropStaticChannels(doc, { keepTranslation: /Hips$/ });
@@ -159,11 +79,7 @@ async function convertClip(srcFile, destName, clipName, opts = {}) {
     if (cut) console.log(`  ${clipName}: trecho no ar de ${cut.takeoff.toFixed(2)} s a ${cut.landing.toFixed(2)} s`);
     else console.log(`  ${clipName}: quadril não sai do chão; clipe mantido inteiro`);
   }
-  capFps(doc, 30);
-  await doc.transform(resample({ tolerance: 2e-4 }), dedup(), prune({ keepLeaves: true }));
-  dropOrphans(doc);
-  await doc.transform(meshopt({ encoder: MeshoptEncoder, level: 'medium', quantizationVolume: 'mesh' }));
-  dropOrphans(doc);
+  await optimize(doc);
 
   const outLib = join(OUT_GLB_LIB, destName + '.glb');
   const outAsset = join(OUT_ASSETS, destName + '.glb');
@@ -212,19 +128,133 @@ function writeExtraManifest() {
     `export default { ${present.map(([, , name]) => name).join(', ')} };`,
     '',
   ];
-  writeFileSync(join(HERE, '../src/engine/extra-clips.js'), lines.join('\n'));
+  writeFileSync(join(OUT_SRC, 'extra-clips.js'), lines.join('\n'));
   console.log(`extra-clips.js: ${present.length ? present.map(([, , n]) => n).join(', ') : 'nenhum clipe opcional'}`);
 }
 
-// `--extra`: só os clipes opcionais (não refaz os demais)
-const onlyExtra = process.argv.includes('--extra');
-console.log('Iniciando processamento das animações 3D...');
-for (const [src, dest, name, opts] of [...(onlyExtra ? [] : LIST), ...EXTRA]) {
-  try {
-    await convertClip(src, dest, name, opts);
-  } catch (err) {
-    console.error(`Erro ao converter ${src}:`, err.message);
+async function runLibrary() {
+  const failed = [];
+  console.log('Iniciando processamento das animações 3D...');
+  for (const [src, dest, name, opts] of [...(onlyExtra ? [] : LIST), ...EXTRA]) {
+    try {
+      await convertClip(src, dest, name, opts);
+    } catch (err) {
+      console.error(`✗ ${name}: ${err.message}`);
+      failed.push(name);
+    }
   }
+  writeExtraManifest();
+  if (failed.length) { console.error(`Falharam ${failed.length}: ${failed.join(', ')}`); process.exit(1); }
+  console.log('Processamento concluído com sucesso!');
 }
-writeExtraManifest();
-console.log('Processamento concluído com sucesso!');
+
+// ---------------------------------------------------------------- lote de combate
+// Registro do runtime gerado do manifesto (uma entrada por clipe; `refY` sai do GLB no carregamento).
+// `motion`: janela [início, fim] do deslocamento do quadril na fonte, em segundos (ver motionWindow).
+function combatRegistry(list, motionOf) {
+  const lines = [
+    `// Gerado por tools/process-animations.mjs --combat a partir de tools/combat-manifest.mjs — não editar à mão.`,
+    `// Lote ${COMBAT_BATCH}: ${list.length} clipes Mixamo de combate, obrigatórios no build.`,
+    ...list.map((e) => `import ${e.key} from '../../assets/${e.glb}';`),
+    '',
+    `export const COMBAT_BATCH = '${COMBAT_BATCH}';`,
+    'export default [',
+    ...list.map((e) => `  { key: '${e.key}', bin: ${e.key}, glb: '${e.glb}', source: '${e.source}', contactMode: '${e.contactMode}', locomotionMode: '${e.locomotionMode}', motion: ${JSON.stringify(motionOf.get(e.key) || null)} },`),
+    '];',
+    '',
+  ];
+  return lines.join('\n');
+}
+
+function checkManifest(list) {
+  const problems = [];
+  if (list.length !== 20) problems.push(`manifesto com ${list.length} entradas (esperado 20)`);
+  for (const field of ['source', 'key', 'glb']) {
+    const seen = new Set();
+    for (const e of list) { if (seen.has(e[field])) problems.push(`${field} repetido: ${e[field]}`); seen.add(e[field]); }
+  }
+  for (const e of list) {
+    if (!/^[a-z][A-Za-z]+$/.test(e.key)) problems.push(`chave inválida: ${e.key}`);
+    if (!/^anim_[a-z_]+\.glb$/.test(e.glb)) problems.push(`nome de GLB inválido: ${e.glb}`);
+    if (!['feet', 'body'].includes(e.contactMode)) problems.push(`${e.key}: contactMode ${e.contactMode}`);
+    if (!['cycle', 'pose', 'oneshot'].includes(e.locomotionMode)) problems.push(`${e.key}: locomotionMode ${e.locomotionMode}`);
+  }
+  return problems;
+}
+
+async function runCombat() {
+  const list = COMBAT_2026_09_26;
+  const dir = join(SRC_ANIM, COMBAT_DIR);
+  console.log(`Lote ${COMBAT_BATCH}: ${list.length} clipes de ${dir}${dryRun ? ' (simulação)' : ''}`);
+  const problems = checkManifest(list);
+  // fontes: todas presentes e idênticas às recebidas, antes de converter qualquer uma
+  for (const e of list) {
+    const f = join(dir, e.source);
+    if (!existsSync(f)) problems.push(`fonte ausente: ${e.source}`);
+    else if (sha256File(f) !== e.sha256) problems.push(`fonte alterada (sha256 diferente): ${e.source}`);
+  }
+  if (problems.length) {
+    for (const p of problems) console.error(`✗ ${p}`);
+    console.error(`Lote recusado: ${problems.length} problema(s). Nada foi escrito.`);
+    process.exit(1);
+  }
+
+  const work = join(TMP, 'combat');
+  rmSync(work, { recursive: true, force: true });
+  mkdirSync(join(work, 'out'), { recursive: true });
+  const failures = [], done = [];
+  for (const e of list) {
+    try {
+      const raw = fbx(join(dir, e.source), work, e.key, { framerate: 'bake30' });
+      const doc = await io.read(raw);
+      dropEmptyAnimations(doc);
+      const anims = doc.getRoot().listAnimations();
+      if (anims.length !== 1) throw new Error(`${anims.length} clipes não vazios no FBX (esperado 1)`);
+      stripToSkeleton(doc);
+      const anim = anims[0];
+      anim.setName(e.key);
+      dropStaticChannels(doc, { keepTranslation: /Hips$/ });
+      const motion = motionWindow(anim);
+      lockHipsXZ(anim);
+      await optimize(doc);
+      const out = join(work, 'out', e.glb);
+      await io.write(out, doc);
+      done.push({ e, out, motion });
+    } catch (err) {
+      failures.push(`${e.key} (${e.source}): ${err.message}`);
+    }
+  }
+
+  // validação do que foi escrito em disco, relido do zero
+  const byHash = new Map(), byClip = new Map(), report = [];
+  const motionOf = new Map(done.map((d) => [d.e.key, d.motion]));
+  for (const { e, out } of done) {
+    if (!existsSync(out) || statSync(out).size === 0) { failures.push(`${e.key}: GLB vazio`); continue; }
+    const doc = await io.read(out);
+    const errs = validateClipDoc(doc, e.key);
+    if (errs.length) { failures.push(`${e.key}: ${errs.join('; ')}`); continue; }
+    const fileHash = sha256(readFileSync(out)), clipHash = clipFingerprint(doc.getRoot().listAnimations()[0]);
+    if (byHash.has(fileHash)) failures.push(`${e.key}: GLB idêntico ao de ${byHash.get(fileHash)}`);
+    if (byClip.has(clipHash)) failures.push(`${e.key}: clipe idêntico ao de ${byClip.get(clipHash)}`);
+    byHash.set(fileHash, e.key); byClip.set(clipHash, e.key);
+    const a = doc.getRoot().listAnimations()[0];
+    report.push({ e, out, kb: statSync(out).size / 1024, T: dur(a), channels: a.listChannels().length, refY: hipsRestY(doc) });
+  }
+  if (failures.length) {
+    for (const f of failures) console.error(`✗ ${f}`);
+    console.error(`Lote recusado: ${failures.length} falha(s). Nenhum GLB nem registro foi escrito.`);
+    process.exit(1);
+  }
+
+  for (const { e, out, kb, T, channels, refY } of report) {
+    copyFileSync(out, join(OUT_ASSETS, e.glb));
+    copyFileSync(out, join(OUT_GLB_LIB, e.glb));
+    console.log(`✓ ${e.key.padEnd(17)} -> ${e.glb.padEnd(28)} ${kb.toFixed(1).padStart(6)} KB  ${T.toFixed(2)} s  ${String(channels).padStart(3)} canais  refY ${refY.toFixed(3)}`);
+  }
+  writeFileSync(join(OUT_SRC, 'combat-clips.js'), combatRegistry(list, motionOf));
+  console.log(`combat-clips.js: ${list.length} entradas`);
+  console.log(`Resumo: ${list.length} fontes, ${report.length} saídas, 0 falhas, 0 duplicatas, 0 malha/pele/material, nomes = chaves do manifesto, quadril sem X/Z em todas as amostras.`);
+}
+
+if (combat) await runCombat();
+else await runLibrary();

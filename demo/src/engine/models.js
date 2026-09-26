@@ -25,6 +25,8 @@ import downBin from '../../assets/anim_down.glb';
 import roarBin from '../../assets/anim_roar.glb';
 import craftBin from '../../assets/anim_craft.glb';
 import EXTRA_CLIPS from './extra-clips.js';
+import COMBAT_CLIPS from './combat-clips.js';
+import { EXTRA_BINS } from './extra-assets.js';
 import lionessBin from '../../assets/beast_lioness.glb';
 import horseBin from '../../assets/mount_horse.glb';
 
@@ -100,6 +102,42 @@ export function instantiate(M) {
   return pivot;
 }
 
+// ---------- registro de clipes humanos ----------
+// Uma entrada por clipe, com o mesmo formato para a biblioteca, os opcionais (`extra-clips.js`) e o
+// lote de combate (`combat-clips.js`, gerado de `tools/combat-manifest.mjs`):
+//   { key, bin, refY, contactMode, locomotionMode, motion, group }
+// `refY` sai sempre de `hipsRef()` — a altura de repouso do quadril no esqueleto do GLB da animação.
+//   contactMode     'feet' | 'body' | 'none': como `characters.js` assenta o clipe no chão
+//   locomotionMode  'cycle' | 'pose' | 'oneshot'
+// A biblioteca antiga (anterior aos opcionais) foi ajustada à mão com a altura do quadril no primeiro
+// quadro de cada clipe; ela guarda essa referência (`refFrom: 'firstFrame'`) para as poses que já
+// estão no jogo não mudarem de altura. Opcionais e combate usam o repouso do esqueleto de origem.
+const LIBRARY = [
+  ['walk', walkBin, 'none', 'cycle'], ['run', runBin, 'none', 'cycle'], ['idle', idleBin, 'none', 'pose'],
+  ['guard', guardBin, 'feet', 'pose'], ['slash', slashBin, 'none', 'oneshot'], ['thrust', thrustBin, 'none', 'oneshot'],
+  ['punch', punchBin, 'none', 'oneshot'], ['smash', smashBin, 'none', 'oneshot'], ['bow', bowBin, 'none', 'oneshot'],
+  ['cast', castBin, 'none', 'oneshot'], ['spell_area', spellAreaBin, 'none', 'oneshot'], ['roll', rollBin, 'none', 'oneshot'],
+  ['down', downBin, 'none', 'oneshot'], ['roar', roarBin, 'none', 'oneshot'], ['craft', craftBin, 'none', 'pose'],
+].map(([key, bin, contactMode, locomotionMode]) => ({ key, bin, contactMode, locomotionMode, motion: null, group: 'library', refFrom: 'firstFrame' }));
+const EXTRA_MODES = {
+  jump: ['feet', 'oneshot'], jumpBoost: ['feet', 'oneshot'], crouchIdle: ['feet', 'pose'], crouchWalk: ['feet', 'cycle'], bowAim: ['none', 'oneshot'],
+};
+const EXTRA = Object.entries(EXTRA_CLIPS).map(([key, bin]) => {
+  const [contactMode, locomotionMode] = EXTRA_MODES[key] || ['none', 'oneshot'];
+  return { key, bin, contactMode, locomotionMode, motion: null, group: 'extra', refFrom: 'rest' };
+});
+const COMBAT = COMBAT_CLIPS.map((e) => ({ ...e, group: 'combat', refFrom: 'rest' }));
+export const CLIP_REGISTRY = [...LIBRARY, ...EXTRA, ...COMBAT];
+
+// Quadril do esqueleto de origem: altura de repouso e altura no primeiro quadro do clipe.
+export function hipsRef(gltf, clip) {
+  let hips = null;
+  gltf.scene.traverse((o) => { if (!hips && /Hips$/.test(o.name)) hips = o; });
+  const rest = hips ? hips.position.y : null;
+  const track = hips && clip ? clip.tracks.find((t) => t.name === hips.name + '.position') : null;
+  return { rest, first: track ? track.values[1] : rest };
+}
+
 // Clipe da caminhada adaptado a um esqueleto: a translação do quadril vem do boneco de origem do
 // Mixamo e é reescalada pela altura do quadril do alvo (senão as pernas flutuam ou afundam).
 // `refY`: altura do quadril em pé no boneco de origem. Sem ela vale o primeiro quadro do clipe — o
@@ -128,58 +166,44 @@ function forwardYaw(gltf, headRe, tailRe) {
   return -Math.atan2(b.x - a.x, b.z - a.z);   // gira o modelo para a cabeça apontar para +Z
 }
 
+// Resolve o registro: lê cada GLB, acha o clipe pela chave e grava `refY`. Uma entrada sem clipe
+// (registro parcial) simplesmente não entra: o animador usa o substituto daquela ação.
+export async function resolveClips(registry = CLIP_REGISTRY) {
+  const getClip = (g, name) => (g && g.animations ? (g.animations.find((a) => a.name === name) || g.animations[0]) : null);
+  const parsed = await Promise.all(registry.map((e) => parse(e.bin)));
+  const out = [];
+  registry.forEach((e, i) => {
+    const clip = getClip(parsed[i], e.key);
+    if (!clip) return;
+    const ref = hipsRef(parsed[i], clip);
+    out.push({ ...e, bin: undefined, clip, refY: e.refFrom === 'firstFrame' ? ref.first : ref.rest, restY: ref.rest });
+  });
+  return out;
+}
+
 export async function loadModels(progress) {
   await MeshoptDecoder.ready;
   progress && progress('personagens');
-  const [
-    kachujin, eve, paladina, walk, run, idle, guard, slash, thrust, punch, smash, bow, cast, spellArea, roll, down, roar, craft,
-    lioness, horse
-  ] = await Promise.all([
-    parse(kachujinBin), parse(eveBin), parse(paladinaBin), parse(walkBin), parse(runBin), parse(idleBin), parse(guardBin),
-    parse(slashBin), parse(thrustBin), parse(punchBin), parse(smashBin), parse(bowBin), parse(castBin),
-    parse(spellAreaBin), parse(rollBin), parse(downBin), parse(roarBin), parse(craftBin),
-    parse(lionessBin), parse(horseBin)
+  const [kachujin, eve, paladina, lioness, horse, clips] = await Promise.all([
+    parse(kachujinBin), parse(eveBin), parse(paladinaBin), parse(lionessBin), parse(horseBin), resolveClips(),
   ]);
-  const getClip = (g, name) => (g && g.animations ? (g.animations.find((a) => a.name === name) || g.animations[0]) : null);
-  const rawClips = {
-    walk: getClip(walk, 'walk'),
-    run: getClip(run, 'run'),
-    idle: getClip(idle, 'idle'),
-    guard: getClip(guard, 'guard'),
-    slash: getClip(slash, 'slash'),
-    thrust: getClip(thrust, 'thrust'),
-    punch: getClip(punch, 'punch'),
-    smash: getClip(smash, 'smash'),
-    bow: getClip(bow, 'bow'),
-    cast: getClip(cast, 'cast'),
-    spell_area: getClip(spellArea, 'spell_area'),
-    roll: getClip(roll, 'roll'),
-    down: getClip(down, 'down'),
-    roar: getClip(roar, 'roar'),
-    craft: getClip(craft, 'craft'),
-  };
-  // clipes opcionais (pulo, agachar): a altura de referência é a do quadril em repouso do esqueleto
-  // de origem, que o GLB da animação preserva
-  const extra = {};
-  for (const [key, bin] of Object.entries(EXTRA_CLIPS)) {
-    const g = await parse(bin);
-    const clip = getClip(g, key);
-    if (!clip) continue;
-    let hips = null;
-    g.scene.traverse((o) => { if (!hips && /Hips$/.test(o.name)) hips = o; });
-    extra[key] = { clip, refY: hips ? hips.position.y : null };
-  }
+  // metadados por chave (sem o clipe cru), lidos pelo animador
+  MODELS.clipMeta = Object.fromEntries(clips.map(({ clip, ...meta }) => [meta.key, meta]));
+  const walk = clips.find((c) => c.key === 'walk');
   for (const [id, g] of [['kachujin', kachujin], ['eve', eve], ['paladina', paladina]]) {
     const M = mold(g, { height: 1.85, rough: 0.68 });
-    M.walk = retarget(rawClips.walk, M.pivot);
+    M.walk = retarget(walk.clip, M.pivot, walk.refY);
     M.anims = {};
-    for (const [k, clip] of Object.entries(rawClips)) {
-      if (clip) M.anims[k] = retarget(clip, M.pivot);
-    }
-    for (const [k, { clip, refY }] of Object.entries(extra)) M.anims[k] = retarget(clip, M.pivot, refY);
+    for (const c of clips) M.anims[c.key] = retarget(c.clip, M.pivot, c.refY);
     MODELS[id] = M;
   }
   progress && progress('criaturas');
+  // corpo das garras (void_hound): molde estático, sem esqueleto — flutua por animação procedural.
+  // Sem ele, as garras continuam com a leoa.
+  if (EXTRA_BINS.cao_vazio) MODELS.hound = mold(await parse(EXTRA_BINS.cao_vazio), { height: 1.3, rough: 0.8, env: 0.5 });
+  // armas do pacote PurePoly: uma cena por modelo, com uma parte por zona (lâmina, guarda, cabo…)
+  MODELS.weapons = {};
+  for (const id of Object.keys(EXTRA_BINS).filter((k) => k.startsWith('arma_'))) MODELS.weapons[id] = (await parse(EXTRA_BINS[id])).scene;
   const lyaw = forwardYaw(lioness, /^Head$/i, /^(Pelvis|Tail)/i);
   const L = mold(lioness, { height: 1.25, yaw: lyaw, rough: 0.85, env: 0.5 });
   L.pivot.updateMatrixWorld(true);

@@ -15,6 +15,9 @@ import grassUrl from '../../assets/nature-kit/tex/grass.webp';
 import flowerUrl from '../../assets/nature-kit/tex/flower.webp';
 import flowerLeafUrl from '../../assets/nature-kit/tex/flowerLeaf.webp';
 import skyEnvUrl from '../../assets/nature-kit/sky-env.webp';
+import MEADOW from '../../assets/meadow-grass/meadow-manifest.json';
+import meadowBin from '../../assets/meadow-grass/meadow-grass.glb';
+import meadowUrl from '../../assets/meadow-grass/meadow.webp';
 import { parseSceneGLB } from './runtime-loader.js';
 import { KIT } from '../engine/props.js';
 import { patchMaterial, foliageMat, foliageDepth } from '../engine/materials.js';
@@ -89,6 +92,62 @@ async function buildMaterials() {
   return { mats, depth };
 }
 
+// A quantização do pacote guarda as posições como inteiros normalizados e devolve a escala ao nó.
+// Como o kit desenha protótipos soltos em InstancedMesh, a transformação do nó é assada na
+// geometria; antes disso os atributos precisam virar float, senão a multiplicação satura no
+// intervalo [-1, 1] e o abeto de 12,5 m chega à cena com 2 m.
+function bakedGeometry(o) {
+  const geo = o.geometry.clone();
+  for (const key of ['position', 'normal', 'uv']) {
+    const attr = geo.getAttribute(key);
+    if (!attr || !attr.normalized) continue;
+    const out = new Float32Array(attr.count * attr.itemSize);
+    for (let i = 0; i < attr.count; i++) {
+      for (let j = 0; j < attr.itemSize; j++) out[i * attr.itemSize + j] = attr.getComponent(i, j);
+    }
+    geo.setAttribute(key, new THREE.BufferAttribute(out, attr.itemSize));
+  }
+  geo.applyMatrix4(o.matrixWorld);
+  geo.computeBoundingSphere();
+  geo.computeBoundingBox();
+  return geo;
+}
+
+// ---------------------------------------------------------------- grama de campo
+// "Grass Medium 01" do Poly Haven, preparado por `tools/build-meadow-grass.mjs`: cobre o chão verde
+// entre as manchas da grama do kit. Mesmo material de grama (vento, esmaecimento na distância,
+// normais para cima); o atlas é cinza de detalhe e o tom vem desta cor, um verde da família do kit.
+const MEADOW_COLOR = '#93ad3c';
+export const MEADOW_TYPES = Object.keys(MEADOW.types);
+
+async function loadMeadow(table, mats, typeInfo) {
+  const size = MEADOW.texture.size;
+  const [gltf, data] = await Promise.all([parseSceneGLB(meadowBin), pixels(meadowUrl, size, false)]);
+  const tex = texture(data, size, true, 0.5);
+  tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+  const m = foliageMat(tex, { wind: 0, grass: true, color: MEADOW_COLOR });
+  m.alphaTest = 0.5; m.roughness = 1; m.metalness = 0; m.envMapIntensity = ENV_INTENSITY;
+  mats.meadow = m;
+  gltf.scene.updateMatrixWorld(true);
+  const geos = new Map();
+  gltf.scene.traverse((o) => {
+    if (!o.isMesh) return;
+    const name = /_L\d$/.test(o.name) ? o.name : o.parent?.name || o.name;
+    geos.set(name, bakedGeometry(o));
+  });
+  for (const [type, info] of Object.entries(MEADOW.types)) {
+    const card = geos.get(`${type}_card_L2`);
+    for (let v = 0; v < info.variants; v++) {
+      for (const lv of [0, 1]) {
+        const g = geos.get(`${type}_${v}_L${lv}`);
+        if (g) table.set(`${type}|${v}|${lv}`, [[g, 'meadow']]);
+      }
+      if (card) table.set(`${type}|${v}|2`, [[card, 'meadow']]);
+    }
+    typeInfo[type] = { variants: info.variants, items: info.items.map((it) => ({ ...it, collider: 0 })), tint: null };
+  }
+}
+
 // ---------------------------------------------------------------- instalação
 export async function installNatureKit({ tier = 'alta' } = {}) {
   try {
@@ -97,11 +156,6 @@ export async function installNatureKit({ tier = 'alta' } = {}) {
     const bigLevels = BIG_TIER_LEVELS[tier] || BIG_TIER_LEVELS.alta;
 
     // `<tipo>_<variante>_L<nível>` → lista de [geometria, id do material]
-    //
-    // A quantização do pacote guarda as posições como inteiros normalizados e devolve a escala ao
-    // nó. Como o kit desenha protótipos soltos em InstancedMesh, a transformação do nó é assada na
-    // geometria; antes disso os atributos precisam virar float, senão a multiplicação satura no
-    // intervalo [-1, 1] e o abeto de 12,5 m chega à cena com 2 m.
     gltf.scene.updateMatrixWorld(true);
     const table = new Map();
     gltf.scene.traverse((o) => {
@@ -114,20 +168,7 @@ export async function installNatureKit({ tier = 'alta' } = {}) {
       if (!m) return;
       const key = `${m[1]}|${m[2]}|${m[3]}`;
       const matId = o.material?.name || 'palette';
-      const geo = o.geometry.clone();
-      for (const key of ['position', 'normal']) {
-        const attr = geo.getAttribute(key);
-        if (!attr || !attr.normalized) continue;
-        const out = new Float32Array(attr.count * attr.itemSize);
-        for (let i = 0; i < attr.count; i++) {
-          for (let j = 0; j < attr.itemSize; j++) out[i * attr.itemSize + j] = attr.getComponent(i, j);
-        }
-        geo.setAttribute(key, new THREE.BufferAttribute(out, attr.itemSize));
-      }
-      geo.applyMatrix4(o.matrixWorld);
-      geo.computeBoundingSphere();
-      geo.computeBoundingBox();
-      (table.get(key) || table.set(key, []).get(key)).push([geo, matId]);
+      (table.get(key) || table.set(key, []).get(key)).push([bakedGeometry(o), matId]);
     });
     if (!table.size) throw new Error('nenhum protótipo reconhecido no kit');
 
@@ -139,6 +180,12 @@ export async function installNatureKit({ tier = 'alta' } = {}) {
         items: info.items,
         tint: info.tint ? new THREE.Color(info.tint) : null,
       };
+    }
+
+    try {
+      await loadMeadow(table, mats, typeInfo);
+    } catch (err) {
+      console.warn('grama de campo indisponível:', err.message);
     }
 
     const cache = new Map();
@@ -160,7 +207,7 @@ export async function installNatureKit({ tier = 'alta' } = {}) {
       // [geometria, material, projeta sombra, profundidade com vento, cor por instância]
       const out = list.map(([geo, matId]) => {
         const material = mats[matId] || mats.palette;
-        const cast = matId !== 'grass' && kind !== 'grass' && kind !== 'flower';
+        const cast = matId !== 'grass' && matId !== 'meadow' && kind !== 'grass' && kind !== 'flower';
         return [geo, material, cast, depth[matId] || null, true];
       });
       cache.set(ck, out);
