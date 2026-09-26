@@ -1,0 +1,1943 @@
+{
+  "library": "Texturas de terreno e natureza — Projeto Game",
+  "version": 1,
+  "prepared_utc": "2026-09-24T00:19:54.402727+00:00",
+  "source_provider": "Poly Haven",
+  "license": "CC0-1.0",
+  "license_url": "https://polyhaven.com/license",
+  "resolution": "2k",
+  "format": "PNG",
+  "download_concurrency": 4,
+  "assets": [
+    {
+      "asset": "sparse_grass",
+      "category": "terreno",
+      "name": "Sparse Grass",
+      "source": "https://polyhaven.com/a/sparse_grass",
+      "metadata_api": "https://api.polyhaven.com/info/sparse_grass",
+      "files_api": "https://api.polyhaven.com/files/sparse_grass",
+      "license": "CC0-1.0",
+      "authors": {
+        "Amal Kumar": "All"
+      },
+      "usage": "Campos com grama irregular e terra exposta",
+      "source_dimensions_mm": [
+        2000,
+        2000
+      ],
+      "surface_repeat_metres": [
+        2.0,
+        2.0
+      ],
+      "dimensions_note": "Extensão física de uma repetição da textura, conforme dimensões em milímetros da API.",
+      "files": [
+        {
+          "map": "Diffuse",
+          "filename": "sparse_grass_diff_2k.png",
+          "path": "terreno/sparse_grass/sparse_grass_diff_2k.png",
+          "size": 22593728,
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/sparse_grass/sparse_grass_diff_2k.png",
+          "md5": "7de88637c54d5fa32953e89b9a31af67",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:20.083635+00:00",
+            "bytes": 22593728,
+            "md5": "7de88637c54d5fa32953e89b9a31af67",
+            "md5_matches_provider": true,
+            "sha256": "d24a836c12689f4fda41358251f30ddb865bbad41ccac63bf276b13559d55167",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGB",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "nor_gl",
+          "filename": "sparse_grass_nor_gl_2k.png",
+          "path": "terreno/sparse_grass/sparse_grass_nor_gl_2k.png",
+          "size": 24333251,
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/sparse_grass/sparse_grass_nor_gl_2k.png",
+          "md5": "890a75197a9aa1e44a29a0af64634576",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:18.419333+00:00",
+            "bytes": 24333251,
+            "md5": "890a75197a9aa1e44a29a0af64634576",
+            "md5_matches_provider": true,
+            "sha256": "3295cf5ca9db4ed1888d94ebf7e69295c1c6607beeb1e3bd5373c7cd20c9318e",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGB",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "Rough",
+          "filename": "sparse_grass_rough_2k.png",
+          "path": "terreno/sparse_grass/sparse_grass_rough_2k.png",
+          "size": 6898080,
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/sparse_grass/sparse_grass_rough_2k.png",
+          "md5": "d33c17e7b26f16ea8aad2779f45e08c8",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:16.482922+00:00",
+            "bytes": 6898080,
+            "md5": "d33c17e7b26f16ea8aad2779f45e08c8",
+            "md5_matches_provider": true,
+            "sha256": "9f3a47f0705f1c09939c7549194bab8863e2ef74f1eae613cf3307e5bd2e8143",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "I;16",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "Displacement",
+          "filename": "sparse_grass_disp_2k.png",
+          "path": "terreno/sparse_grass/sparse_grass_disp_2k.png",
+          "size": 7172026,
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/sparse_grass/sparse_grass_disp_2k.png",
+          "md5": "c9f328ac5e7e29d65abe10b9943efb64",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:17.279663+00:00",
+            "bytes": 7172026,
+            "md5": "c9f328ac5e7e29d65abe10b9943efb64",
+            "md5_matches_provider": true,
+            "sha256": "ab2a2ac5ac8a9aea06f97a0cb4e06089b58ee29079c104731a4f4786c4e490cd",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "I;16",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "AO",
+          "filename": "sparse_grass_ao_2k.png",
+          "path": "terreno/sparse_grass/sparse_grass_ao_2k.png",
+          "size": 5996521,
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/sparse_grass/sparse_grass_ao_2k.png",
+          "md5": "d0f64e44c7314973c97f884f1039f74b",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:18.945195+00:00",
+            "bytes": 5996521,
+            "md5": "d0f64e44c7314973c97f884f1039f74b",
+            "md5_matches_provider": true,
+            "sha256": "696c4ab65ce302a62308964a5f4beff31f62de075e1ef899eb19dda9d14e85d9",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "I;16",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        }
+      ]
+    },
+    {
+      "asset": "rocky_trail_02",
+      "category": "terreno",
+      "name": "Rocky Trail 02",
+      "source": "https://polyhaven.com/a/rocky_trail_02",
+      "metadata_api": "https://api.polyhaven.com/info/rocky_trail_02",
+      "files_api": "https://api.polyhaven.com/files/rocky_trail_02",
+      "license": "CC0-1.0",
+      "authors": {
+        "Amal Kumar": "All"
+      },
+      "usage": "Trilhas de terra compactada e cascalho",
+      "source_dimensions_mm": [
+        2000,
+        2000
+      ],
+      "surface_repeat_metres": [
+        2.0,
+        2.0
+      ],
+      "dimensions_note": "Extensão física de uma repetição da textura, conforme dimensões em milímetros da API.",
+      "files": [
+        {
+          "map": "Diffuse",
+          "filename": "rocky_trail_02_diff_2k.png",
+          "path": "terreno/rocky_trail_02/rocky_trail_02_diff_2k.png",
+          "size": 22487028,
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rocky_trail_02/rocky_trail_02_diff_2k.png",
+          "md5": "c500a0e838249abd8218a089db866490",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:25.008319+00:00",
+            "bytes": 22487028,
+            "md5": "c500a0e838249abd8218a089db866490",
+            "md5_matches_provider": true,
+            "sha256": "191d392b18439db343a711fa96e0bab63b1716005ac5727fa1555bdc4a51a0e5",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGB",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "nor_gl",
+          "filename": "rocky_trail_02_nor_gl_2k.png",
+          "path": "terreno/rocky_trail_02/rocky_trail_02_nor_gl_2k.png",
+          "size": 24179832,
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rocky_trail_02/rocky_trail_02_nor_gl_2k.png",
+          "md5": "54645fd05a1c85536b7b03f28d477200",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:25.000991+00:00",
+            "bytes": 24179832,
+            "md5": "54645fd05a1c85536b7b03f28d477200",
+            "md5_matches_provider": true,
+            "sha256": "c52f968f4f20d18a7e916e0d1feeadfa8113f52a402b9a125cd16be297512628",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGB",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "Rough",
+          "filename": "rocky_trail_02_rough_2k.png",
+          "path": "terreno/rocky_trail_02/rocky_trail_02_rough_2k.png",
+          "size": 7238567,
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rocky_trail_02/rocky_trail_02_rough_2k.png",
+          "md5": "5d20509091f729f72297e76a070c62a0",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:21.725304+00:00",
+            "bytes": 7238567,
+            "md5": "5d20509091f729f72297e76a070c62a0",
+            "md5_matches_provider": true,
+            "sha256": "281801cd8a9b36a27d707b5d2f89a8bce378dbc91cd30cef48da1407a0d72d09",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "I;16",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "Displacement",
+          "filename": "rocky_trail_02_disp_2k.png",
+          "path": "terreno/rocky_trail_02/rocky_trail_02_disp_2k.png",
+          "size": 6925114,
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rocky_trail_02/rocky_trail_02_disp_2k.png",
+          "md5": "1d868dd865ab9ff5635dd2a18aefb1ed",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:25.200279+00:00",
+            "bytes": 6925114,
+            "md5": "1d868dd865ab9ff5635dd2a18aefb1ed",
+            "md5_matches_provider": true,
+            "sha256": "3c596c0402148084006c67cd5fa4401e3d692b038f80478bacfed5044403776e",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "I;16",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "AO",
+          "filename": "rocky_trail_02_ao_2k.png",
+          "path": "terreno/rocky_trail_02/rocky_trail_02_ao_2k.png",
+          "size": 7949340,
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rocky_trail_02/rocky_trail_02_ao_2k.png",
+          "md5": "a40801c36b2e033ebcb400752c074bae",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:28.899075+00:00",
+            "bytes": 7949340,
+            "md5": "a40801c36b2e033ebcb400752c074bae",
+            "md5_matches_provider": true,
+            "sha256": "af163b4b17a70457ca34ac2c28b9df44e212fe3bd0c61447f0d474143518d166",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "I;16",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        }
+      ]
+    },
+    {
+      "asset": "forrest_ground_01",
+      "category": "terreno",
+      "name": "Forest Ground 01",
+      "source": "https://polyhaven.com/a/forrest_ground_01",
+      "metadata_api": "https://api.polyhaven.com/info/forrest_ground_01",
+      "files_api": "https://api.polyhaven.com/files/forrest_ground_01",
+      "license": "CC0-1.0",
+      "authors": {
+        "Rob Tuytel": "All"
+      },
+      "usage": "Chão de bosque com folhas, gravetos e matéria orgânica",
+      "source_dimensions_mm": [
+        2000,
+        2000
+      ],
+      "surface_repeat_metres": [
+        2.0,
+        2.0
+      ],
+      "dimensions_note": "Extensão física de uma repetição da textura, conforme dimensões em milímetros da API.",
+      "files": [
+        {
+          "map": "Diffuse",
+          "filename": "forrest_ground_01_diff_2k.png",
+          "path": "terreno/forrest_ground_01/forrest_ground_01_diff_2k.png",
+          "size": 26253635,
+          "md5": "cda857d84802f75a7c4e9e4868ead076",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/forrest_ground_01/forrest_ground_01_diff_2k.png",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:33.150038+00:00",
+            "bytes": 26253635,
+            "md5": "cda857d84802f75a7c4e9e4868ead076",
+            "md5_matches_provider": true,
+            "sha256": "06a7c3c4a3916fd96821c4f4d21b4a38c333e931bfc66856e19dab720a22ffa5",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGBA",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "nor_gl",
+          "filename": "forrest_ground_01_nor_gl_2k.png",
+          "path": "terreno/forrest_ground_01/forrest_ground_01_nor_gl_2k.png",
+          "size": 27037479,
+          "md5": "dbeb8ca5c1914b78865f7d5ae1f70026",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/forrest_ground_01/forrest_ground_01_nor_gl_2k.png",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:32.995952+00:00",
+            "bytes": 27037479,
+            "md5": "dbeb8ca5c1914b78865f7d5ae1f70026",
+            "md5_matches_provider": true,
+            "sha256": "bfc3e06ea31c3de513c9421a8fbbb4a540ebe32fada1bbb545286c1abc96e313",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGBA",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "Rough",
+          "filename": "forrest_ground_01_rough_2k.png",
+          "path": "terreno/forrest_ground_01/forrest_ground_01_rough_2k.png",
+          "size": 7262563,
+          "md5": "32d508b95d8ecf0a87786cbe29a4d82d",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/forrest_ground_01/forrest_ground_01_rough_2k.png",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:27.862443+00:00",
+            "bytes": 7262563,
+            "md5": "32d508b95d8ecf0a87786cbe29a4d82d",
+            "md5_matches_provider": true,
+            "sha256": "b69fd13c094fd8dda54825f228517faf93ac2763785e097e00a8bbe6f3df200d",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "I;16",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "Displacement",
+          "filename": "forrest_ground_01_disp_2k.png",
+          "path": "terreno/forrest_ground_01/forrest_ground_01_disp_2k.png",
+          "size": 8254943,
+          "md5": "a5450e0b6a21239a8cc37faac9ad641c",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/forrest_ground_01/forrest_ground_01_disp_2k.png",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:32.945083+00:00",
+            "bytes": 8254943,
+            "md5": "a5450e0b6a21239a8cc37faac9ad641c",
+            "md5_matches_provider": true,
+            "sha256": "1d8cb8bbe9039ee2cd22068d457617a1748170405aacd49d33fcf637e08bb12b",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGBA",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "AO",
+          "filename": "forrest_ground_01_ao_2k.png",
+          "path": "terreno/forrest_ground_01/forrest_ground_01_ao_2k.png",
+          "size": 9817046,
+          "md5": "9a9baa0270c78a37762aa690651ddfcb",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/forrest_ground_01/forrest_ground_01_ao_2k.png",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:34.549654+00:00",
+            "bytes": 9817046,
+            "md5": "9a9baa0270c78a37762aa690651ddfcb",
+            "md5_matches_provider": true,
+            "sha256": "7c659c4116033014bc3ff81cc7ebea397d47a177e056b81491a431815104b67c",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGBA",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        }
+      ]
+    },
+    {
+      "asset": "rock_3",
+      "category": "rochas",
+      "name": "Rock 3",
+      "source": "https://polyhaven.com/a/rock_3",
+      "metadata_api": "https://api.polyhaven.com/info/rock_3",
+      "files_api": "https://api.polyhaven.com/files/rock_3",
+      "license": "CC0-1.0",
+      "authors": {
+        "Rob Tuytel": "All"
+      },
+      "usage": "Rochas cinzentas, encostas e superfícies erodidas",
+      "source_dimensions_mm": [
+        1500,
+        1500
+      ],
+      "surface_repeat_metres": [
+        1.5,
+        1.5
+      ],
+      "dimensions_note": "Extensão física de uma repetição da textura, conforme dimensões em milímetros da API.",
+      "files": [
+        {
+          "map": "Diffuse",
+          "filename": "rock_3_diff_2k.png",
+          "path": "rochas/rock_3/rock_3_diff_2k.png",
+          "size": 9269182,
+          "md5": "6ce05e52225a076d7ec67a54ce07f6ab",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rock_3/rock_3_diff_2k.png",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:35.793672+00:00",
+            "bytes": 9269182,
+            "md5": "6ce05e52225a076d7ec67a54ce07f6ab",
+            "md5_matches_provider": true,
+            "sha256": "33dd55b2a6ad56b81994013eca1ec93c7dc3754e106bce3a477e3cec799f2b84",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGB",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "nor_gl",
+          "filename": "rock_3_nor_gl_2k.png",
+          "path": "rochas/rock_3/rock_3_nor_gl_2k.png",
+          "size": 8784332,
+          "md5": "9c894aae6ffa61e94209b8551f87e5d8",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rock_3/rock_3_nor_gl_2k.png",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:35.811146+00:00",
+            "bytes": 8784332,
+            "md5": "9c894aae6ffa61e94209b8551f87e5d8",
+            "md5_matches_provider": true,
+            "sha256": "04adb75b2c355b7052be97bbb5482f3e34f5c004483efd25ab1511a4dbbe02e4",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGB",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "Rough",
+          "filename": "rock_3_rough_2k.png",
+          "path": "rochas/rock_3/rock_3_rough_2k.png",
+          "size": 7657637,
+          "md5": "917e95a5c3f49eda3015f95eee550a4c",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rock_3/rock_3_rough_2k.png",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:35.716007+00:00",
+            "bytes": 7657637,
+            "md5": "917e95a5c3f49eda3015f95eee550a4c",
+            "md5_matches_provider": true,
+            "sha256": "87468651969b0c07bb05d4d2b053ef51be7ea7479833af7c81fa14609ec6898a",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "I;16",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "Displacement",
+          "filename": "rock_3_disp_2k.png",
+          "path": "rochas/rock_3/rock_3_disp_2k.png",
+          "size": 8052503,
+          "md5": "02ce8192521cda098c85fecc9b0bfe8c",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rock_3/rock_3_disp_2k.png",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:37.307667+00:00",
+            "bytes": 8052503,
+            "md5": "02ce8192521cda098c85fecc9b0bfe8c",
+            "md5_matches_provider": true,
+            "sha256": "7574c0e5ab9255153aea233cc5dc260b30346ddd6086b502b817b416ed3fe04d",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "I;16",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "AO",
+          "filename": "rock_3_ao_2k.png",
+          "path": "rochas/rock_3/rock_3_ao_2k.png",
+          "size": 3541849,
+          "md5": "e4d01260315da7583a71d9ebae763525",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rock_3/rock_3_ao_2k.png",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:38.339601+00:00",
+            "bytes": 3541849,
+            "md5": "e4d01260315da7583a71d9ebae763525",
+            "md5_matches_provider": true,
+            "sha256": "065cb9d9818fde8d153a015749b80023003c57bf89045c87656ff93013146966",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "L",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        }
+      ]
+    },
+    {
+      "asset": "dark_rock",
+      "category": "rochas",
+      "name": "Dark Rock",
+      "source": "https://polyhaven.com/a/dark_rock",
+      "metadata_api": "https://api.polyhaven.com/info/dark_rock",
+      "files_api": "https://api.polyhaven.com/files/dark_rock",
+      "license": "CC0-1.0",
+      "authors": {
+        "Amal Kumar": "All"
+      },
+      "usage": "Variações rochosas dos Ermos e da Região Turbulenta",
+      "source_dimensions_mm": [
+        2421.1976528167725,
+        2421.199083328247
+      ],
+      "surface_repeat_metres": [
+        2.4211976528167725,
+        2.421199083328247
+      ],
+      "dimensions_note": "Extensão física de uma repetição da textura, conforme dimensões em milímetros da API.",
+      "files": [
+        {
+          "map": "Diffuse",
+          "filename": "dark_rock_diff_2k.png",
+          "path": "rochas/dark_rock/dark_rock_diff_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/dark_rock/dark_rock_diff_2k.png",
+          "md5": "f28176e49faa20ff7d0740a4faef267a",
+          "size": 23871575,
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:44.125143+00:00",
+            "bytes": 23871575,
+            "md5": "f28176e49faa20ff7d0740a4faef267a",
+            "md5_matches_provider": true,
+            "sha256": "4b5ebdeed1ffaac7891321776f78cc177ab42f89d9a9f96dfe770016625f26a5",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGBA",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "nor_gl",
+          "filename": "dark_rock_nor_gl_2k.png",
+          "path": "rochas/dark_rock/dark_rock_nor_gl_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/dark_rock/dark_rock_nor_gl_2k.png",
+          "md5": "118ea02faebe8cf4c4799b9a1655d48d",
+          "size": 25483495,
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:41.193912+00:00",
+            "bytes": 25483495,
+            "md5": "118ea02faebe8cf4c4799b9a1655d48d",
+            "md5_matches_provider": true,
+            "sha256": "cbc6ca75d74d4b6753a87fc9f211c91aa54b3ae5b9339ef4c912147c78e25977",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGBA",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "Rough",
+          "filename": "dark_rock_rough_2k.png",
+          "path": "rochas/dark_rock/dark_rock_rough_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/dark_rock/dark_rock_rough_2k.png",
+          "md5": "b45b4d2cfb53d15ae7db9505320e67b6",
+          "size": 7289540,
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:40.891072+00:00",
+            "bytes": 7289540,
+            "md5": "b45b4d2cfb53d15ae7db9505320e67b6",
+            "md5_matches_provider": true,
+            "sha256": "0bf3a1bab1a05f2c2bee9b340e036ba63ed98dba6491c28f42671f0bf6c86e68",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "I;16",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "Displacement",
+          "filename": "dark_rock_disp_2k.png",
+          "path": "rochas/dark_rock/dark_rock_disp_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/dark_rock/dark_rock_disp_2k.png",
+          "md5": "f6f16f9d5497675db1330580cd61657e",
+          "size": 5698235,
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:42.223476+00:00",
+            "bytes": 5698235,
+            "md5": "f6f16f9d5497675db1330580cd61657e",
+            "md5_matches_provider": true,
+            "sha256": "32370eb6d0c0e90260fcf01885f49f192b26e957c49d870be44154eddfaf0c01",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "I;16",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "AO",
+          "filename": "dark_rock_ao_2k.png",
+          "path": "rochas/dark_rock/dark_rock_ao_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/dark_rock/dark_rock_ao_2k.png",
+          "md5": "3aad0b9d8c3142197b553b414e8e7f2f",
+          "size": 4587000,
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:44.031445+00:00",
+            "bytes": 4587000,
+            "md5": "3aad0b9d8c3142197b553b414e8e7f2f",
+            "md5_matches_provider": true,
+            "sha256": "57bac1dadb59e449011c42a6fe86108182d2adb667196c281dc68f190a20ac33",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "I;16",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        }
+      ]
+    },
+    {
+      "asset": "river_small_rocks",
+      "category": "terreno",
+      "name": "River Small Rocks",
+      "source": "https://polyhaven.com/a/river_small_rocks",
+      "metadata_api": "https://api.polyhaven.com/info/river_small_rocks",
+      "files_api": "https://api.polyhaven.com/files/river_small_rocks",
+      "license": "CC0-1.0",
+      "authors": {
+        "Rob Tuytel": "Photography, Processing",
+        "Rico Cilliers": "Minor adjustment"
+      },
+      "usage": "Seixos e transições nas margens do rio",
+      "source_dimensions_mm": [
+        2900.0000953674316,
+        2900.0003337860107
+      ],
+      "surface_repeat_metres": [
+        2.9000000953674316,
+        2.9000003337860107
+      ],
+      "dimensions_note": "Extensão física de uma repetição da textura, conforme dimensões em milímetros da API.",
+      "files": [
+        {
+          "map": "Diffuse",
+          "filename": "river_small_rocks_diff_2k.png",
+          "path": "terreno/river_small_rocks/river_small_rocks_diff_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/river_small_rocks/river_small_rocks_diff_2k.png",
+          "size": 8256127,
+          "md5": "cb07f63cb064de016cdfe4af2c56020e",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:47.203084+00:00",
+            "bytes": 8256127,
+            "md5": "cb07f63cb064de016cdfe4af2c56020e",
+            "md5_matches_provider": true,
+            "sha256": "b634294c3ead442fa9e06ddd6f0a17aa7a2b41493bda7432552aaa30315094ed",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGB",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "nor_gl",
+          "filename": "river_small_rocks_nor_gl_2k.png",
+          "path": "terreno/river_small_rocks/river_small_rocks_nor_gl_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/river_small_rocks/river_small_rocks_nor_gl_2k.png",
+          "size": 9673468,
+          "md5": "4c7c11e5be495f63fe10c0a1e6418e54",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:43.852233+00:00",
+            "bytes": 9673468,
+            "md5": "4c7c11e5be495f63fe10c0a1e6418e54",
+            "md5_matches_provider": true,
+            "sha256": "d26daa3b79a4b71649d082da975648b88dfc72d426130adeae199a5de5149f39",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGB",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "Rough",
+          "filename": "river_small_rocks_rough_2k.png",
+          "path": "terreno/river_small_rocks/river_small_rocks_rough_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/river_small_rocks/river_small_rocks_rough_2k.png",
+          "size": 2598463,
+          "md5": "ca17412be3be5ee7cbf6343ee75bc860",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:46.120346+00:00",
+            "bytes": 2598463,
+            "md5": "ca17412be3be5ee7cbf6343ee75bc860",
+            "md5_matches_provider": true,
+            "sha256": "6e068529c49f6529b189490b0793cfed7496588f227516a4fd97c77f9ff5b7ad",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "L",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "Displacement",
+          "filename": "river_small_rocks_disp_2k.png",
+          "path": "terreno/river_small_rocks/river_small_rocks_disp_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/river_small_rocks/river_small_rocks_disp_2k.png",
+          "size": 7757746,
+          "md5": "6fe1428e2d0cdfd6a8465dde2e688dc9",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:45.568053+00:00",
+            "bytes": 7757746,
+            "md5": "6fe1428e2d0cdfd6a8465dde2e688dc9",
+            "md5_matches_provider": true,
+            "sha256": "32216ca0d31a15489cb166afff2756ff90c6cac77bb6af0c30bfdebbe2c676bc",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGB",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "AO",
+          "filename": "river_small_rocks_ao_2k.png",
+          "path": "terreno/river_small_rocks/river_small_rocks_ao_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/river_small_rocks/river_small_rocks_ao_2k.png",
+          "size": 4047674,
+          "md5": "d40f4ef9965d162ab2e29f70e6447069",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:47.154251+00:00",
+            "bytes": 4047674,
+            "md5": "d40f4ef9965d162ab2e29f70e6447069",
+            "md5_matches_provider": true,
+            "sha256": "aa0179e0031ffffd79d1889407845687490afde17d8a8a85daa858e4a9178a0a",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGB",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        }
+      ]
+    },
+    {
+      "asset": "bark_brown_02",
+      "category": "cascas",
+      "name": "Bark Brown 02",
+      "source": "https://polyhaven.com/a/bark_brown_02",
+      "metadata_api": "https://api.polyhaven.com/info/bark_brown_02",
+      "files_api": "https://api.polyhaven.com/files/bark_brown_02",
+      "license": "CC0-1.0",
+      "authors": {
+        "Rob Tuytel": "All"
+      },
+      "usage": "Casca de árvores de copa ampla",
+      "source_dimensions_mm": [
+        999.9990463256836,
+        999.998927116394
+      ],
+      "surface_repeat_metres": [
+        0.9999990463256836,
+        0.999998927116394
+      ],
+      "dimensions_note": "Extensão física de uma repetição da textura, conforme dimensões em milímetros da API.",
+      "files": [
+        {
+          "map": "Diffuse",
+          "filename": "bark_brown_02_diff_2k.png",
+          "path": "cascas/bark_brown_02/bark_brown_02_diff_2k.png",
+          "size": 8514206,
+          "md5": "c2d57e5293da1d365ac395cae19b1d9b",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/bark_brown_02/bark_brown_02_diff_2k.png",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:54.744656+00:00",
+            "bytes": 8514206,
+            "md5": "c2d57e5293da1d365ac395cae19b1d9b",
+            "md5_matches_provider": true,
+            "sha256": "e2c2563e4149bf06386f8e8db590d5c2d7e8f2459e3e08132fe616acb2d07085",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGBA",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "nor_gl",
+          "filename": "bark_brown_02_nor_gl_2k.png",
+          "path": "cascas/bark_brown_02/bark_brown_02_nor_gl_2k.png",
+          "size": 9323032,
+          "md5": "24bbfca9cae988a4a753cb42123cab3f",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/bark_brown_02/bark_brown_02_nor_gl_2k.png",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:48.787750+00:00",
+            "bytes": 9323032,
+            "md5": "24bbfca9cae988a4a753cb42123cab3f",
+            "md5_matches_provider": true,
+            "sha256": "d37078fc9b058f60b9445e53f8fef7c74caf8065b325a07521152b6033229456",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGBA",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "Rough",
+          "filename": "bark_brown_02_rough_2k.png",
+          "path": "cascas/bark_brown_02/bark_brown_02_rough_2k.png",
+          "size": 2827131,
+          "md5": "27383735fba1354d912e35046985acc3",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/bark_brown_02/bark_brown_02_rough_2k.png",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:49.283669+00:00",
+            "bytes": 2827131,
+            "md5": "27383735fba1354d912e35046985acc3",
+            "md5_matches_provider": true,
+            "sha256": "e36caff0fcb15dc78998d83fae32b83c5afe711a086e342af34b417d8104ac76",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "L",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "Displacement",
+          "filename": "bark_brown_02_disp_2k.png",
+          "path": "cascas/bark_brown_02/bark_brown_02_disp_2k.png",
+          "size": 6555476,
+          "md5": "8bc0ca06214c073060c7bafee313214d",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/bark_brown_02/bark_brown_02_disp_2k.png",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:49.717621+00:00",
+            "bytes": 6555476,
+            "md5": "8bc0ca06214c073060c7bafee313214d",
+            "md5_matches_provider": true,
+            "sha256": "9428b672837475fac8fbd4377e5b10a8b344fa3f2a5ee8fed66cccff9c0e67d8",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGBA",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "AO",
+          "filename": "bark_brown_02_ao_2k.png",
+          "path": "cascas/bark_brown_02/bark_brown_02_ao_2k.png",
+          "size": 3912373,
+          "md5": "9a0cbce89e0749733589dd2faba4618a",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/bark_brown_02/bark_brown_02_ao_2k.png",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:52.019740+00:00",
+            "bytes": 3912373,
+            "md5": "9a0cbce89e0749733589dd2faba4618a",
+            "md5_matches_provider": true,
+            "sha256": "ec1bb5a63f0aa9866e7ccf7a29b2c15b8e8ca780ad5d3327bd060dbf4b5df9b0",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "L",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        }
+      ]
+    },
+    {
+      "asset": "pine_bark",
+      "category": "cascas",
+      "name": "Pine Bark",
+      "source": "https://polyhaven.com/a/pine_bark",
+      "metadata_api": "https://api.polyhaven.com/info/pine_bark",
+      "files_api": "https://api.polyhaven.com/files/pine_bark",
+      "license": "CC0-1.0",
+      "authors": {
+        "Dimitrios Savva": "All"
+      },
+      "usage": "Casca dos pinheiros",
+      "source_dimensions_mm": [
+        1999.9996423721313,
+        1999.9996423721313
+      ],
+      "surface_repeat_metres": [
+        1.9999996423721313,
+        1.9999996423721313
+      ],
+      "dimensions_note": "Extensão física de uma repetição da textura, conforme dimensões em milímetros da API.",
+      "files": [
+        {
+          "map": "Diffuse",
+          "filename": "pine_bark_diff_2k.png",
+          "path": "cascas/pine_bark/pine_bark_diff_2k.png",
+          "size": 22131157,
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/pine_bark/pine_bark_diff_2k.png",
+          "md5": "015bb4064ae0bc402414c9b82e37b2f2",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:53.174955+00:00",
+            "bytes": 22131157,
+            "md5": "015bb4064ae0bc402414c9b82e37b2f2",
+            "md5_matches_provider": true,
+            "sha256": "5bbefb465d4e4485eec1b06f3912568cc727c0608a899780a2dbd66d17ba5869",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGB",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "nor_gl",
+          "filename": "pine_bark_nor_gl_2k.png",
+          "path": "cascas/pine_bark/pine_bark_nor_gl_2k.png",
+          "size": 23305492,
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/pine_bark/pine_bark_nor_gl_2k.png",
+          "md5": "6142fcfc3f2f7b7d34e9de4ba7d5ff04",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:55.792126+00:00",
+            "bytes": 23305492,
+            "md5": "6142fcfc3f2f7b7d34e9de4ba7d5ff04",
+            "md5_matches_provider": true,
+            "sha256": "a2c1783e4190480d2b5eb4fd5da0ba828ba70c940d64614c60cfe4e997a0749e",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGB",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "Rough",
+          "filename": "pine_bark_rough_2k.png",
+          "path": "cascas/pine_bark/pine_bark_rough_2k.png",
+          "size": 9796810,
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/pine_bark/pine_bark_rough_2k.png",
+          "md5": "cbd4b77bb13ef7dd59cd3e34257e9390",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:55.589424+00:00",
+            "bytes": 9796810,
+            "md5": "cbd4b77bb13ef7dd59cd3e34257e9390",
+            "md5_matches_provider": true,
+            "sha256": "4db8016d2cbdb5196b200198726c971adfceed50b7ffd9933ca03213b09cb261",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGB",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "Displacement",
+          "filename": "pine_bark_disp_2k.png",
+          "path": "cascas/pine_bark/pine_bark_disp_2k.png",
+          "size": 6454207,
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/pine_bark/pine_bark_disp_2k.png",
+          "md5": "7a63428effcf14a5cb4cbe7d62c8d94d",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:56.966454+00:00",
+            "bytes": 6454207,
+            "md5": "7a63428effcf14a5cb4cbe7d62c8d94d",
+            "md5_matches_provider": true,
+            "sha256": "3cab0dd9efa1972168d6ad7245a5b561f7a700a039f9c1313d882b638d5d0925",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "I;16",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "AO",
+          "filename": "pine_bark_ao_2k.png",
+          "path": "cascas/pine_bark/pine_bark_ao_2k.png",
+          "size": 7461732,
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/pine_bark/pine_bark_ao_2k.png",
+          "md5": "ebd1764811207779f29254c42de5a75d",
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:57.334693+00:00",
+            "bytes": 7461732,
+            "md5": "ebd1764811207779f29254c42de5a75d",
+            "md5_matches_provider": true,
+            "sha256": "5a43f48d6e21e49b1fd593a52682af2647372bbdbfd0fad2b6d24b45c59d303a",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "I;16",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        }
+      ]
+    },
+    {
+      "asset": "island_tree_03",
+      "category": "folhagem",
+      "name": "Island Tree 03",
+      "source": "https://polyhaven.com/a/island_tree_03",
+      "metadata_api": "https://api.polyhaven.com/info/island_tree_03",
+      "files_api": "https://api.polyhaven.com/files/island_tree_03",
+      "license": "CC0-1.0",
+      "authors": {
+        "Rob Tuytel": "scanning, processing",
+        "Rico Cilliers": "cleanup, processing"
+      },
+      "usage": "Folhas largas para reconstruir copas",
+      "source_dimensions_mm": [
+        8489.88127708435,
+        2913.232445716858,
+        2615.518140606582
+      ],
+      "surface_repeat_metres": null,
+      "dimensions_note": "Dimensões do modelo completo; não definem o tamanho de cada folha/ramo no atlas.",
+      "files": [
+        {
+          "map": "leaves_alpha",
+          "filename": "island_tree_03_leaves_alpha_2k.png",
+          "path": "folhagem/island_tree_03/island_tree_03_leaves_alpha_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Models/png/2k/island_tree_03/island_tree_03_leaves_alpha_2k.png",
+          "md5": "063774afef8fe1d35ce52d56bf41bf81",
+          "size": 139077,
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:56.953584+00:00",
+            "bytes": 139077,
+            "md5": "063774afef8fe1d35ce52d56bf41bf81",
+            "md5_matches_provider": true,
+            "sha256": "30c36ae0d9023400035f0af9d336ed5f73a84bf8a88c8e2bec8faa07d725992b",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "I;16",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "leaves_diff",
+          "filename": "island_tree_03_leaves_diff_2k.png",
+          "path": "folhagem/island_tree_03/island_tree_03_leaves_diff_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Models/png/2k/island_tree_03/island_tree_03_leaves_diff_2k.png",
+          "md5": "d54fd06a5611278810df55d427cc4b1b",
+          "size": 6428036,
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:58.677742+00:00",
+            "bytes": 6428036,
+            "md5": "d54fd06a5611278810df55d427cc4b1b",
+            "md5_matches_provider": true,
+            "sha256": "fca98db31845a92e6374fccd032d40d6134e2c80fdca8038b063897c8e8f0035",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGBA",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "leaves_nor_gl",
+          "filename": "island_tree_03_leaves_nor_gl_2k.png",
+          "path": "folhagem/island_tree_03/island_tree_03_leaves_nor_gl_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Models/png/2k/island_tree_03/island_tree_03_leaves_nor_gl_2k.png",
+          "md5": "3d3d53270e1a5d6be297307c7ab8629c",
+          "size": 10109651,
+          "verification": {
+            "verified_utc": "2026-09-24T00:21:04.317424+00:00",
+            "bytes": 10109651,
+            "md5": "3d3d53270e1a5d6be297307c7ab8629c",
+            "md5_matches_provider": true,
+            "sha256": "2d152d8530e707056fce44303de71cf63503f5d95b80d0820dc7625c99d8d2d9",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGB",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "leaves_rough",
+          "filename": "island_tree_03_leaves_rough_2k.png",
+          "path": "folhagem/island_tree_03/island_tree_03_leaves_rough_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Models/png/2k/island_tree_03/island_tree_03_leaves_rough_2k.png",
+          "md5": "a49ed311f1d7f504a17d917ffbc83bd1",
+          "size": 2723975,
+          "verification": {
+            "verified_utc": "2026-09-24T00:21:00.731083+00:00",
+            "bytes": 2723975,
+            "md5": "a49ed311f1d7f504a17d917ffbc83bd1",
+            "md5_matches_provider": true,
+            "sha256": "eccee8f209c8dd869b478a209ec0b44a3de6bae11c9594700f7e201771a9eac2",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "I;16",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        }
+      ]
+    },
+    {
+      "asset": "pine_tree_01",
+      "category": "folhagem",
+      "name": "Pine Tree 01",
+      "source": "https://polyhaven.com/a/pine_tree_01",
+      "metadata_api": "https://api.polyhaven.com/info/pine_tree_01",
+      "files_api": "https://api.polyhaven.com/files/pine_tree_01",
+      "license": "CC0-1.0",
+      "authors": {
+        "Rob Tuytel": "photography",
+        "Rico Cilliers": "modeling"
+      },
+      "usage": "Ramos com agulhas para pinheiros",
+      "source_dimensions_mm": [
+        26719.930171966553,
+        1300.55171251297,
+        17577.758572995663
+      ],
+      "surface_repeat_metres": null,
+      "dimensions_note": "Dimensões do modelo completo; não definem o tamanho de cada folha/ramo no atlas.",
+      "files": [
+        {
+          "map": "twig_alpha",
+          "filename": "pine_tree_01_twig_alpha_2k.png",
+          "path": "folhagem/pine_tree_01/pine_tree_01_twig_alpha_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Models/png/2k/pine_tree_01/pine_tree_01_twig_alpha_2k.png",
+          "md5": "85f9f62d98dc35cce642895d75f79fa6",
+          "size": 814656,
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:57.663088+00:00",
+            "bytes": 814656,
+            "md5": "85f9f62d98dc35cce642895d75f79fa6",
+            "md5_matches_provider": true,
+            "sha256": "1e5a1fe741f4cb731a3f537589db62a1cbcd380775e44d13f1b88b9e717df56b",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGB",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "twig_diff",
+          "filename": "pine_tree_01_twig_diff_2k.png",
+          "path": "folhagem/pine_tree_01/pine_tree_01_twig_diff_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Models/png/2k/pine_tree_01/pine_tree_01_twig_diff_2k.png",
+          "md5": "7e331929a726605fc99af8b82253d100",
+          "size": 10070495,
+          "verification": {
+            "verified_utc": "2026-09-24T00:20:58.880458+00:00",
+            "bytes": 10070495,
+            "md5": "7e331929a726605fc99af8b82253d100",
+            "md5_matches_provider": true,
+            "sha256": "68b4476c8a4272d51aafdfea3805d24984f3a64c22b4794ceea87317b380eb33",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGBA",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "twig_nor_gl",
+          "filename": "pine_tree_01_twig_nor_gl_2k.png",
+          "path": "folhagem/pine_tree_01/pine_tree_01_twig_nor_gl_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Models/png/2k/pine_tree_01/pine_tree_01_twig_nor_gl_2k.png",
+          "md5": "3ebdf235873ec43c44528a0efcbd8892",
+          "size": 9430327,
+          "verification": {
+            "verified_utc": "2026-09-24T00:21:02.248211+00:00",
+            "bytes": 9430327,
+            "md5": "3ebdf235873ec43c44528a0efcbd8892",
+            "md5_matches_provider": true,
+            "sha256": "546a19689795dd28a48f041ae5a4ff4c6273648b2e0d32d40df6b48cdc122b99",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGB",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        },
+        {
+          "map": "twig_rough",
+          "filename": "pine_tree_01_twig_rough_2k.png",
+          "path": "folhagem/pine_tree_01/pine_tree_01_twig_rough_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Models/png/2k/pine_tree_01/pine_tree_01_twig_rough_2k.png",
+          "md5": "6f2b474081a4196ce90cc71ceb01bb96",
+          "size": 4106318,
+          "verification": {
+            "verified_utc": "2026-09-24T00:21:01.224972+00:00",
+            "bytes": 4106318,
+            "md5": "6f2b474081a4196ce90cc71ceb01bb96",
+            "md5_matches_provider": true,
+            "sha256": "c10b8c98b159162a07de51ac809237a62bdc39de2ca659cfcf06a57eebf162d2",
+            "dimensions_px": [
+              2048,
+              2048
+            ],
+            "mode": "RGB",
+            "png_full_decode": true
+          },
+          "status": "downloaded_verified"
+        }
+      ]
+    }
+  ],
+  "completed_utc": "2026-09-24T00:21:04.322894+00:00",
+  "verification_summary": {
+    "expected_files": 48,
+    "verified_files": 48,
+    "total_verified_bytes": 495072130,
+    "all_md5_match": true,
+    "all_png_decoded": true,
+    "errors": []
+  },
+  "files": [
+    {
+      "assetId": "sparse_grass",
+      "map": "Diffuse",
+      "relativePath": "terreno/sparse_grass/sparse_grass_diff_2k.png",
+      "bytes": 22593728,
+      "md5": "7de88637c54d5fa32953e89b9a31af67",
+      "sha256": "d24a836c12689f4fda41358251f30ddb865bbad41ccac63bf276b13559d55167",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/sparse_grass/sparse_grass_diff_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "sparse_grass",
+      "map": "nor_gl",
+      "relativePath": "terreno/sparse_grass/sparse_grass_nor_gl_2k.png",
+      "bytes": 24333251,
+      "md5": "890a75197a9aa1e44a29a0af64634576",
+      "sha256": "3295cf5ca9db4ed1888d94ebf7e69295c1c6607beeb1e3bd5373c7cd20c9318e",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/sparse_grass/sparse_grass_nor_gl_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "sparse_grass",
+      "map": "Rough",
+      "relativePath": "terreno/sparse_grass/sparse_grass_rough_2k.png",
+      "bytes": 6898080,
+      "md5": "d33c17e7b26f16ea8aad2779f45e08c8",
+      "sha256": "9f3a47f0705f1c09939c7549194bab8863e2ef74f1eae613cf3307e5bd2e8143",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/sparse_grass/sparse_grass_rough_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "sparse_grass",
+      "map": "Displacement",
+      "relativePath": "terreno/sparse_grass/sparse_grass_disp_2k.png",
+      "bytes": 7172026,
+      "md5": "c9f328ac5e7e29d65abe10b9943efb64",
+      "sha256": "ab2a2ac5ac8a9aea06f97a0cb4e06089b58ee29079c104731a4f4786c4e490cd",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/sparse_grass/sparse_grass_disp_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "sparse_grass",
+      "map": "AO",
+      "relativePath": "terreno/sparse_grass/sparse_grass_ao_2k.png",
+      "bytes": 5996521,
+      "md5": "d0f64e44c7314973c97f884f1039f74b",
+      "sha256": "696c4ab65ce302a62308964a5f4beff31f62de075e1ef899eb19dda9d14e85d9",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/sparse_grass/sparse_grass_ao_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "rocky_trail_02",
+      "map": "Diffuse",
+      "relativePath": "terreno/rocky_trail_02/rocky_trail_02_diff_2k.png",
+      "bytes": 22487028,
+      "md5": "c500a0e838249abd8218a089db866490",
+      "sha256": "191d392b18439db343a711fa96e0bab63b1716005ac5727fa1555bdc4a51a0e5",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rocky_trail_02/rocky_trail_02_diff_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "rocky_trail_02",
+      "map": "nor_gl",
+      "relativePath": "terreno/rocky_trail_02/rocky_trail_02_nor_gl_2k.png",
+      "bytes": 24179832,
+      "md5": "54645fd05a1c85536b7b03f28d477200",
+      "sha256": "c52f968f4f20d18a7e916e0d1feeadfa8113f52a402b9a125cd16be297512628",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rocky_trail_02/rocky_trail_02_nor_gl_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "rocky_trail_02",
+      "map": "Rough",
+      "relativePath": "terreno/rocky_trail_02/rocky_trail_02_rough_2k.png",
+      "bytes": 7238567,
+      "md5": "5d20509091f729f72297e76a070c62a0",
+      "sha256": "281801cd8a9b36a27d707b5d2f89a8bce378dbc91cd30cef48da1407a0d72d09",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rocky_trail_02/rocky_trail_02_rough_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "rocky_trail_02",
+      "map": "Displacement",
+      "relativePath": "terreno/rocky_trail_02/rocky_trail_02_disp_2k.png",
+      "bytes": 6925114,
+      "md5": "1d868dd865ab9ff5635dd2a18aefb1ed",
+      "sha256": "3c596c0402148084006c67cd5fa4401e3d692b038f80478bacfed5044403776e",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rocky_trail_02/rocky_trail_02_disp_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "rocky_trail_02",
+      "map": "AO",
+      "relativePath": "terreno/rocky_trail_02/rocky_trail_02_ao_2k.png",
+      "bytes": 7949340,
+      "md5": "a40801c36b2e033ebcb400752c074bae",
+      "sha256": "af163b4b17a70457ca34ac2c28b9df44e212fe3bd0c61447f0d474143518d166",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rocky_trail_02/rocky_trail_02_ao_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "forrest_ground_01",
+      "map": "Diffuse",
+      "relativePath": "terreno/forrest_ground_01/forrest_ground_01_diff_2k.png",
+      "bytes": 26253635,
+      "md5": "cda857d84802f75a7c4e9e4868ead076",
+      "sha256": "06a7c3c4a3916fd96821c4f4d21b4a38c333e931bfc66856e19dab720a22ffa5",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/forrest_ground_01/forrest_ground_01_diff_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "forrest_ground_01",
+      "map": "nor_gl",
+      "relativePath": "terreno/forrest_ground_01/forrest_ground_01_nor_gl_2k.png",
+      "bytes": 27037479,
+      "md5": "dbeb8ca5c1914b78865f7d5ae1f70026",
+      "sha256": "bfc3e06ea31c3de513c9421a8fbbb4a540ebe32fada1bbb545286c1abc96e313",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/forrest_ground_01/forrest_ground_01_nor_gl_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "forrest_ground_01",
+      "map": "Rough",
+      "relativePath": "terreno/forrest_ground_01/forrest_ground_01_rough_2k.png",
+      "bytes": 7262563,
+      "md5": "32d508b95d8ecf0a87786cbe29a4d82d",
+      "sha256": "b69fd13c094fd8dda54825f228517faf93ac2763785e097e00a8bbe6f3df200d",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/forrest_ground_01/forrest_ground_01_rough_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "forrest_ground_01",
+      "map": "Displacement",
+      "relativePath": "terreno/forrest_ground_01/forrest_ground_01_disp_2k.png",
+      "bytes": 8254943,
+      "md5": "a5450e0b6a21239a8cc37faac9ad641c",
+      "sha256": "1d8cb8bbe9039ee2cd22068d457617a1748170405aacd49d33fcf637e08bb12b",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/forrest_ground_01/forrest_ground_01_disp_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "forrest_ground_01",
+      "map": "AO",
+      "relativePath": "terreno/forrest_ground_01/forrest_ground_01_ao_2k.png",
+      "bytes": 9817046,
+      "md5": "9a9baa0270c78a37762aa690651ddfcb",
+      "sha256": "7c659c4116033014bc3ff81cc7ebea397d47a177e056b81491a431815104b67c",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/forrest_ground_01/forrest_ground_01_ao_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "rock_3",
+      "map": "Diffuse",
+      "relativePath": "rochas/rock_3/rock_3_diff_2k.png",
+      "bytes": 9269182,
+      "md5": "6ce05e52225a076d7ec67a54ce07f6ab",
+      "sha256": "33dd55b2a6ad56b81994013eca1ec93c7dc3754e106bce3a477e3cec799f2b84",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 8,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rock_3/rock_3_diff_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "rock_3",
+      "map": "nor_gl",
+      "relativePath": "rochas/rock_3/rock_3_nor_gl_2k.png",
+      "bytes": 8784332,
+      "md5": "9c894aae6ffa61e94209b8551f87e5d8",
+      "sha256": "04adb75b2c355b7052be97bbb5482f3e34f5c004483efd25ab1511a4dbbe02e4",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 8,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rock_3/rock_3_nor_gl_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "rock_3",
+      "map": "Rough",
+      "relativePath": "rochas/rock_3/rock_3_rough_2k.png",
+      "bytes": 7657637,
+      "md5": "917e95a5c3f49eda3015f95eee550a4c",
+      "sha256": "87468651969b0c07bb05d4d2b053ef51be7ea7479833af7c81fa14609ec6898a",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rock_3/rock_3_rough_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "rock_3",
+      "map": "Displacement",
+      "relativePath": "rochas/rock_3/rock_3_disp_2k.png",
+      "bytes": 8052503,
+      "md5": "02ce8192521cda098c85fecc9b0bfe8c",
+      "sha256": "7574c0e5ab9255153aea233cc5dc260b30346ddd6086b502b817b416ed3fe04d",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rock_3/rock_3_disp_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "rock_3",
+      "map": "AO",
+      "relativePath": "rochas/rock_3/rock_3_ao_2k.png",
+      "bytes": 3541849,
+      "md5": "e4d01260315da7583a71d9ebae763525",
+      "sha256": "065cb9d9818fde8d153a015749b80023003c57bf89045c87656ff93013146966",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 8,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rock_3/rock_3_ao_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "dark_rock",
+      "map": "Diffuse",
+      "relativePath": "rochas/dark_rock/dark_rock_diff_2k.png",
+      "bytes": 23871575,
+      "md5": "f28176e49faa20ff7d0740a4faef267a",
+      "sha256": "4b5ebdeed1ffaac7891321776f78cc177ab42f89d9a9f96dfe770016625f26a5",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/dark_rock/dark_rock_diff_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "dark_rock",
+      "map": "nor_gl",
+      "relativePath": "rochas/dark_rock/dark_rock_nor_gl_2k.png",
+      "bytes": 25483495,
+      "md5": "118ea02faebe8cf4c4799b9a1655d48d",
+      "sha256": "cbc6ca75d74d4b6753a87fc9f211c91aa54b3ae5b9339ef4c912147c78e25977",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/dark_rock/dark_rock_nor_gl_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "dark_rock",
+      "map": "Rough",
+      "relativePath": "rochas/dark_rock/dark_rock_rough_2k.png",
+      "bytes": 7289540,
+      "md5": "b45b4d2cfb53d15ae7db9505320e67b6",
+      "sha256": "0bf3a1bab1a05f2c2bee9b340e036ba63ed98dba6491c28f42671f0bf6c86e68",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/dark_rock/dark_rock_rough_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "dark_rock",
+      "map": "Displacement",
+      "relativePath": "rochas/dark_rock/dark_rock_disp_2k.png",
+      "bytes": 5698235,
+      "md5": "f6f16f9d5497675db1330580cd61657e",
+      "sha256": "32370eb6d0c0e90260fcf01885f49f192b26e957c49d870be44154eddfaf0c01",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/dark_rock/dark_rock_disp_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "dark_rock",
+      "map": "AO",
+      "relativePath": "rochas/dark_rock/dark_rock_ao_2k.png",
+      "bytes": 4587000,
+      "md5": "3aad0b9d8c3142197b553b414e8e7f2f",
+      "sha256": "57bac1dadb59e449011c42a6fe86108182d2adb667196c281dc68f190a20ac33",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/dark_rock/dark_rock_ao_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "river_small_rocks",
+      "map": "Diffuse",
+      "relativePath": "terreno/river_small_rocks/river_small_rocks_diff_2k.png",
+      "bytes": 8256127,
+      "md5": "cb07f63cb064de016cdfe4af2c56020e",
+      "sha256": "b634294c3ead442fa9e06ddd6f0a17aa7a2b41493bda7432552aaa30315094ed",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 8,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/river_small_rocks/river_small_rocks_diff_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "river_small_rocks",
+      "map": "nor_gl",
+      "relativePath": "terreno/river_small_rocks/river_small_rocks_nor_gl_2k.png",
+      "bytes": 9673468,
+      "md5": "4c7c11e5be495f63fe10c0a1e6418e54",
+      "sha256": "d26daa3b79a4b71649d082da975648b88dfc72d426130adeae199a5de5149f39",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 8,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/river_small_rocks/river_small_rocks_nor_gl_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "river_small_rocks",
+      "map": "Rough",
+      "relativePath": "terreno/river_small_rocks/river_small_rocks_rough_2k.png",
+      "bytes": 2598463,
+      "md5": "ca17412be3be5ee7cbf6343ee75bc860",
+      "sha256": "6e068529c49f6529b189490b0793cfed7496588f227516a4fd97c77f9ff5b7ad",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 8,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/river_small_rocks/river_small_rocks_rough_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "river_small_rocks",
+      "map": "Displacement",
+      "relativePath": "terreno/river_small_rocks/river_small_rocks_disp_2k.png",
+      "bytes": 7757746,
+      "md5": "6fe1428e2d0cdfd6a8465dde2e688dc9",
+      "sha256": "32216ca0d31a15489cb166afff2756ff90c6cac77bb6af0c30bfdebbe2c676bc",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/river_small_rocks/river_small_rocks_disp_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "river_small_rocks",
+      "map": "AO",
+      "relativePath": "terreno/river_small_rocks/river_small_rocks_ao_2k.png",
+      "bytes": 4047674,
+      "md5": "d40f4ef9965d162ab2e29f70e6447069",
+      "sha256": "aa0179e0031ffffd79d1889407845687490afde17d8a8a85daa858e4a9178a0a",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 8,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/river_small_rocks/river_small_rocks_ao_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "bark_brown_02",
+      "map": "Diffuse",
+      "relativePath": "cascas/bark_brown_02/bark_brown_02_diff_2k.png",
+      "bytes": 8514206,
+      "md5": "c2d57e5293da1d365ac395cae19b1d9b",
+      "sha256": "e2c2563e4149bf06386f8e8db590d5c2d7e8f2459e3e08132fe616acb2d07085",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 8,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/bark_brown_02/bark_brown_02_diff_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "bark_brown_02",
+      "map": "nor_gl",
+      "relativePath": "cascas/bark_brown_02/bark_brown_02_nor_gl_2k.png",
+      "bytes": 9323032,
+      "md5": "24bbfca9cae988a4a753cb42123cab3f",
+      "sha256": "d37078fc9b058f60b9445e53f8fef7c74caf8065b325a07521152b6033229456",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 8,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/bark_brown_02/bark_brown_02_nor_gl_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "bark_brown_02",
+      "map": "Rough",
+      "relativePath": "cascas/bark_brown_02/bark_brown_02_rough_2k.png",
+      "bytes": 2827131,
+      "md5": "27383735fba1354d912e35046985acc3",
+      "sha256": "e36caff0fcb15dc78998d83fae32b83c5afe711a086e342af34b417d8104ac76",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 8,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/bark_brown_02/bark_brown_02_rough_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "bark_brown_02",
+      "map": "Displacement",
+      "relativePath": "cascas/bark_brown_02/bark_brown_02_disp_2k.png",
+      "bytes": 6555476,
+      "md5": "8bc0ca06214c073060c7bafee313214d",
+      "sha256": "9428b672837475fac8fbd4377e5b10a8b344fa3f2a5ee8fed66cccff9c0e67d8",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/bark_brown_02/bark_brown_02_disp_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "bark_brown_02",
+      "map": "AO",
+      "relativePath": "cascas/bark_brown_02/bark_brown_02_ao_2k.png",
+      "bytes": 3912373,
+      "md5": "9a0cbce89e0749733589dd2faba4618a",
+      "sha256": "ec1bb5a63f0aa9866e7ccf7a29b2c15b8e8ca780ad5d3327bd060dbf4b5df9b0",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 8,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/bark_brown_02/bark_brown_02_ao_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "pine_bark",
+      "map": "Diffuse",
+      "relativePath": "cascas/pine_bark/pine_bark_diff_2k.png",
+      "bytes": 22131157,
+      "md5": "015bb4064ae0bc402414c9b82e37b2f2",
+      "sha256": "5bbefb465d4e4485eec1b06f3912568cc727c0608a899780a2dbd66d17ba5869",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/pine_bark/pine_bark_diff_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "pine_bark",
+      "map": "nor_gl",
+      "relativePath": "cascas/pine_bark/pine_bark_nor_gl_2k.png",
+      "bytes": 23305492,
+      "md5": "6142fcfc3f2f7b7d34e9de4ba7d5ff04",
+      "sha256": "a2c1783e4190480d2b5eb4fd5da0ba828ba70c940d64614c60cfe4e997a0749e",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/pine_bark/pine_bark_nor_gl_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "pine_bark",
+      "map": "Rough",
+      "relativePath": "cascas/pine_bark/pine_bark_rough_2k.png",
+      "bytes": 9796810,
+      "md5": "cbd4b77bb13ef7dd59cd3e34257e9390",
+      "sha256": "4db8016d2cbdb5196b200198726c971adfceed50b7ffd9933ca03213b09cb261",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/pine_bark/pine_bark_rough_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "pine_bark",
+      "map": "Displacement",
+      "relativePath": "cascas/pine_bark/pine_bark_disp_2k.png",
+      "bytes": 6454207,
+      "md5": "7a63428effcf14a5cb4cbe7d62c8d94d",
+      "sha256": "3cab0dd9efa1972168d6ad7245a5b561f7a700a039f9c1313d882b638d5d0925",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/pine_bark/pine_bark_disp_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "pine_bark",
+      "map": "AO",
+      "relativePath": "cascas/pine_bark/pine_bark_ao_2k.png",
+      "bytes": 7461732,
+      "md5": "ebd1764811207779f29254c42de5a75d",
+      "sha256": "5a43f48d6e21e49b1fd593a52682af2647372bbdbfd0fad2b6d24b45c59d303a",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/pine_bark/pine_bark_ao_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "island_tree_03",
+      "map": "leaves_alpha",
+      "relativePath": "folhagem/island_tree_03/island_tree_03_leaves_alpha_2k.png",
+      "bytes": 139077,
+      "md5": "063774afef8fe1d35ce52d56bf41bf81",
+      "sha256": "30c36ae0d9023400035f0af9d336ed5f73a84bf8a88c8e2bec8faa07d725992b",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Models/png/2k/island_tree_03/island_tree_03_leaves_alpha_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "island_tree_03",
+      "map": "leaves_diff",
+      "relativePath": "folhagem/island_tree_03/island_tree_03_leaves_diff_2k.png",
+      "bytes": 6428036,
+      "md5": "d54fd06a5611278810df55d427cc4b1b",
+      "sha256": "fca98db31845a92e6374fccd032d40d6134e2c80fdca8038b063897c8e8f0035",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Models/png/2k/island_tree_03/island_tree_03_leaves_diff_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "island_tree_03",
+      "map": "leaves_nor_gl",
+      "relativePath": "folhagem/island_tree_03/island_tree_03_leaves_nor_gl_2k.png",
+      "bytes": 10109651,
+      "md5": "3d3d53270e1a5d6be297307c7ab8629c",
+      "sha256": "2d152d8530e707056fce44303de71cf63503f5d95b80d0820dc7625c99d8d2d9",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Models/png/2k/island_tree_03/island_tree_03_leaves_nor_gl_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "island_tree_03",
+      "map": "leaves_rough",
+      "relativePath": "folhagem/island_tree_03/island_tree_03_leaves_rough_2k.png",
+      "bytes": 2723975,
+      "md5": "a49ed311f1d7f504a17d917ffbc83bd1",
+      "sha256": "eccee8f209c8dd869b478a209ec0b44a3de6bae11c9594700f7e201771a9eac2",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Models/png/2k/island_tree_03/island_tree_03_leaves_rough_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "pine_tree_01",
+      "map": "twig_alpha",
+      "relativePath": "folhagem/pine_tree_01/pine_tree_01_twig_alpha_2k.png",
+      "bytes": 814656,
+      "md5": "85f9f62d98dc35cce642895d75f79fa6",
+      "sha256": "1e5a1fe741f4cb731a3f537589db62a1cbcd380775e44d13f1b88b9e717df56b",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Models/png/2k/pine_tree_01/pine_tree_01_twig_alpha_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "pine_tree_01",
+      "map": "twig_diff",
+      "relativePath": "folhagem/pine_tree_01/pine_tree_01_twig_diff_2k.png",
+      "bytes": 10070495,
+      "md5": "7e331929a726605fc99af8b82253d100",
+      "sha256": "68b4476c8a4272d51aafdfea3805d24984f3a64c22b4794ceea87317b380eb33",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Models/png/2k/pine_tree_01/pine_tree_01_twig_diff_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "pine_tree_01",
+      "map": "twig_nor_gl",
+      "relativePath": "folhagem/pine_tree_01/pine_tree_01_twig_nor_gl_2k.png",
+      "bytes": 9430327,
+      "md5": "3ebdf235873ec43c44528a0efcbd8892",
+      "sha256": "546a19689795dd28a48f041ae5a4ff4c6273648b2e0d32d40df6b48cdc122b99",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Models/png/2k/pine_tree_01/pine_tree_01_twig_nor_gl_2k.png",
+      "verified": true
+    },
+    {
+      "assetId": "pine_tree_01",
+      "map": "twig_rough",
+      "relativePath": "folhagem/pine_tree_01/pine_tree_01_twig_rough_2k.png",
+      "bytes": 4106318,
+      "md5": "6f2b474081a4196ce90cc71ceb01bb96",
+      "sha256": "c10b8c98b159162a07de51ac809237a62bdc39de2ca659cfcf06a57eebf162d2",
+      "width": 2048,
+      "height": 2048,
+      "sourcePngBitDepth": 16,
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Models/png/2k/pine_tree_01/pine_tree_01_twig_rough_2k.png",
+      "verified": true
+    }
+  ]
+}

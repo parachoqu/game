@@ -1,0 +1,754 @@
+{
+  "schema_version": "1.0.0",
+  "file_count": 123,
+  "total_bytes_excluding_inventory": 1656096215,
+  "bytes_by_category": {
+    "blender_master": 702177536,
+    "export": 857823974,
+    "render": 75777842,
+    "report": 1158797,
+    "source_or_documentation": 18989126,
+    "test": 22625,
+    "tool": 146315
+  },
+  "files": [
+    {
+      "path": "MUNDO_MESTRE.blend",
+      "category": "blender_master",
+      "bytes": 351298658,
+      "sha256": "ab58b8486992054a91640c4192e21024ff578f4a4366b01362a9fb0726917a76"
+    },
+    {
+      "path": "MUNDO_MESTRE.blend1",
+      "category": "blender_master",
+      "bytes": 350792635,
+      "sha256": "f8e9ba6eec8d346b368901161b3109f7bcc3a9fda941f21c8ca775dbcaa0d745"
+    },
+    {
+      "path": "README.md",
+      "category": "source_or_documentation",
+      "bytes": 4500,
+      "sha256": "73cf9222bf1fada18f0c9757b16f8374d8f6ee94e0cfa1286bbca797169af8f5"
+    },
+    {
+      "path": "config/world_config.json",
+      "category": "source_or_documentation",
+      "bytes": 5582,
+      "sha256": "35fbeda44c46a46291d660b303c92608c8c2806ba716694bb14a3f7e1def445f"
+    },
+    {
+      "path": "docs/EXECUTION_LEDGER.md",
+      "category": "source_or_documentation",
+      "bytes": 3239,
+      "sha256": "96b9cdf8fdf5ceb98ab5a576144386e3da89af097dd6dc87ef5ba2c23f17babd"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_PLAN.md",
+      "category": "source_or_documentation",
+      "bytes": 1080,
+      "sha256": "ab3519b9ba907086c452ee1c59515774614c07bb04e68f446ee44f08ef37cd31"
+    },
+    {
+      "path": "exports/atlas/atlas_mundo.glb",
+      "category": "export",
+      "bytes": 79448836,
+      "sha256": "333a6e893a6645535ec80fb0ad9c3a4073337b50fe2e8480b4bb6664e0a869ee"
+    },
+    {
+      "path": "exports/library/assets.json",
+      "category": "export",
+      "bytes": 4088,
+      "sha256": "3e7557251934a563f48df7db4bc198a3050ae05716db8f5e528c38fab07215a8"
+    },
+    {
+      "path": "exports/library/environment_kit.glb",
+      "category": "export",
+      "bytes": 196116500,
+      "sha256": "1e0bccb80fc85da3baa20e4cf6c65ac1bd559b9083d2d6b33780d225ea836b44"
+    },
+    {
+      "path": "exports/manifest.json",
+      "category": "export",
+      "bytes": 11465,
+      "sha256": "0ce7f7a924ee7ce7c6b8ce619f871c9f7b078ce283911951f04cc52cfc6a4430"
+    },
+    {
+      "path": "exports/maps/atlas_biome.png",
+      "category": "export",
+      "bytes": 10013,
+      "sha256": "d499f26e8ec7a11bee08d7ce5d78e77db5a5cee79eea594b311f45b05c245f75"
+    },
+    {
+      "path": "exports/maps/atlas_height.exr",
+      "category": "export",
+      "bytes": 25326,
+      "sha256": "a131c8c66f08bebe949c295cd7816799d37820eb955719651e3b37fa66cd8dc7"
+    },
+    {
+      "path": "exports/maps/atlas_height.png",
+      "category": "export",
+      "bytes": 512802,
+      "sha256": "a9f47d585bc8738b2e924248005e9b9e09598939e2b85e9bea0336205ca85300"
+    },
+    {
+      "path": "exports/maps/atlas_water.png",
+      "category": "export",
+      "bytes": 5005,
+      "sha256": "b132330b8bbbf2621f3ed42cb0d94457eb5e509c35708d81a2926aadf40202f0"
+    },
+    {
+      "path": "exports/maps/region_biome.png",
+      "category": "export",
+      "bytes": 15458,
+      "sha256": "b5aa3f5d9539773c7c4dcc2912f6cf3cfed84c3a4e9fe46c14e8145970119017"
+    },
+    {
+      "path": "exports/maps/region_height.exr",
+      "category": "export",
+      "bytes": 40420,
+      "sha256": "07cec66cfc5067b8af876d4ab0324e96f2331a8203fe08cb516af958d68fc8b7"
+    },
+    {
+      "path": "exports/maps/region_height.png",
+      "category": "export",
+      "bytes": 1164245,
+      "sha256": "607e3f5f0a75ff7f8972738c602743e1c8a093116046a255646bb664285ba0ab"
+    },
+    {
+      "path": "exports/maps/region_water.png",
+      "category": "export",
+      "bytes": 1784,
+      "sha256": "e70ec995957358f5e0dd3be4777fc3dda776b9f2a3feff933dd25e924987a0ca"
+    },
+    {
+      "path": "exports/maps/turbulent_biome.png",
+      "category": "export",
+      "bytes": 1304,
+      "sha256": "7981f733329f9e1a30afd59327027d3fe7ed3c43adccfc9436c99f7afd24bf51"
+    },
+    {
+      "path": "exports/maps/turbulent_height.exr",
+      "category": "export",
+      "bytes": 11016,
+      "sha256": "f17b2cae5c96c8970b20b95153a6148cce4407391e9ec369baf310fd9a56c5aa"
+    },
+    {
+      "path": "exports/maps/turbulent_height.png",
+      "category": "export",
+      "bytes": 383760,
+      "sha256": "e2c158e21126a70377195c61708413ef32dfb01e5f85f75371a20dcc706789ac"
+    },
+    {
+      "path": "exports/maps/turbulent_water.png",
+      "category": "export",
+      "bytes": 334,
+      "sha256": "9a375b054fca97ac3ded08a85a68041a53f2aa7b93f6a3953062ba47a8a44b3b"
+    },
+    {
+      "path": "exports/materials.json",
+      "category": "export",
+      "bytes": 7189,
+      "sha256": "f0e5fd8ab63bc6dc1af3111a114d80e864c29818b1ffae42ac3bf8dda17c04ea"
+    },
+    {
+      "path": "exports/region/architecture.glb",
+      "category": "export",
+      "bytes": 75272388,
+      "sha256": "e8b26e59c62ebab5ec4abc8b9b3ce2413a2fc2227bc1170d23f3863f76d3fd1d"
+    },
+    {
+      "path": "exports/region/chunks/region_0_0.glb",
+      "category": "export",
+      "bytes": 202940,
+      "sha256": "5692d772824b0ea26f9c99e40452f4897eecc03bcfb7e26ef1412fb941560e26"
+    },
+    {
+      "path": "exports/region/chunks/region_0_1.glb",
+      "category": "export",
+      "bytes": 202936,
+      "sha256": "81330fd0510fe11387f5f9824b0e6fa18a509b5a789cc749bb290c3691c7a578"
+    },
+    {
+      "path": "exports/region/chunks/region_0_2.glb",
+      "category": "export",
+      "bytes": 202936,
+      "sha256": "7f0086da5bcaad17c10d80c823633a8ebe4c1737de99ae96e241c029b04a4f7f"
+    },
+    {
+      "path": "exports/region/chunks/region_0_3.glb",
+      "category": "export",
+      "bytes": 202940,
+      "sha256": "eea0ad3bd30783b38ec73f22970e9fbf48e0fa060313cf826c04978b05a9c95c"
+    },
+    {
+      "path": "exports/region/chunks/region_1_0.glb",
+      "category": "export",
+      "bytes": 202936,
+      "sha256": "b1f52971502fb8d88206e53578bda521b7c7ab999b5ec7059042b42b6680aa41"
+    },
+    {
+      "path": "exports/region/chunks/region_1_1.glb",
+      "category": "export",
+      "bytes": 202932,
+      "sha256": "45e727ebb6ee5f6e04beb141cebfe4bc9579c06dd76456c9aea942c6e6e330c9"
+    },
+    {
+      "path": "exports/region/chunks/region_1_2.glb",
+      "category": "export",
+      "bytes": 202936,
+      "sha256": "1358f6aa348ddfe3a052a0a088a433495d96709024d9635452731c7eecb18b01"
+    },
+    {
+      "path": "exports/region/chunks/region_1_3.glb",
+      "category": "export",
+      "bytes": 202936,
+      "sha256": "aed3a209ba52d8c112290f8c1118b4a5db240bb803422171ffbc91372aef54fb"
+    },
+    {
+      "path": "exports/region/chunks/region_2_0.glb",
+      "category": "export",
+      "bytes": 202936,
+      "sha256": "bc2f97295cbb88ab54bca80e56a3f3e46ae2d99f3e6133a7a93efe83dac13176"
+    },
+    {
+      "path": "exports/region/chunks/region_2_1.glb",
+      "category": "export",
+      "bytes": 202932,
+      "sha256": "3ab900d33c59945a2c2c36df23493a30ca2c81b43d9ccc87a3d51dc1047926b6"
+    },
+    {
+      "path": "exports/region/chunks/region_2_2.glb",
+      "category": "export",
+      "bytes": 202932,
+      "sha256": "88bb070b8a669f0df46a7f1ee5921d765f89e10e1723ac068f93a31da04be602"
+    },
+    {
+      "path": "exports/region/chunks/region_2_3.glb",
+      "category": "export",
+      "bytes": 202932,
+      "sha256": "ca994cd2a919e2e5908c40a72aa6005d3f2b804570c4fb590d6eea17ad80cd8d"
+    },
+    {
+      "path": "exports/region/chunks/region_3_0.glb",
+      "category": "export",
+      "bytes": 202936,
+      "sha256": "ee7012f47d274d2b3600f5db36e3b15791ead572d72e8e9a8404805f7530db35"
+    },
+    {
+      "path": "exports/region/chunks/region_3_1.glb",
+      "category": "export",
+      "bytes": 202936,
+      "sha256": "2aa6b695056742040d164c337c103a881bbcbea69bb99fb2c272840efd3be136"
+    },
+    {
+      "path": "exports/region/chunks/region_3_2.glb",
+      "category": "export",
+      "bytes": 202936,
+      "sha256": "88b5132014bcc1d60d0dc1a3edbc9e0e4bdf5ddee9955d3a714e69433194c7e1"
+    },
+    {
+      "path": "exports/region/chunks/region_3_3.glb",
+      "category": "export",
+      "bytes": 202940,
+      "sha256": "ef5bdc500b5c46519dafc665ee855fbc2c54352849ed8a2611ceef899f010433"
+    },
+    {
+      "path": "exports/region/environment.glb",
+      "category": "export",
+      "bytes": 128254360,
+      "sha256": "524e0bf4d0df988b0f08572f43fa0b798d245ddb763d7930243283760b45bced"
+    },
+    {
+      "path": "exports/region/instances.json",
+      "category": "export",
+      "bytes": 215831,
+      "sha256": "6206d00d09bec158b170fc77267ecdb0f7589dfa1b40db8c2995323c03acfebc"
+    },
+    {
+      "path": "exports/region/nature.glb",
+      "category": "export",
+      "bytes": 174107964,
+      "sha256": "9d2cda9b4d3ced08377ad05c06bc13f81a5b555cb87a5485c8f645616c011cfa"
+    },
+    {
+      "path": "exports/region/points_of_interest.json",
+      "category": "export",
+      "bytes": 2087,
+      "sha256": "163999e80351675ea604b2615a127522241d87d3c3c10044f5aee812a4368ed9"
+    },
+    {
+      "path": "exports/region/routes.glb",
+      "category": "export",
+      "bytes": 50476696,
+      "sha256": "19be89dfa4ddf46abd5d77c3fb4da0973fe64c53c7c738a5e87682a06336661f"
+    },
+    {
+      "path": "exports/region/routes.json",
+      "category": "export",
+      "bytes": 16502,
+      "sha256": "d566e37f23c27ec5c06c2a41b76667ce84ffc6b2b2d6d52708b0ade26a6d24c8"
+    },
+    {
+      "path": "exports/region/waterworks.glb",
+      "category": "export",
+      "bytes": 3080,
+      "sha256": "3ac5e1b9f34c969f7212f75f3120b7d423ca7c253bb2bb85aa9ba52b025e0e60"
+    },
+    {
+      "path": "exports/turbulent/instances.json",
+      "category": "export",
+      "bytes": 14601,
+      "sha256": "d5517dcb0f9f56038a07d3943599d777c72ac924e005f2278983dacd06c5cf75"
+    },
+    {
+      "path": "exports/turbulent/points_of_interest.json",
+      "category": "export",
+      "bytes": 91,
+      "sha256": "cc2a5cd99611af81db7bd898ca550236055c7e1446b5475a2bdfc275664d1aad"
+    },
+    {
+      "path": "exports/turbulent/routes.json",
+      "category": "export",
+      "bytes": 6157,
+      "sha256": "d871c811ef227271ecc97dc5095908549d897c47dd44a5b988579a868a1be0d4"
+    },
+    {
+      "path": "exports/turbulent/turbulenta_01.glb",
+      "category": "export",
+      "bytes": 148447700,
+      "sha256": "675c9c04d0dda20c8baf3c312b93cabf05fb3dbc4db52386b8633a58a7ff7005"
+    },
+    {
+      "path": "renders/final/contact-sheet.jpg",
+      "category": "render",
+      "bytes": 132728,
+      "sha256": "1ce8ff5969e49a38fce5a5af641704a5c65950ef4b453007d4da68709a2bc950"
+    },
+    {
+      "path": "renders/final/final_atlas.png",
+      "category": "render",
+      "bytes": 7512143,
+      "sha256": "3fa10393ac16c4330e339786a016514ae8290907d4e08d5fed625992697b0bd1"
+    },
+    {
+      "path": "renders/final/final_regiao_comercial.png",
+      "category": "render",
+      "bytes": 8426251,
+      "sha256": "8de61de63df1cecc0f64ecc13a6e2fb93c71ff128e929c2f4d22b912161ff6f3"
+    },
+    {
+      "path": "renders/final/final_turbulenta.png",
+      "category": "render",
+      "bytes": 7323243,
+      "sha256": "cd6c26999297ceef25194eaa9b10cbad577dc534ec5f631fd7254b21f37c5843"
+    },
+    {
+      "path": "renders/previews/01_atlas_fisico.png",
+      "category": "render",
+      "bytes": 564634,
+      "sha256": "80758434bdf5a874a4ed0c98a9fb9053f931a45bf46588d56ca0817c16a8074f"
+    },
+    {
+      "path": "renders/previews/02_atlas_politico.png",
+      "category": "render",
+      "bytes": 586752,
+      "sha256": "12ed5644ffaf3c56dff65f8255f8e59c0ad5d4e622e7b736eafb1b1b4fd87d08"
+    },
+    {
+      "path": "renders/previews/03_continente_principal.png",
+      "category": "render",
+      "bytes": 522815,
+      "sha256": "af250d532e1a80edb8cd74d3f4ba921ee7f0b1a380de92031465dcdf2c787f64"
+    },
+    {
+      "path": "renders/previews/04_segundo_continente.png",
+      "category": "render",
+      "bytes": 512435,
+      "sha256": "0010c4f7f321d5e41c38e0f919e2711b13b0bc94e05318d7392871704175aa38"
+    },
+    {
+      "path": "renders/previews/05_regiao_aerea.png",
+      "category": "render",
+      "bytes": 695402,
+      "sha256": "347c2946142477e51639e9971fa384af93df0db9199b177becd44a2c64ae53d5"
+    },
+    {
+      "path": "renders/previews/06_vale_entreposto.png",
+      "category": "render",
+      "bytes": 617329,
+      "sha256": "2b1b5f14d23f962d9399872a123cf1b86041741cf66356c56be1523496c0efaa"
+    },
+    {
+      "path": "renders/previews/07_bosque_mina.png",
+      "category": "render",
+      "bytes": 569334,
+      "sha256": "008645749a497b692dc5c14c22d03fbebded1d84428b93d1ce47e4b384ed4544"
+    },
+    {
+      "path": "renders/previews/08_garganta.png",
+      "category": "render",
+      "bytes": 601498,
+      "sha256": "809d7824e8516da6e521ddbdfcbaa074f436515f128d859e1a1842892f7bc95e"
+    },
+    {
+      "path": "renders/previews/09_acampamento_observatorio.png",
+      "category": "render",
+      "bytes": 640414,
+      "sha256": "8b08320497032c799dc6fa787b6bfdf03a5d3bf189f9bdb0af6d41a06a2d7de8"
+    },
+    {
+      "path": "renders/previews/10_ermos_entreposto_norte.png",
+      "category": "render",
+      "bytes": 689250,
+      "sha256": "b1be41f9f55588dc112a3677142fd3d9fbf1dc8e17cec9912f0112d895cdbad5"
+    },
+    {
+      "path": "renders/previews/11_turbulenta_aerea.png",
+      "category": "render",
+      "bytes": 579981,
+      "sha256": "90f29f6a51b3a7bda0f8cbcc2cc91cc54223b9e2f269a87fff63b7f98d670d8f"
+    },
+    {
+      "path": "renders/previews/12_turbulenta_portal.png",
+      "category": "render",
+      "bytes": 504777,
+      "sha256": "d66c5175adcbfa4087001f359f5a35d08193a0705a4c888568f531c30728be89"
+    },
+    {
+      "path": "renders/validation/01_atlas_fisico.png",
+      "category": "render",
+      "bytes": 3756595,
+      "sha256": "b70e9b63d00aca29d5cce351daafae238a82c93ada85ad4af89bf993522741f4"
+    },
+    {
+      "path": "renders/validation/02_atlas_politico.png",
+      "category": "render",
+      "bytes": 3878537,
+      "sha256": "2637cf15de671c54a5cdcf16ba227a13e6a04c34d015cbeb1210e92ced0fe3a5"
+    },
+    {
+      "path": "renders/validation/03_continente_principal.png",
+      "category": "render",
+      "bytes": 3447112,
+      "sha256": "8cf1d0633b9437404c8160a5653dbc587d1b2944d927757eac0b37c29b1d7162"
+    },
+    {
+      "path": "renders/validation/04_segundo_continente.png",
+      "category": "render",
+      "bytes": 3368381,
+      "sha256": "6bea193a1be7e6b91ef66fe22090ef6c50064960645b846e98d6f9af5d137965"
+    },
+    {
+      "path": "renders/validation/05_regiao_aerea.png",
+      "category": "render",
+      "bytes": 4213533,
+      "sha256": "472fe0abd88a53afe1ffcfe421d8539dc7110dda7904cf05895d882e2322e8c0"
+    },
+    {
+      "path": "renders/validation/06_vale_entreposto.png",
+      "category": "render",
+      "bytes": 3890990,
+      "sha256": "22dff992929e2af64dc42bd3938cd7068960f5bc7d366c2156cce90b64e2a1c7"
+    },
+    {
+      "path": "renders/validation/07_bosque_mina.png",
+      "category": "render",
+      "bytes": 3207885,
+      "sha256": "12b9da566a211c6c6aaaff04d16bc4fc72f211a6960410d29f245c7a39a0dfab"
+    },
+    {
+      "path": "renders/validation/08_garganta.png",
+      "category": "render",
+      "bytes": 3913582,
+      "sha256": "a4446744a2f5971a4cbda4ccae93d8ed51e73de8f85edb81899cf345598c0f27"
+    },
+    {
+      "path": "renders/validation/09_acampamento_observatorio.png",
+      "category": "render",
+      "bytes": 3961554,
+      "sha256": "15065001518a9a64eb50f32793ea8a99ec73842e2655856320cee994065a5077"
+    },
+    {
+      "path": "renders/validation/10_ermos_entreposto_norte.png",
+      "category": "render",
+      "bytes": 4136982,
+      "sha256": "73d9f4eaad7d95c81922f988baa7584bfb1ff8c0a822e668eaa57a6c37950d3d"
+    },
+    {
+      "path": "renders/validation/11_turbulenta_aerea.png",
+      "category": "render",
+      "bytes": 3523253,
+      "sha256": "ff1e869b8e80c1d9d4f9455552d29e5474d3f5f3ee3c2fbf7d843dc0af8792a9"
+    },
+    {
+      "path": "renders/validation/12_turbulenta_portal.png",
+      "category": "render",
+      "bytes": 3340060,
+      "sha256": "c98198d07fbe35fed79c8d9c9dbf8285e1f86768d1a100022c0c999c9ba52b53"
+    },
+    {
+      "path": "renders/validation/contact-sheet.jpg",
+      "category": "render",
+      "bytes": 660392,
+      "sha256": "f577e255712426df24362d68d6b246b710fe77341b41ea95cb29cf059478a8c2"
+    },
+    {
+      "path": "reports/LICENSES.json",
+      "category": "report",
+      "bytes": 4012,
+      "sha256": "ca14d3a14254a31fd69ea0c6826324e93b8ddd3a18ad70ad3388b8b2fd0d7760"
+    },
+    {
+      "path": "reports/RELATORIO_FINAL.md",
+      "category": "report",
+      "bytes": 7433,
+      "sha256": "70bbd6919e2482d2bbd6c46a83fb553ade2d676a7ac1333b08526a0cb3e7c71e"
+    },
+    {
+      "path": "reports/apt-simulation-after-update.txt",
+      "category": "report",
+      "bytes": 21043,
+      "sha256": "b024b773291120aeb95bfc6b86776af3ce60598d2f8854c796488c16ca6c58ff"
+    },
+    {
+      "path": "reports/apt-simulation-before.txt",
+      "category": "report",
+      "bytes": 20250,
+      "sha256": "75012c8b244ae42cee3c8d4160b2ce107076adc038211981aaa4871281d537bb"
+    },
+    {
+      "path": "reports/blend-validation.json",
+      "category": "report",
+      "bytes": 7534,
+      "sha256": "e191b4883a495cec815f0a56a8159b3e81aea16e978bac5c6acd0dc0fa03fdb1"
+    },
+    {
+      "path": "reports/blender-smoke/smoke.blend",
+      "category": "blender_master",
+      "bytes": 86243,
+      "sha256": "ada2ff81281bef8a46983899e6dce46c84d80978511363838f776f807575d1e8"
+    },
+    {
+      "path": "reports/blender-smoke/smoke.glb",
+      "category": "report",
+      "bytes": 1952,
+      "sha256": "6f9c059ad2e3d68e7cb163d2844ec7efa5227d72bfc5762651f3026c205c5756"
+    },
+    {
+      "path": "reports/blender-smoke/smoke.png",
+      "category": "report",
+      "bytes": 28024,
+      "sha256": "893d877410b31a3070e31175c6814ce0da2efffd00ffae442c760ba5cb3ec037"
+    },
+    {
+      "path": "reports/demo-after.sha256",
+      "category": "report",
+      "bytes": 258806,
+      "sha256": "93535b7204aaa0261ca0cc8dd3629693c3ad36a287dc96dde90afc55a4c4e7ae"
+    },
+    {
+      "path": "reports/demo-before.sha256",
+      "category": "report",
+      "bytes": 258806,
+      "sha256": "74749444d244a19fe97e73dd4d6dbc5f6b96e2d885d7f5bf027d3c32943e5bbc"
+    },
+    {
+      "path": "reports/demo-integrity.json",
+      "category": "report",
+      "bytes": 4476,
+      "sha256": "2b44010254e58395b964ffed023a177741e72541aeb7313cfa8cfca4fe3b6ebf"
+    },
+    {
+      "path": "reports/demo-stability-baseline.sha256",
+      "category": "report",
+      "bytes": 258806,
+      "sha256": "93535b7204aaa0261ca0cc8dd3629693c3ad36a287dc96dde90afc55a4c4e7ae"
+    },
+    {
+      "path": "reports/dpkg-selections-after.txt",
+      "category": "report",
+      "bytes": 116735,
+      "sha256": "5a7edb731082aa241495c736c25de3322fabeacf3d75b8eebf56cf89c9f3e1ad"
+    },
+    {
+      "path": "reports/dpkg-selections-before.txt",
+      "category": "report",
+      "bytes": 115353,
+      "sha256": "32b2c9f2ee1054c7fb5763f38a065138cc5b79246096c665368a02e222385e81"
+    },
+    {
+      "path": "reports/export-report.json",
+      "category": "report",
+      "bytes": 3205,
+      "sha256": "88851016a220ff49578fa8c0c8e94d10de9df6fbf7332d1e7eaf4aaad1a7e4fd"
+    },
+    {
+      "path": "reports/generation-report.json",
+      "category": "report",
+      "bytes": 2551,
+      "sha256": "e8a9f0513978c59fbf8750135e928ca619011c0243adc85550e5962684aa6139"
+    },
+    {
+      "path": "reports/glb-validation.json",
+      "category": "report",
+      "bytes": 35696,
+      "sha256": "ebee246dac1db211b7a9ff9fcac88cffd04e29b6924ce51b07fdf2d68dfa49fe"
+    },
+    {
+      "path": "reports/production-validation.json",
+      "category": "report",
+      "bytes": 5981,
+      "sha256": "d8d8a06382b11f87e454ef04ff13d502ab034efcb9e918ae76b0481ca3b6e969"
+    },
+    {
+      "path": "reports/regeneration-safety.json",
+      "category": "report",
+      "bytes": 1422,
+      "sha256": "bd3c984ff94b1e7862efc4621a4d2a5d8db0b46a4eced07244bf474131840777"
+    },
+    {
+      "path": "reports/render-report.json",
+      "category": "report",
+      "bytes": 4786,
+      "sha256": "3466d7cb5525f703b21e2409786eb6143b6fbfb7e2d1cd1779a0898d839dd6c6"
+    },
+    {
+      "path": "reports/system-install-report.json",
+      "category": "report",
+      "bytes": 1926,
+      "sha256": "4b063323d14ebad91bb4648424bbe576d88d59120476e0f699bfdf71415c44f7"
+    },
+    {
+      "path": "source/data/atlas.npz",
+      "category": "source_or_documentation",
+      "bytes": 5356332,
+      "sha256": "17f9550378a71079e659443b056e67a6a9bcd049c24daa20c37f7cecc29e3166"
+    },
+    {
+      "path": "source/data/region.npz",
+      "category": "source_or_documentation",
+      "bytes": 10889842,
+      "sha256": "6bd1dd0b05a4c5ef3601c923cb71379dcaa00a66f98138c30c4c4318501f111a"
+    },
+    {
+      "path": "source/data/turbulent.npz",
+      "category": "source_or_documentation",
+      "bytes": 2728551,
+      "sha256": "04d34ad7d77afea5f8c331aeebfc0ea2d9515974a770b5ef80051f6337d287fb"
+    },
+    {
+      "path": "tests/blender_smoke_test.py",
+      "category": "test",
+      "bytes": 1837,
+      "sha256": "a292fba3dbaf9d809aa9a7ac2b742c989696a86daf0f44f0cc4d6de145e39768"
+    },
+    {
+      "path": "tests/blender_structure_test.py",
+      "category": "test",
+      "bytes": 3651,
+      "sha256": "5716430c9c02a3c16f64d6f6c55bace8cb7da89bbe7f61fde94e8288a36fa4e9"
+    },
+    {
+      "path": "tests/test_export_contract.py",
+      "category": "test",
+      "bytes": 4496,
+      "sha256": "b6464521c1ae02e136471495a6f628ec75810c15528aa8456480e6f71019140f"
+    },
+    {
+      "path": "tests/test_render_contract.py",
+      "category": "test",
+      "bytes": 2209,
+      "sha256": "31fd45ba2ede58d4c8a270b1fa4636cd02bfaf464a456b47e9129b39903860bd"
+    },
+    {
+      "path": "tests/test_worldgen_core.py",
+      "category": "test",
+      "bytes": 7356,
+      "sha256": "c8d5c7b53112dada3b83092f2b0d35b824f967950ae86f0712ae19e816728faf"
+    },
+    {
+      "path": "tests/test_worldgen_io.py",
+      "category": "test",
+      "bytes": 3076,
+      "sha256": "7dbbd51d19fcb764f513081ba884c1a2b6a53d6c5c0ab6aa97361960fd191fe1"
+    },
+    {
+      "path": "tools/blender_assets.py",
+      "category": "tool",
+      "bytes": 12395,
+      "sha256": "23d5d5dec2a8c845f589603b96b4712820a5d9f4e3af69e7f1c1df943390a7bb"
+    },
+    {
+      "path": "tools/blender_common.py",
+      "category": "tool",
+      "bytes": 17424,
+      "sha256": "4895ec8c39a9d7e8b4cc23fde8856a7053a0595f8e37b01ae46ca568e4512b8a"
+    },
+    {
+      "path": "tools/build_master.py",
+      "category": "tool",
+      "bytes": 39287,
+      "sha256": "ce45b31161f4102e4379e9e01fa5199142023b8f0d5abf28fece1d8d96cc218d"
+    },
+    {
+      "path": "tools/create_inventory.py",
+      "category": "tool",
+      "bytes": 2073,
+      "sha256": "e9de26a362d3098b56422e835e5fcf1189ce46044fd602ab252c70b8e06c74d8"
+    },
+    {
+      "path": "tools/export_world.py",
+      "category": "tool",
+      "bytes": 12205,
+      "sha256": "822e45e6e052da43e25503896dd8167345b202fbed6808b8e8d275063551dd07"
+    },
+    {
+      "path": "tools/regenerate_sources.py",
+      "category": "tool",
+      "bytes": 4954,
+      "sha256": "030610617ca50de2d83d106bb76a4aede5f967fe02e7e312617b12b88957e025"
+    },
+    {
+      "path": "tools/render_world.py",
+      "category": "tool",
+      "bytes": 7221,
+      "sha256": "d90041e4465cc009a92765d33a9f478bceb0368af6a292b2a1a3f8fa793f082f"
+    },
+    {
+      "path": "tools/validate_blend.py",
+      "category": "tool",
+      "bytes": 6878,
+      "sha256": "e2b2f25a4f488ca9cd94795531dcc91c04fe07f791e30dc3efc5b81f010abcc7"
+    },
+    {
+      "path": "tools/validate_glbs.py",
+      "category": "tool",
+      "bytes": 3674,
+      "sha256": "80ce9d62e5ad2685c4be4dfea32bca992ff8d9d87d3ee6630226a9013af28e1c"
+    },
+    {
+      "path": "tools/validate_production.py",
+      "category": "tool",
+      "bytes": 9703,
+      "sha256": "fcef724ab5481a9f1ecf3f6414b163cf1ff4bf0e3adfa6efeb72529700d09a6b"
+    },
+    {
+      "path": "tools/verify_demo_integrity.py",
+      "category": "tool",
+      "bytes": 3335,
+      "sha256": "b506f63fa31edb3ce2b6b358ed8d23cc9a00951de626406de6dfd5ce2e750d72"
+    },
+    {
+      "path": "tools/worldgen_core.py",
+      "category": "tool",
+      "bytes": 22821,
+      "sha256": "8f1d29d7bad6b406018a7b319d1db9a859f68bc8a34e88b81ca991147a91aceb"
+    },
+    {
+      "path": "tools/worldgen_io.py",
+      "category": "tool",
+      "bytes": 4345,
+      "sha256": "cc8043d76dfdfdc789b0018fae34d4c9c518117f95ee3dfa38f840f7065bc5e7"
+    }
+  ]
+}

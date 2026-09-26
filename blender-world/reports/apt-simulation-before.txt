@@ -1,0 +1,306 @@
+NOTE: This is only a simulation!
+      apt-get needs root privileges for real execution.
+      Keep also in mind that locking is deactivated,
+      so don't depend on the relevance to the real current situation!
+Reading package lists...
+Building dependency tree...
+Reading state information...
+Solving dependencies...
+The following packages were automatically installed and are no longer required:
+  libbluray3:i386 libgdal38 libgsoap-2.8.139 libkmlbase1t64 libkmldom1t64
+  libkmlengine1t64 libmbedcrypto16:i386 libopenjph0.27 libpoppler147
+  libpython3.13-dev libvidstab1.1 libx265-215:i386 python3.13 python3.13-dev
+  python3.13-minimal python3.13-venv rpcsvc-proto
+Use 'apt autoremove' to remove them.
+The following additional packages will be installed:
+  blender-data blueman dcmtk-data ffmpeg gdal-data gdal-plugins libaec0
+  libavcodec62 libavcodec62:i386 libavdevice62 libavfilter11 libavformat62
+  libavformat62:i386 libavif16 libavif16:i386 libavutil60 libavutil60:i386
+  libbluray4 libbluray4:i386 libc-bin libc-dev-bin libc-gconv-modules-extra
+  libc-gconv-modules-extra:i386 libc-l10n libc6 libc6:i386 libc6-dev
+  libc6-i386 libcharls2 libdcmtk20 libembree4-4 libgdal39 libgdcm3.0t64
+  libgpgme45 libgpgmepp7 libgsoap-2.8.142 libhdf5-320 libhunspell-1.7-0
+  libimath-3-2-30 libldb2 liblog4cplus9 liblz4-1:i386 libminizip-ng4t64
+  libnss-winbind libopencolorio2.5 libopencv-core410 libopencv-imgcodecs410
+  libopencv-imgproc410 libopencv-videoio410 libopenexr-3-4-33
+  libopenimageio2.5 libopenjph0.28 libopenvdb10.0t64 libopenxr-loader1
+  libosdcpu3.6.0 libosdgpu3.6.0 libpam-winbind libpoppler-glib8t64
+  libpoppler162 libpugixml1v5 libpystring0 libpython3-dev libpython3-stdlib
+  libpython3.14 libpython3.14-dev libpython3.14-minimal libpython3.14-stdlib
+  libraw25 librist4 librist4:i386 libshaderc1 libsmbclient0 libsocket++1
+  libspnav0 libswresample6 libswresample6:i386 libswscale9 libsz2 libtalloc2
+  libtdb1 libtevent0t64 libvidstab1.2 libwbclient0 libx264-165
+  libx264-165:i386 libxxhash0:i386 libyaml-cpp0.9 locales onboard
+  onboard-common onboard-data poppler-utils python3 python3-aardwolf
+  python3-dev python3-gdal python3-ldb python3-minimal python3-samba
+  python3-talloc python3-tdb python3-tk python3-venv python3.14 python3.14-dev
+  python3.14-minimal python3.14-tk python3.14-venv samba samba-common
+  samba-common-bin samba-libs smbclient tdb-tools virtualbox virtualbox-dkms
+  virtualbox-qt winbind
+Suggested packages:
+  libbluray-bdj libbluray-bdj:i386 spacenavd python3.14-doc binfmt-support
+The following NEW packages will be installed:
+  blender blender-data dcmtk-data libbluray4 libbluray4:i386 libcharls2
+  libdcmtk20 libembree4-4 libgdal39 libgdcm3.0t64 libgsoap-2.8.142 libhdf5-320
+  libimath-3-2-30 liblog4cplus9 liblz4-1:i386 libminizip-ng4t64
+  libopencolorio2.5 libopencv-core410 libopencv-imgcodecs410
+  libopencv-imgproc410 libopencv-videoio410 libopenimageio2.5 libopenjph0.28
+  libopenvdb10.0t64 libopenxr-loader1 libosdcpu3.6.0 libosdgpu3.6.0
+  libpoppler162 libpugixml1v5 libpystring0 libpython3.14 libpython3.14-dev
+  libpython3.14-minimal libpython3.14-stdlib libraw25 libshaderc1 libsocket++1
+  libspnav0 libvidstab1.2 libxxhash0:i386 libyaml-cpp0.9 python3.14
+  python3.14-dev python3.14-minimal python3.14-venv
+The following packages will be upgraded:
+  blueman ffmpeg gdal-data gdal-plugins libaec0 libavcodec62 libavcodec62:i386
+  libavdevice62 libavfilter11 libavformat62 libavformat62:i386 libavif16
+  libavif16:i386 libavutil60 libavutil60:i386 libc-bin libc-dev-bin
+  libc-gconv-modules-extra libc-gconv-modules-extra:i386 libc-l10n libc6
+  libc6:i386 libc6-dev libc6-i386 libgpgme45 libgpgmepp7 libhunspell-1.7-0
+  libldb2 libnss-winbind libopenexr-3-4-33 libpam-winbind libpoppler-glib8t64
+  libpython3-dev libpython3-stdlib librist4 librist4:i386 libsmbclient0
+  libswresample6 libswresample6:i386 libswscale9 libsz2 libtalloc2 libtdb1
+  libtevent0t64 libwbclient0 libx264-165 libx264-165:i386 locales onboard
+  onboard-common onboard-data poppler-utils python3 python3-aardwolf
+  python3-dev python3-gdal python3-ldb python3-minimal python3-samba
+  python3-talloc python3-tdb python3-tk python3-venv python3.14-tk samba
+  samba-common samba-common-bin samba-libs smbclient tdb-tools virtualbox
+  virtualbox-dkms virtualbox-qt winbind
+74 upgraded, 45 newly installed, 0 to remove and 1838 not upgraded.
+Inst libc-l10n [2.42-13] (2.43-4 kali-rolling [all])
+Inst locales [2.42-13] (2.43-4 kali-rolling [all]) []
+Inst libc-gconv-modules-extra [2.42-13] (2.43-4 kali-rolling [amd64]) [libc-gconv-modules-extra:amd64 on libc-gconv-modules-extra:i386] [libc-gconv-modules-extra:i386 on libc-gconv-modules-extra:amd64] [libc-gconv-modules-extra:i386 libc6:amd64 ]
+Inst libc-gconv-modules-extra:i386 [2.42-13] (2.43-4 kali-rolling [i386]) [libc6:amd64 libc6:i386 ]
+Inst libc6:i386 [2.42-13] (2.43-4 kali-rolling [i386]) [libc6:amd64 on libc6:i386] [libc6:i386 on libc6:amd64] [libc6:amd64 ]
+Inst libc6 [2.42-13] (2.43-4 kali-rolling [amd64]) [libc6-i386:amd64 libc-dev-bin:amd64 libc-bin:amd64 libc6-dev:amd64 ]
+Conf libc-gconv-modules-extra (2.43-4 kali-rolling [amd64]) [libc6-i386:amd64 libc-dev-bin:amd64 libc-bin:amd64 libc6-dev:amd64 ]
+Conf libc6 (2.43-4 kali-rolling [amd64]) [libc6-i386:amd64 libc-dev-bin:amd64 libc-bin:amd64 libc6-dev:amd64 ]
+Inst libc6-i386 [2.42-13] (2.43-4 kali-rolling [amd64]) [libc-dev-bin:amd64 libc-bin:amd64 libc6-dev:amd64 ]
+Inst libc-dev-bin [2.42-13] (2.43-4 kali-rolling [amd64]) [libc-bin:amd64 libc6-dev:amd64 ]
+Inst libc6-dev [2.42-13] (2.43-4 kali-rolling [amd64]) [libc-bin:amd64 ]
+Inst libc-bin [2.42-13] (2.43-4 kali-rolling [amd64])
+Conf libc-bin (2.43-4 kali-rolling [amd64])
+Inst libpython3.14-minimal (3.14.6-1 kali-rolling [amd64])
+Inst python3.14-minimal (3.14.6-1 kali-rolling [amd64])
+Inst libpython3-dev [3.13.9-3] (3.14.6-1 kali-rolling [amd64]) [python3-dev:amd64 ]
+Inst python3-dev [3.13.9-3] (3.14.6-1 kali-rolling [amd64]) []
+Inst virtualbox-qt [7.2.8-dfsg-1] (7.2.16-dfsg-1 kali-rolling [amd64]) []
+Inst virtualbox [7.2.8-dfsg-1] (7.2.16-dfsg-1 kali-rolling [amd64]) []
+Inst python3-venv [3.13.9-3] (3.14.6-1 kali-rolling [amd64]) []
+Inst python3-tdb [2:1.4.15+samba4.24.1+dfsg-1] (2:1.4.15+samba4.24.6+dfsg-1 kali-rolling [amd64]) []
+Inst python3-talloc [2:2.4.4+samba4.24.1+dfsg-1] (2:2.4.4+samba4.24.6+dfsg-1 kali-rolling [amd64]) []
+Inst python3-samba [2:4.24.1+dfsg-1] (2:4.24.6+dfsg-1 kali-rolling [amd64]) []
+Inst python3-ldb [2:2.11.0+samba4.24.1+dfsg-1] (2:2.11.0+samba4.24.6+dfsg-1 kali-rolling [amd64]) []
+Inst python3-aardwolf [0.2.8-0kali3+b1] (0.2.8-0kali3+b2 kali-rolling [amd64]) []
+Inst onboard-common [1.4.4.1+ds-1] (1.4.4.3+ds-1 kali-rolling [all]) [onboard:amd64 ]
+Inst onboard-data [1.4.4.1+ds-1] (1.4.4.3+ds-1 kali-rolling [all]) [onboard:amd64 ]
+Inst onboard [1.4.4.1+ds-1] (1.4.4.3+ds-1+b1 kali-rolling [amd64]) []
+Inst blueman [2.4.4-1] (2.4.4-1+b1 kali-rolling [amd64]) []
+Conf libpython3.14-minimal (3.14.6-1 kali-rolling [amd64]) []
+Conf python3.14-minimal (3.14.6-1 kali-rolling [amd64]) []
+Inst python3-minimal [3.13.9-3] (3.14.6-1 kali-rolling [amd64]) [python3:amd64 on python3-minimal:amd64] [python3:amd64 ]
+Conf python3-minimal (3.14.6-1 kali-rolling [amd64]) [python3:amd64 ]
+Inst python3 [3.13.9-3] (3.14.6-1 kali-rolling [amd64]) []
+Inst libpython3.14-stdlib (3.14.6-1 kali-rolling [amd64]) []
+Inst libpython3.14 (3.14.6-1 kali-rolling [amd64]) []
+Inst libpython3.14-dev (3.14.6-1 kali-rolling [amd64]) []
+Inst python3.14 (3.14.6-1 kali-rolling [amd64]) []
+Inst python3.14-dev (3.14.6-1 kali-rolling [amd64]) []
+Inst virtualbox-dkms [7.2.8-dfsg-1] (7.2.16-dfsg-1 kali-rolling [amd64]) []
+Inst libgsoap-2.8.142 (2.8.142-2 kali-rolling [amd64]) []
+Inst python3.14-venv (3.14.6-1 kali-rolling [amd64]) []
+Inst libtdb1 [2:1.4.15+samba4.24.1+dfsg-1] (2:1.4.15+samba4.24.6+dfsg-1 kali-rolling [amd64]) []
+Inst libtalloc2 [2:2.4.4+samba4.24.1+dfsg-1] (2:2.4.4+samba4.24.6+dfsg-1 kali-rolling [amd64]) []
+Inst libnss-winbind [2:4.24.1+dfsg-1] (2:4.24.6+dfsg-1 kali-rolling [amd64]) []
+Inst libpam-winbind [2:4.24.1+dfsg-1] (2:4.24.6+dfsg-1 kali-rolling [amd64]) []
+Inst samba-common [2:4.24.1+dfsg-1] (2:4.24.6+dfsg-1 kali-rolling [all]) []
+Inst libtevent0t64 [2:0.17.1+samba4.24.1+dfsg-1] (2:0.17.1+samba4.24.6+dfsg-1 kali-rolling [amd64]) []
+Inst winbind [2:4.24.1+dfsg-1] (2:4.24.6+dfsg-1 kali-rolling [amd64]) []
+Inst samba-common-bin [2:4.24.1+dfsg-1] (2:4.24.6+dfsg-1 kali-rolling [amd64]) [samba:amd64 ]
+Inst samba [2:4.24.1+dfsg-1] (2:4.24.6+dfsg-1 kali-rolling [amd64]) []
+Inst libwbclient0 [2:4.24.1+dfsg-1] (2:4.24.6+dfsg-1 kali-rolling [amd64]) []
+Inst libsmbclient0 [2:4.24.1+dfsg-1] (2:4.24.6+dfsg-1 kali-rolling [amd64]) []
+Inst smbclient [2:4.24.1+dfsg-1] (2:4.24.6+dfsg-1 kali-rolling [amd64]) []
+Inst libldb2 [2:2.11.0+samba4.24.1+dfsg-1] (2:2.11.0+samba4.24.6+dfsg-1 kali-rolling [amd64]) [samba-libs:amd64 ]
+Inst samba-libs [2:4.24.1+dfsg-1] (2:4.24.6+dfsg-1 kali-rolling [amd64]) []
+Inst libhunspell-1.7-0 [1.7.2+really1.7.2-11+b2] (1.7.3+really1.7.3-5 kali-rolling [amd64]) []
+Inst libpython3-stdlib [3.13.9-3] (3.14.6-1 kali-rolling [amd64])
+Inst blender-data (5.0.1+dfsg-5 kali-rolling [all])
+Inst libswscale9 [7:8.1.1-3] (7:8.1.2-2+b3 kali-rolling [amd64]) []
+Inst libavformat62:i386 [7:8.1.1-3] (7:8.1.2-2+b3 kali-rolling [i386]) [libavformat62:amd64 on libavformat62:i386] [libavformat62:i386 on libavformat62:amd64] [libavformat62:amd64 ]
+Inst libavformat62 [7:8.1.1-3] (7:8.1.2-2+b3 kali-rolling [amd64]) [libavdevice62:amd64 ]
+Inst libavdevice62 [7:8.1.1-3] (7:8.1.2-2+b3 kali-rolling [amd64]) []
+Inst libavfilter11 [7:8.1.1-3] (7:8.1.2-2+b3 kali-rolling [amd64]) []
+Inst libavcodec62:i386 [7:8.1.1-3] (7:8.1.2-2+b3 kali-rolling [i386]) [libavcodec62:amd64 on libavcodec62:i386] [libavcodec62:i386 on libavcodec62:amd64] [libavcodec62:amd64 ]
+Inst libavcodec62 [7:8.1.1-3] (7:8.1.2-2+b3 kali-rolling [amd64]) []
+Inst libavutil60 [7:8.1.1-3] (7:8.1.2-2+b3 kali-rolling [amd64]) [libavutil60:amd64 on libavutil60:i386] [libavutil60:i386 on libavutil60:amd64] [libavutil60:i386 ]
+Inst libavutil60:i386 [7:8.1.1-3] (7:8.1.2-2+b3 kali-rolling [i386]) []
+Inst libswresample6 [7:8.1.1-3] (7:8.1.2-2+b3 kali-rolling [amd64]) [libswresample6:amd64 on libswresample6:i386] [libswresample6:i386 on libswresample6:amd64] [libswresample6:i386 ]
+Inst libswresample6:i386 [7:8.1.1-3] (7:8.1.2-2+b3 kali-rolling [i386]) []
+Inst libvidstab1.2 (1.1.1-4 kali-rolling [amd64]) []
+Inst libbluray4 (1:1.5.0-3 kali-rolling [amd64]) []
+Inst libxxhash0:i386 (0.8.3-2+b2 kali-rolling [i386]) []
+Inst liblz4-1:i386 (1.10.0-10 kali-rolling [i386]) []
+Inst librist4 [0.2.14+dfsg-1] (0.2.20+dfsg-1 kali-rolling [amd64]) [librist4:amd64 on librist4:i386] [librist4:i386 on librist4:amd64] [librist4:i386 ]
+Inst librist4:i386 [0.2.14+dfsg-1] (0.2.20+dfsg-1 kali-rolling [i386]) []
+Inst libbluray4:i386 (1:1.5.0-3 kali-rolling [i386]) []
+Inst libx264-165:i386 [2:0.165.3222+gitb35605ac-3+b2] (2:0.165.3223+git20250910.0480cb0-1 kali-rolling [i386]) [libx264-165:amd64 on libx264-165:i386] [libx264-165:i386 on libx264-165:amd64] [libx264-165:amd64 ]
+Inst libx264-165 [2:0.165.3222+gitb35605ac-3+b2] (2:0.165.3223+git20250910.0480cb0-1 kali-rolling [amd64])
+Inst libembree4-4 (4.4.1+dfsg-2 kali-rolling [amd64])
+Inst libimath-3-2-30 (3.2.2-2+b1 kali-rolling [amd64])
+Inst libminizip-ng4t64 (4.0.10+dfsg-2+b1 kali-rolling [amd64])
+Inst libpystring0 (1.1.5-1 kali-rolling [amd64])
+Inst libyaml-cpp0.9 (0.9.0+dfsg-9 kali-rolling [amd64])
+Inst libopencolorio2.5 (2.5.1+dfsg-4+b4 kali-rolling [amd64])
+Inst libopenjph0.28 (0.28.1-1 kali-rolling [amd64])
+Inst libopenexr-3-4-33 [3.4.6+ds-4+b1] (3.4.14-0.1 kali-rolling [amd64])
+Inst dcmtk-data (3.7.0+really3.7.0-7 kali-rolling [all])
+Inst libdcmtk20 (3.7.0+really3.7.0-7 kali-rolling [amd64])
+Inst libopencv-core410 (4.10.0+dfsg-8+b4 kali-rolling [amd64])
+Inst libopencv-imgproc410 (4.10.0+dfsg-8+b4 kali-rolling [amd64])
+Inst gdal-data [3.12.3+dfsg-1] (3.13.3+dfsg-1 kali-rolling [all])
+Inst gdal-plugins [3.12.3+dfsg-1] (3.13.3+dfsg-1 kali-rolling [amd64])
+Inst libaec0 [1.1.6-1] (1.1.7-1 kali-rolling [amd64])
+Inst libavif16 [1.4.1-1+b1] (1.4.2-1 kali-rolling [amd64]) [libavif16:amd64 on libavif16:i386] [libavif16:i386 on libavif16:amd64] [libavif16:i386 ]
+Inst libavif16:i386 [1.4.1-1+b1] (1.4.2-1 kali-rolling [i386])
+Inst libsz2 [1.1.6-1] (1.1.7-1 kali-rolling [amd64])
+Inst libhdf5-320 (2.1.0+repack-1 kali-rolling [amd64])
+Inst libgpgme45 [2.0.1-2+b1] (2.1.2-1 kali-rolling [amd64])
+Inst libgpgmepp7 [2.0.0-3] (2.1.0-2 kali-rolling [amd64])
+Inst libpoppler162 (26.07.0-2 kali-rolling [amd64])
+Inst libgdal39 (3.13.3+dfsg-1 kali-rolling [amd64])
+Inst libcharls2 (2.4.2-2+b3 kali-rolling [amd64])
+Inst libsocket++1 (1.12.13+git20131030.5d039ba-2 kali-rolling [amd64])
+Inst libgdcm3.0t64 (3.0.24-14 kali-rolling [amd64])
+Inst libopencv-imgcodecs410 (4.10.0+dfsg-8+b4 kali-rolling [amd64])
+Inst libopencv-videoio410 (4.10.0+dfsg-8+b4 kali-rolling [amd64])
+Inst liblog4cplus9 (2.1.2-2 kali-rolling [amd64])
+Inst libopenvdb10.0t64 (10.0.1-4+b1 kali-rolling [amd64])
+Inst libraw25 (0.22.1-1 kali-rolling [amd64])
+Inst libopenimageio2.5 (2.5.19.1+dfsg-2+b5 kali-rolling [amd64])
+Inst libopenxr-loader1 (1.1.61~ds-1 kali-rolling [amd64])
+Inst libosdcpu3.6.0 (3.6.0-3+b2 kali-rolling [amd64])
+Inst libosdgpu3.6.0 (3.6.0-3+b2 kali-rolling [amd64])
+Inst libpugixml1v5 (1.16-1 kali-rolling [amd64])
+Inst libshaderc1 (2026.3-1 kali-rolling [amd64])
+Inst libspnav0 (1.2-1 kali-rolling [amd64])
+Inst blender (5.0.1+dfsg-5 kali-rolling [amd64])
+Inst ffmpeg [7:8.1.1-3] (7:8.1.2-2+b3 kali-rolling [amd64])
+Inst libpoppler-glib8t64 [25.03.0-11.1+b1] (26.07.0-2 kali-rolling [amd64])
+Inst poppler-utils [25.03.0-11.1+b1] (26.07.0-2 kali-rolling [amd64])
+Inst python3-gdal [3.12.3+dfsg-1] (3.13.3+dfsg-1 kali-rolling [amd64])
+Inst python3.14-tk [3.14.4-2] (3.14.6-1 kali-rolling [amd64])
+Inst python3-tk [3.13.9-3] (3.14.6-1 kali-rolling [amd64])
+Inst tdb-tools [2:1.4.15+samba4.24.1+dfsg-1] (2:1.4.15+samba4.24.6+dfsg-1 kali-rolling [amd64])
+Conf libc-l10n (2.43-4 kali-rolling [all])
+Conf locales (2.43-4 kali-rolling [all])
+Conf libc-gconv-modules-extra:i386 (2.43-4 kali-rolling [i386])
+Conf libc6:i386 (2.43-4 kali-rolling [i386])
+Conf libc6-i386 (2.43-4 kali-rolling [amd64])
+Conf libc-dev-bin (2.43-4 kali-rolling [amd64])
+Conf libc6-dev (2.43-4 kali-rolling [amd64])
+Conf libpython3-dev (3.14.6-1 kali-rolling [amd64])
+Conf python3-dev (3.14.6-1 kali-rolling [amd64])
+Conf virtualbox-qt (7.2.16-dfsg-1 kali-rolling [amd64])
+Conf virtualbox (7.2.16-dfsg-1 kali-rolling [amd64])
+Conf python3-venv (3.14.6-1 kali-rolling [amd64])
+Conf python3-tdb (2:1.4.15+samba4.24.6+dfsg-1 kali-rolling [amd64])
+Conf python3-talloc (2:2.4.4+samba4.24.6+dfsg-1 kali-rolling [amd64])
+Conf python3-samba (2:4.24.6+dfsg-1 kali-rolling [amd64])
+Conf python3-ldb (2:2.11.0+samba4.24.6+dfsg-1 kali-rolling [amd64])
+Conf python3-aardwolf (0.2.8-0kali3+b2 kali-rolling [amd64])
+Conf onboard-common (1.4.4.3+ds-1 kali-rolling [all])
+Conf onboard-data (1.4.4.3+ds-1 kali-rolling [all])
+Conf onboard (1.4.4.3+ds-1+b1 kali-rolling [amd64])
+Conf blueman (2.4.4-1+b1 kali-rolling [amd64])
+Conf python3 (3.14.6-1 kali-rolling [amd64])
+Conf libpython3.14-stdlib (3.14.6-1 kali-rolling [amd64])
+Conf libpython3.14 (3.14.6-1 kali-rolling [amd64])
+Conf libpython3.14-dev (3.14.6-1 kali-rolling [amd64])
+Conf python3.14 (3.14.6-1 kali-rolling [amd64])
+Conf python3.14-dev (3.14.6-1 kali-rolling [amd64])
+Conf virtualbox-dkms (7.2.16-dfsg-1 kali-rolling [amd64])
+Conf libgsoap-2.8.142 (2.8.142-2 kali-rolling [amd64])
+Conf python3.14-venv (3.14.6-1 kali-rolling [amd64])
+Conf libtdb1 (2:1.4.15+samba4.24.6+dfsg-1 kali-rolling [amd64])
+Conf libtalloc2 (2:2.4.4+samba4.24.6+dfsg-1 kali-rolling [amd64])
+Conf libnss-winbind (2:4.24.6+dfsg-1 kali-rolling [amd64])
+Conf libpam-winbind (2:4.24.6+dfsg-1 kali-rolling [amd64])
+Conf samba-common (2:4.24.6+dfsg-1 kali-rolling [all])
+Conf libtevent0t64 (2:0.17.1+samba4.24.6+dfsg-1 kali-rolling [amd64])
+Conf winbind (2:4.24.6+dfsg-1 kali-rolling [amd64])
+Conf samba-common-bin (2:4.24.6+dfsg-1 kali-rolling [amd64])
+Conf samba (2:4.24.6+dfsg-1 kali-rolling [amd64])
+Conf libwbclient0 (2:4.24.6+dfsg-1 kali-rolling [amd64])
+Conf libsmbclient0 (2:4.24.6+dfsg-1 kali-rolling [amd64])
+Conf smbclient (2:4.24.6+dfsg-1 kali-rolling [amd64])
+Conf libldb2 (2:2.11.0+samba4.24.6+dfsg-1 kali-rolling [amd64])
+Conf samba-libs (2:4.24.6+dfsg-1 kali-rolling [amd64])
+Conf libhunspell-1.7-0 (1.7.3+really1.7.3-5 kali-rolling [amd64])
+Conf libpython3-stdlib (3.14.6-1 kali-rolling [amd64])
+Conf blender-data (5.0.1+dfsg-5 kali-rolling [all])
+Conf libswscale9 (7:8.1.2-2+b3 kali-rolling [amd64])
+Conf libavformat62:i386 (7:8.1.2-2+b3 kali-rolling [i386])
+Conf libavformat62 (7:8.1.2-2+b3 kali-rolling [amd64])
+Conf libavdevice62 (7:8.1.2-2+b3 kali-rolling [amd64])
+Conf libavfilter11 (7:8.1.2-2+b3 kali-rolling [amd64])
+Conf libavcodec62:i386 (7:8.1.2-2+b3 kali-rolling [i386])
+Conf libavcodec62 (7:8.1.2-2+b3 kali-rolling [amd64])
+Conf libavutil60 (7:8.1.2-2+b3 kali-rolling [amd64])
+Conf libavutil60:i386 (7:8.1.2-2+b3 kali-rolling [i386])
+Conf libswresample6 (7:8.1.2-2+b3 kali-rolling [amd64])
+Conf libswresample6:i386 (7:8.1.2-2+b3 kali-rolling [i386])
+Conf libvidstab1.2 (1.1.1-4 kali-rolling [amd64])
+Conf libbluray4 (1:1.5.0-3 kali-rolling [amd64])
+Conf libxxhash0:i386 (0.8.3-2+b2 kali-rolling [i386])
+Conf liblz4-1:i386 (1.10.0-10 kali-rolling [i386])
+Conf librist4 (0.2.20+dfsg-1 kali-rolling [amd64])
+Conf librist4:i386 (0.2.20+dfsg-1 kali-rolling [i386])
+Conf libbluray4:i386 (1:1.5.0-3 kali-rolling [i386])
+Conf libx264-165:i386 (2:0.165.3223+git20250910.0480cb0-1 kali-rolling [i386])
+Conf libx264-165 (2:0.165.3223+git20250910.0480cb0-1 kali-rolling [amd64])
+Conf libembree4-4 (4.4.1+dfsg-2 kali-rolling [amd64])
+Conf libimath-3-2-30 (3.2.2-2+b1 kali-rolling [amd64])
+Conf libminizip-ng4t64 (4.0.10+dfsg-2+b1 kali-rolling [amd64])
+Conf libpystring0 (1.1.5-1 kali-rolling [amd64])
+Conf libyaml-cpp0.9 (0.9.0+dfsg-9 kali-rolling [amd64])
+Conf libopencolorio2.5 (2.5.1+dfsg-4+b4 kali-rolling [amd64])
+Conf libopenjph0.28 (0.28.1-1 kali-rolling [amd64])
+Conf libopenexr-3-4-33 (3.4.14-0.1 kali-rolling [amd64])
+Conf dcmtk-data (3.7.0+really3.7.0-7 kali-rolling [all])
+Conf libdcmtk20 (3.7.0+really3.7.0-7 kali-rolling [amd64])
+Conf libopencv-core410 (4.10.0+dfsg-8+b4 kali-rolling [amd64])
+Conf libopencv-imgproc410 (4.10.0+dfsg-8+b4 kali-rolling [amd64])
+Conf gdal-data (3.13.3+dfsg-1 kali-rolling [all])
+Conf gdal-plugins (3.13.3+dfsg-1 kali-rolling [amd64])
+Conf libaec0 (1.1.7-1 kali-rolling [amd64])
+Conf libavif16 (1.4.2-1 kali-rolling [amd64])
+Conf libavif16:i386 (1.4.2-1 kali-rolling [i386])
+Conf libsz2 (1.1.7-1 kali-rolling [amd64])
+Conf libhdf5-320 (2.1.0+repack-1 kali-rolling [amd64])
+Conf libgpgme45 (2.1.2-1 kali-rolling [amd64])
+Conf libgpgmepp7 (2.1.0-2 kali-rolling [amd64])
+Conf libpoppler162 (26.07.0-2 kali-rolling [amd64])
+Conf libgdal39 (3.13.3+dfsg-1 kali-rolling [amd64])
+Conf libcharls2 (2.4.2-2+b3 kali-rolling [amd64])
+Conf libsocket++1 (1.12.13+git20131030.5d039ba-2 kali-rolling [amd64])
+Conf libgdcm3.0t64 (3.0.24-14 kali-rolling [amd64])
+Conf libopencv-imgcodecs410 (4.10.0+dfsg-8+b4 kali-rolling [amd64])
+Conf libopencv-videoio410 (4.10.0+dfsg-8+b4 kali-rolling [amd64])
+Conf liblog4cplus9 (2.1.2-2 kali-rolling [amd64])
+Conf libopenvdb10.0t64 (10.0.1-4+b1 kali-rolling [amd64])
+Conf libraw25 (0.22.1-1 kali-rolling [amd64])
+Conf libopenimageio2.5 (2.5.19.1+dfsg-2+b5 kali-rolling [amd64])
+Conf libopenxr-loader1 (1.1.61~ds-1 kali-rolling [amd64])
+Conf libosdcpu3.6.0 (3.6.0-3+b2 kali-rolling [amd64])
+Conf libosdgpu3.6.0 (3.6.0-3+b2 kali-rolling [amd64])
+Conf libpugixml1v5 (1.16-1 kali-rolling [amd64])
+Conf libshaderc1 (2026.3-1 kali-rolling [amd64])
+Conf libspnav0 (1.2-1 kali-rolling [amd64])
+Conf blender (5.0.1+dfsg-5 kali-rolling [amd64])
+Conf ffmpeg (7:8.1.2-2+b3 kali-rolling [amd64])
+Conf libpoppler-glib8t64 (26.07.0-2 kali-rolling [amd64])
+Conf poppler-utils (26.07.0-2 kali-rolling [amd64])
+Conf python3-gdal (3.13.3+dfsg-1 kali-rolling [amd64])
+Conf python3.14-tk (3.14.6-1 kali-rolling [amd64])
+Conf python3-tk (3.14.6-1 kali-rolling [amd64])
+Conf tdb-tools (2:1.4.15+samba4.24.6+dfsg-1 kali-rolling [amd64])

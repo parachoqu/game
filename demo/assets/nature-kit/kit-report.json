@@ -1,0 +1,213 @@
+{
+  "generated_at": "2026-09-25T23:38:09.141Z",
+  "kit_schema": "1.0.0",
+  "source_package_bytes": 171876065,
+  "packages": [
+    {
+      "label": "nature-kit.glb",
+      "input": 3319356,
+      "bytes": 996016,
+      "sha256": "f084648505f74b30970a91f55d2e1a34f01d24a8a2cd2f208b7b9f1c5d041fe6",
+      "reduction": 0.6999
+    },
+    {
+      "label": "tex/palette.webp",
+      "input": 54104,
+      "bytes": 20452,
+      "sha256": "694db21f4fe1c86ba4f54e24c160d25e64072b5fc00cb3b9060e21570757f2cd",
+      "reduction": 0.622
+    },
+    {
+      "label": "tex/branch.webp",
+      "input": 37407,
+      "bytes": 17460,
+      "sha256": "598610774d67d6b45f6dae79d30b73ef3bef5b9a5806350991aaa5d0b815d1cc",
+      "reduction": 0.5332
+    },
+    {
+      "label": "tex/leaves.webp",
+      "input": 19810,
+      "bytes": 9630,
+      "sha256": "653db27a4b5387d5d7ba91cccadf172641d60f63654bce6ca57f9a00aa1d89d9",
+      "reduction": 0.5139
+    },
+    {
+      "label": "tex/grass.webp",
+      "input": 51435,
+      "bytes": 31048,
+      "sha256": "20406782de47f26ad47f71bce00d41660a338e0696318139aea4fe15aec49cfc",
+      "reduction": 0.3964
+    },
+    {
+      "label": "tex/flower.webp",
+      "input": 59985,
+      "bytes": 36682,
+      "sha256": "e24b8d98a7c843d840fd2b6982bf101da14604d873a291b6685293bcb4281cd5",
+      "reduction": 0.3885
+    },
+    {
+      "label": "tex/flowerLeaf.webp",
+      "input": 2358,
+      "bytes": 1002,
+      "sha256": "4956a64aba35ff69a3805526a6a243fa8de7394ec306f6d23dc686803a836b24",
+      "reduction": 0.5751
+    },
+    {
+      "label": "tex/terrainGrass.webp",
+      "input": 6513,
+      "bytes": 548,
+      "sha256": "22f52fe867191915fd784f863f74552b373d427fac5c1408d387724a8ad3bc04",
+      "reduction": 0.9159
+    },
+    {
+      "label": "tex/terrainDirt.webp",
+      "input": 6513,
+      "bytes": 544,
+      "sha256": "2d8ea42e55e8b3b86aa2713bc0975ba6e20442633affce2e2a946b4934da1d72",
+      "reduction": 0.9165
+    },
+    {
+      "label": "sky-env.webp",
+      "input": 262444413,
+      "bytes": 39592,
+      "sha256": "7febd1edac839e61ac192d3a9b5ad8dca4a3f5a596da7e6484c66c6440b93b98",
+      "reduction": 0.9998
+    },
+    {
+      "label": "kit-manifest.json",
+      "input": 0,
+      "bytes": 35952,
+      "sha256": "eabf0bcad4657d064782a70377683822aa032c9a59478465c3b1c0c816cfa087",
+      "reduction": null
+    }
+  ],
+  "embedded_total_bytes": 1188926,
+  "types": {
+    "pine": {
+      "variants": 1,
+      "triangles": [
+        9729,
+        3954,
+        2632
+      ],
+      "height_m": 12.466
+    },
+    "broad": {
+      "variants": 1,
+      "triangles": [
+        5113,
+        2076,
+        1381
+      ],
+      "height_m": 5.002
+    },
+    "dead": {
+      "variants": 1,
+      "triangles": [
+        2057,
+        547,
+        307
+      ],
+      "height_m": 12.466
+    },
+    "bush": {
+      "variants": 1,
+      "triangles": [
+        560,
+        353,
+        105
+      ],
+      "height_m": 1.526
+    },
+    "grass": {
+      "variants": 1,
+      "triangles": [
+        280,
+        172,
+        75
+      ],
+      "height_m": 0.5
+    },
+    "flower": {
+      "variants": 1,
+      "triangles": [
+        80,
+        43,
+        29
+      ],
+      "height_m": 0.872
+    },
+    "mushroom": {
+      "variants": 1,
+      "triangles": [
+        360,
+        195,
+        66
+      ],
+      "height_m": 0.37
+    },
+    "rock": {
+      "variants": 5,
+      "triangles": [
+        756,
+        410,
+        142
+      ],
+      "height_m": 1.299
+    },
+    "cliff": {
+      "variants": 5,
+      "triangles": [
+        940,
+        510,
+        176
+      ],
+      "height_m": 6.079
+    },
+    "pebble": {
+      "variants": 5,
+      "triangles": [
+        98,
+        52,
+        18
+      ],
+      "height_m": 0.238
+    },
+    "log": {
+      "variants": 1,
+      "triangles": [
+        710,
+        384,
+        133
+      ],
+      "height_m": 0.48
+    },
+    "stump": {
+      "variants": 1,
+      "triangles": [
+        646,
+        350,
+        120
+      ],
+      "height_m": 0.983
+    },
+    "branch": {
+      "variants": 1,
+      "triangles": [
+        189,
+        103,
+        32
+      ],
+      "height_m": 0.047
+    },
+    "mountain": {
+      "variants": 1,
+      "triangles": [
+        2260,
+        1226,
+        424
+      ],
+      "height_m": 45.009
+    }
+  }
+}

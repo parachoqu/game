@@ -1,0 +1,100 @@
+{
+  "generated_at": "2026-09-25T03:15:41.877Z",
+  "runtime_schema": "1.0.0",
+  "source_root": "blender-world/exports",
+  "source_total_bytes": 452630449,
+  "packages": [
+    {
+      "label": "region-height.bin",
+      "input": 1164245,
+      "bytes": 2101250,
+      "sha256": "cf67a4c41cde5038cfdb6bcdf225c858b42a069094c9c90e79b41e608bf1561b",
+      "reduction": -0.8048
+    },
+    {
+      "label": "region-mask.bin",
+      "input": 17242,
+      "bytes": 525313,
+      "sha256": "c9be6f6c430fe71822faf806da5d542a064eebf4f60daf2ad65d13d1bbc9427a",
+      "reduction": -29.4671
+    },
+    {
+      "label": "turbulent-height.bin",
+      "input": 383760,
+      "bytes": 526338,
+      "sha256": "8de28b492b2c1de9b3fe7ca40facb8704483188a9a66290a331c010dbb11f2e3",
+      "reduction": -0.3715
+    },
+    {
+      "label": "region-props.glb",
+      "input": 128254360,
+      "bytes": 50808,
+      "sha256": "64c18e4114ad7bae9665b3d5cddbea57a34b54a23ea5d52615da27c43ef04933",
+      "reduction": 0.9996
+    },
+    {
+      "label": "region-water.glb",
+      "input": 128254360,
+      "bytes": 5956,
+      "sha256": "2f453d71469ab752d78768ad0c1c4a12ce8102328ae1675817cf90da4edf053f",
+      "reduction": 1
+    },
+    {
+      "label": "turbulent-props.glb",
+      "input": 148447700,
+      "bytes": 99772,
+      "sha256": "815b6c1f09384762e3384fe7724c7878b6bedb1dd56f23da4101e6e29886099b",
+      "reduction": 0.9993
+    },
+    {
+      "label": "nature-prototypes.glb",
+      "input": 174107964,
+      "bytes": 20908,
+      "sha256": "c4c06d3384bc3cc08407a237f3e2dce520a08ef4034b802152b68a2c8dc67af5",
+      "reduction": 0.9999
+    },
+    {
+      "label": "world-manifest.json",
+      "input": 11465,
+      "bytes": 75918,
+      "sha256": "c7056a58dcf4376d05099d073d045712a17103a3e9ccccf24134830dd9f37b20",
+      "reduction": -5.6217
+    }
+  ],
+  "embedded_total_bytes": 3385355,
+  "validation": {
+    "region_chunks": {
+      "vertices": 67600,
+      "max_error_m": 0.00083,
+      "at_plan": [
+        -352,
+        -256
+      ]
+    },
+    "turbulent_terrain": {
+      "vertices": 16641,
+      "max_error_m": 0.00027
+    },
+    "biome_values": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "river_columns": 1025
+  },
+  "textures": {
+    "generated": 0,
+    "strategy": "as superfícies PBR (WebP) já embutidas em demo/assets/nature cobrem os seis conjuntos CC0 usados pelo mundo; nenhuma textura nova é gerada",
+    "reused": [
+      "sparse_grass",
+      "rocky_trail_02",
+      "rock_3",
+      "dark_rock",
+      "bark_brown_02",
+      "pine_bark"
+    ]
+  }
+}

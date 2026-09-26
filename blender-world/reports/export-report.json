@@ -1,0 +1,151 @@
+{
+  "blender_version": "5.0.1",
+  "exports": [
+    {
+      "bytes": 79448836,
+      "compression": "none",
+      "file": "atlas/atlas_mundo.glb",
+      "objects": 40
+    },
+    {
+      "bytes": 202940,
+      "compression": "none",
+      "file": "region/chunks/region_0_0.glb",
+      "objects": 1
+    },
+    {
+      "bytes": 202936,
+      "compression": "none",
+      "file": "region/chunks/region_0_1.glb",
+      "objects": 1
+    },
+    {
+      "bytes": 202936,
+      "compression": "none",
+      "file": "region/chunks/region_0_2.glb",
+      "objects": 1
+    },
+    {
+      "bytes": 202940,
+      "compression": "none",
+      "file": "region/chunks/region_0_3.glb",
+      "objects": 1
+    },
+    {
+      "bytes": 202936,
+      "compression": "none",
+      "file": "region/chunks/region_1_0.glb",
+      "objects": 1
+    },
+    {
+      "bytes": 202932,
+      "compression": "none",
+      "file": "region/chunks/region_1_1.glb",
+      "objects": 1
+    },
+    {
+      "bytes": 202936,
+      "compression": "none",
+      "file": "region/chunks/region_1_2.glb",
+      "objects": 1
+    },
+    {
+      "bytes": 202936,
+      "compression": "none",
+      "file": "region/chunks/region_1_3.glb",
+      "objects": 1
+    },
+    {
+      "bytes": 202936,
+      "compression": "none",
+      "file": "region/chunks/region_2_0.glb",
+      "objects": 1
+    },
+    {
+      "bytes": 202932,
+      "compression": "none",
+      "file": "region/chunks/region_2_1.glb",
+      "objects": 1
+    },
+    {
+      "bytes": 202932,
+      "compression": "none",
+      "file": "region/chunks/region_2_2.glb",
+      "objects": 1
+    },
+    {
+      "bytes": 202932,
+      "compression": "none",
+      "file": "region/chunks/region_2_3.glb",
+      "objects": 1
+    },
+    {
+      "bytes": 202936,
+      "compression": "none",
+      "file": "region/chunks/region_3_0.glb",
+      "objects": 1
+    },
+    {
+      "bytes": 202936,
+      "compression": "none",
+      "file": "region/chunks/region_3_1.glb",
+      "objects": 1
+    },
+    {
+      "bytes": 202936,
+      "compression": "none",
+      "file": "region/chunks/region_3_2.glb",
+      "objects": 1
+    },
+    {
+      "bytes": 202940,
+      "compression": "none",
+      "file": "region/chunks/region_3_3.glb",
+      "objects": 1
+    },
+    {
+      "bytes": 50476696,
+      "compression": "none",
+      "file": "region/routes.glb",
+      "objects": 4
+    },
+    {
+      "bytes": 75272388,
+      "compression": "none",
+      "file": "region/architecture.glb",
+      "objects": 55
+    },
+    {
+      "bytes": 3080,
+      "compression": "none",
+      "file": "region/waterworks.glb",
+      "objects": 2
+    },
+    {
+      "bytes": 174107964,
+      "compression": "none",
+      "file": "region/nature.glb",
+      "objects": 4
+    },
+    {
+      "bytes": 128254360,
+      "compression": "none",
+      "file": "region/environment.glb",
+      "objects": 78
+    },
+    {
+      "bytes": 148447700,
+      "compression": "none",
+      "file": "turbulent/turbulenta_01.glb",
+      "objects": 22
+    },
+    {
+      "bytes": 196116500,
+      "compression": "none",
+      "file": "library/environment_kit.glb",
+      "objects": 18
+    }
+  ],
+  "schema_version": "1.0.0",
+  "total_glb_bytes": 855374496
+}

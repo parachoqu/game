@@ -1,0 +1,99 @@
+{
+  "schema_version": "1.0.0",
+  "passed": false,
+  "baseline_files": 1993,
+  "current_files": 1993,
+  "baseline_aggregate_sha256": "74749444d244a19fe97e73dd4d6dbc5f6b96e2d885d7f5bf027d3c32943e5bbc",
+  "current_aggregate_sha256": "93535b7204aaa0261ca0cc8dd3629693c3ad36a287dc96dde90afc55a4c4e7ae",
+  "added_paths": [],
+  "removed_paths": [],
+  "modified_paths": [
+    {
+      "path": "demo/LEIAME.md",
+      "baseline_sha256": "86cd13fa6c72f28e0e61afe620dbd98a0559416bb55891a18f43e9e300001fbd",
+      "current_sha256": "f14d9d81db8f7c93a8e5a161008be7d588fff9ba2b22e8ae255ea94ccd9d9c7f",
+      "current_mtime": 1790267746.8535292
+    },
+    {
+      "path": "demo/dist/Projeto_Game_Demo.html",
+      "baseline_sha256": "d2c2d2be0d2d221436d6eddb1eaae71129e4670f61e2e03a9f47502f7463ca97",
+      "current_sha256": "662228271ffa92d5d3a7d825d740395b98b91302c16ade2af2b33291195d5453",
+      "current_mtime": 1790287846.40996
+    },
+    {
+      "path": "demo/dist/projeto-game-demo.html",
+      "baseline_sha256": "970982d56de992023486b27027cae53830dd5abac810bba352dcdb6c48501c1d",
+      "current_sha256": "84db3e3917939cb5524f3153fccb06da72c0969fcad7c61f64da27faf04d4518",
+      "current_mtime": 1790287846.4379606
+    },
+    {
+      "path": "demo/src/engine/audio.js",
+      "baseline_sha256": "41d27b22b865bea6d6d34be3263ded29201956d48f8b368eb6c22a9004ede3b0",
+      "current_sha256": "d059e817f016ee4a384bf195916be16d3889490e706d6299445fe7417cb69830",
+      "current_mtime": 1790266451.4238424
+    },
+    {
+      "path": "demo/src/engine/characters.js",
+      "baseline_sha256": "54945f7c8fe854bf23f4e70f75f691bfd0069f1e6ae4afa8eaaa716199a3d5bf",
+      "current_sha256": "21affed83ca0f7f3f6bd8b6a0ee5c76ca8e9531128eabfc8411421fc3e7d6e36",
+      "current_mtime": 1790268311.2983887
+    },
+    {
+      "path": "demo/src/engine/input.js",
+      "baseline_sha256": "b16294935ffad7bdd7cfd846d147cfbbda758e56e70b46fbf7919c3f077e46f0",
+      "current_sha256": "ec124a4f356823cfaf5e4054e55457a84cc0c2ca3b1f9098b197bc7be3c724ea",
+      "current_mtime": 1790287078.1863508
+    },
+    {
+      "path": "demo/src/game/collide.js",
+      "baseline_sha256": "080d7261c0934e291d0f54ac22c53a7994f3577a7291204a024cc0394fb46669",
+      "current_sha256": "91cae3918904640eaca9c1858a89d0d0ea238dc767d836d96bb146097cc7cf78",
+      "current_mtime": 1790266440.9956098
+    },
+    {
+      "path": "demo/src/game/combat.js",
+      "baseline_sha256": "210b2303e730918bdc8cfae4915500b94e15810647237fd548f22518f1ce3279",
+      "current_sha256": "866cc8a975af606a9312069f267be93a6944060bf6815856c8b5de28ce78b994",
+      "current_mtime": 1790266482.6446943
+    },
+    {
+      "path": "demo/src/game/player.js",
+      "baseline_sha256": "530da5dc4481c3e505e4bdbb7dba357132f82e453fd3a5d393c1044d12af1aa8",
+      "current_sha256": "5134b1bbcab8eff6dbd2ffc318df6a9a7d3fdfe4dca29da3223026ed0c07f3cb",
+      "current_mtime": 1790287845.9219792
+    },
+    {
+      "path": "demo/src/index.html",
+      "baseline_sha256": "4be4d6f1cc30af4f31e1a8a681c5dec4a87d5e9e19844c10cf5bb2fdc88f476e",
+      "current_sha256": "643412532b8b20ccff629ebda630100dfef4f918f962126d48c6fb8af15ac17d",
+      "current_mtime": 1790266549.9859552
+    },
+    {
+      "path": "demo/src/main.js",
+      "baseline_sha256": "3a3b8244d81e398c2bc4d0472bb705e4000fd5d532fcb4fbb38d8e4c7df05c19",
+      "current_sha256": "1601b0f94a7620f2ac1b62a3460a6ef6a0582d8cd96a563227e899945abd6a8f",
+      "current_mtime": 1790266838.8475885
+    },
+    {
+      "path": "demo/src/styles.css",
+      "baseline_sha256": "623a2dbef848b42599d91acfac41cfc6e13f12b4693ff3f1665a2166d7748eff",
+      "current_sha256": "fc9d4232fd78a1ab7f17f00601109acfc914e5dd387a0075c6d19db91cb7299b",
+      "current_mtime": 1790266567.5503178
+    },
+    {
+      "path": "demo/src/ui/hud.js",
+      "baseline_sha256": "d9e094d7d1d6f386a8fc373f4da9a121a7bcb48cbdb5c434e2a519507e04b032",
+      "current_sha256": "94b81ea940cdaa3b9721e2181519fd8ea6eed9040f42d06476f93833f3573755",
+      "current_mtime": 1790266598.1949422
+    },
+    {
+      "path": "demo/src/ui/panels.js",
+      "baseline_sha256": "e147c2342f65746ded101267f2dbbd236de753ff92fb64bde2308c1bd1cae9b5",
+      "current_sha256": "309254c0884a9eb623a5131539caed60bc2fa886f6b544f7e352ea6fabf77285",
+      "current_mtime": 1790265024.4844449
+    }
+  ],
+  "changed_record_count": 14,
+  "stable_since_drift_detection": true,
+  "stability_baseline_aggregate_sha256": "93535b7204aaa0261ca0cc8dd3629693c3ad36a287dc96dde90afc55a4c4e7ae"
+}

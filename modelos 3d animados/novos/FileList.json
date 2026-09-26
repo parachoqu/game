@@ -1,0 +1,420 @@
+{
+	"files": [
+		{
+			"path": "MHC_paladin.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/Wardrobe/WI_ma_boots_pala_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/Wardrobe/WI_ma_chest_05_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/Wardrobe/WI_ma_gloves_04_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/Wardrobe/WI_ma_gloves_04_c.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/Wardrobe/WI_ma_pants_01_c.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/Wardrobe/Skeletal/WI_ma_hat_paladin_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/Wardrobe/WI_ma_chest_05_c.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/Wardrobe/WI_pala_combine_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/Base/Textures/Metahuman_body_mask/T_mh_body_mask_shoes.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/Outfits/OA_ma_boots_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/Base/Textures/Metahuman_body_mask/T_mh_mask_chest_full.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/Outfits/OA_ma_chest_05_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/Base/Textures/Metahuman_body_mask/T_mh_body_mask_gloves.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/Outfits/OA_ma_gloves_04_c.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/Outfits/OA_ma_gloves_04_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/Base/Textures/Metahuman_body_mask/T_mh_mask_legs.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/Outfits/OA_ma_pants_01_c.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Meshes/UE5/Male/Hats/SK_ma_tal_nrw_heavy_helm_paladin_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/Outfits/OA_ma_chest_05_c.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/Outfits/OA_ma_pala_combine_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Materials/Shoes/MI_shoe_set_04_a_bright_gold.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/SK_tal_nrw_base.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Meshes/UE5/Male/Feet/SK_ma_tal_nrw_shoe_heavy_04_e.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/ClothAssets/CA_boots_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/Outfits/DF_ma_chest_01_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Materials/Chest/MI_ma_chest_heavy_05_d_blue_golden.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/ClothAssets/CA_chest_05_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Meshes/UE5/Male/UpperBody/SK_ma_tal_nrw_chest_heavy_05_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Materials/Gloves_Bracers/MI_bracers_heavy_04.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Materials/Gloves_Bracers/MI_longglove_01_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Meshes/UE5/Male/Gloves/SK_ma_tal_nrw_bracers_heavy_04_c.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/ClothAssets/CA_gloves_04_c.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Materials/Gloves_Bracers/MI_bracers_heavy_04_b_white_gold.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/ClothAssets/CA_gloves_04_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Meshes/UE5/Male/Gloves/SK_ma_tal_nrw_bracers_heavy_04_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Materials/Pants/MI_pants_medium_dark.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Materials/Shoes/MI_shoe_set_04_a_bright.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Meshes/UE5/Male/LowerBody/SK_ma_tal_nrw_pants_01_e.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/ClothAssets/CA_pants_01_c.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/SKEL_metahuman_base.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Materials/Helmet/MI_helm_paladin.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Materials/Chest/MI_ma_chest_heavy_05_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Materials/Chest/MI_ma_cloak_01_a_brown.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Meshes/UE5/Male/UpperBody/SK_ma_tal_nrw_chest_heavy_05_c.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/ClothAssets/CA_chest_05_c.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Materials/Chest/MI_ma_cloak_01_a_golden.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Materials/Gloves_Bracers/MI_bracers_heavy_04_blue.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Meshes/UE5/Male/SK_ma_pala_combine_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/ClothAssets/CA_pala_combine.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/Base/Materials/MI_BaseComplex_GlobalTint_.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Pants_Shoes/Shoes/T_shoe_heavy_paladin_D.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Pants_Shoes/Shoes/T_shoe_heavy_paladin_ID.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Pants_Shoes/Shoes/T_shoe_heavy_paladin_N.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Pants_Shoes/Shoes/T_shoe_heavy_paladin_ORM.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/ClothAssets/DF_ca_boots_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Chest/T_chest_heavy_armour_05_d_D.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Chest/T_chest_heavy_armour_05_d_ID.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Chest/T_chest_heavy_armour_05_d_N.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Chest/T_chest_heavy_armour_05_d_ORM.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/ClothAssets/DF_ca_chest_05_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Meshes/UE5/Male/Physics_Metahuman/PH_m_tal_nrw_skirt_05_b_long.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Bracers_Gloves/T_bracers_heavy_04_D.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Bracers_Gloves/T_bracers_heavy_04_ID.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Bracers_Gloves/T_bracers_heavy_04_N.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Bracers_Gloves/T_bracers_heavy_04_ORM.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/Base/Materials/M_Base_Complex_Master.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Bracers_Gloves/T_armor_gloves_01_D.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Bracers_Gloves/T_armor_gloves_01_ID.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Bracers_Gloves/T_armor_gloves_01_N.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Bracers_Gloves/T_armor_gloves_01_ORM.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/ClothAssets/DF_ca_gloves_04_c.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Bracers_Gloves/T_bracers_heavy_04_b_ID.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/ClothAssets/DF_ca_gloves_04_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Pants_Shoes/Pants/T_pants_medium_01_D.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Pants_Shoes/Pants/T_pants_medium_01_N.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Pants_Shoes/Pants/T_pants_medium_01_ORM.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/ClothAssets/DF_ca_pants_01_c.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/Base/DemoContent/Meshes/SKEL_Mannequin_UE5.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Helmet/T_helm_heavy_paladin_D.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Helmet/T_helm_heavy_paladin_ID.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Helmet/T_helm_heavy_paladin_N.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Helmet/T_helm_heavy_paladin_b_ORM.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Chest/T_chest_heavy_armour_05_a_D.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Chest/T_chest_heavy_armour_05_a_ID.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Chest/T_chest_heavy_armour_05_a_N.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Chest/T_chest_heavy_armour_05_a_ORM.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Chest/T_cloak_01_a_D.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Chest/T_cloak_01_a_ID.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Chest/T_cloak_01_a_N.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Textures/Chest/T_cloak_01_a_ORM.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Meshes/UE5/Male/Physics_Metahuman/PH_m_tal_nrw_heavy_chest_04_a.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/ClothAssets/DF_ca_chest_05_c.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Materials/Chest/MI_ma_chest_heavy_05_a_red.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/Materials/Shoes/MI_shoe_set_04_dark.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/CharacterParts_HeavyArmour/MH_Creator/ClothAssets/DF_ca_pala_combine.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/Base/Textures/Basebody/Skinset_light/T_ma_base_body_01_D.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/Base/Textures/Basebody/Skinset_light/T_ma_base_body_01_ID.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/Base/Textures/Basebody/Skinset_light/T_ma_base_body_01_N.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/Base/Materials/MaterialFunctions/MF_RGBA_PatternBlend.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/Base/Materials/MaterialFunctions/MF_RGBYMCA_Multiplier.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/Base/Materials/MaterialFunctions/MF_RGBYMCA_Tint.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/Base/Textures/Logo/T_polyphoria_logo_master.uasset",
+			"version": "0.0"
+		},
+		{
+			"path": "Polyphoria/Polyphoria/Base/Textures/Basebody/Skinset_light/T_ma_base_body_01_ORS.uasset",
+			"version": "0.0"
+		}
+	]
+}

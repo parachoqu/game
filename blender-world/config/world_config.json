@@ -1,0 +1,172 @@
+{
+  "schema_version": "1.0.0",
+  "blender_version": "5.0.1",
+  "status_labels": ["BASE", "PROPOSTA", "EM_ABERTO"],
+  "seeds": {
+    "atlas": 26092401,
+    "region": 26092402,
+    "turbulent": 26092403
+  },
+  "atlas": {
+    "size_km": [220, 140],
+    "samples": [1024, 640],
+    "unit_km": 1.0,
+    "main_continent_km": [120, 85],
+    "second_continent_km": [70, 50],
+    "sea_level_km": 0.0
+  },
+  "region": {
+    "size_m": [1024, 1024],
+    "samples": [1025, 1025],
+    "chunks": [4, 4],
+    "unit_m": 1.0,
+    "water_level_m": 10.0,
+    "route_clearance_m": {
+      "trade": 4.0,
+      "trail": 2.5
+    }
+  },
+  "turbulent": {
+    "size_m": [256, 256],
+    "samples": [513, 513],
+    "unit_m": 1.0
+  },
+  "biomes": [
+    {"id": 0, "name": "bacias_temperadas"},
+    {"id": 1, "name": "colinas_produtivas"},
+    {"id": 2, "name": "serras_altitude"},
+    {"id": 3, "name": "baixadas_umidas"},
+    {"id": 4, "name": "planaltos_secos"},
+    {"id": 5, "name": "costas_desembocaduras"},
+    {"id": 6, "name": "turbulenta_anomala"}
+  ],
+  "biome_rules": {
+    "inputs": ["altitude", "slope", "moisture", "exposure", "distance_to_water", "occupation"],
+    "atlas": {
+      "mountain_altitude_km": 1.7,
+      "coast_altitude_km": 0.16,
+      "wetland_moisture": 0.72,
+      "dry_plateau_moisture": 0.38
+    },
+    "region": {
+      "productive_hills_min_m": 36.0,
+      "mountain_min_m": 68.0,
+      "mountain_slope_deg": 26.0,
+      "wetland_moisture": 0.68,
+      "dry_plateau_moisture": 0.31
+    }
+  },
+  "realms": [
+    {"id": "valdora", "name": "Valdora", "status": "PROPOSTA", "identity": "bacias habitadas e comercio fluvial"},
+    {"id": "serrabruma", "name": "Serrabruma", "status": "PROPOSTA", "identity": "cordilheiras passagens e mineracao"},
+    {"id": "verdeferro", "name": "Verdeferro", "status": "PROPOSTA", "identity": "bosques e colinas produtivas"},
+    {"id": "marevia", "name": "Marevia", "status": "PROPOSTA", "identity": "costas estuarios e entrepostos maritimos"},
+    {"id": "pedrassol", "name": "Pedrassol", "status": "PROPOSTA", "identity": "planaltos interiores mais secos"},
+    {"id": "altavela", "name": "Altavela", "status": "PROPOSTA", "identity": "territorios antigos ruinas e observatorios"}
+  ],
+  "region_anchors": {
+    "outpost_south": [10.0, -410.0],
+    "market": [40.0, -375.0],
+    "bridge_main": [0.0, -145.0],
+    "bridge_minor": [275.0, -118.0],
+    "mine": [-345.0, -72.0],
+    "cave_west": [-410.0, -5.0],
+    "gorge_center": [-25.0, 80.0],
+    "camp": [300.0, 72.0],
+    "observatory": [-260.0, 205.0],
+    "wastes": [-350.0, 365.0],
+    "portal_turbulent": [315.0, 320.0],
+    "outpost_north": [35.0, 425.0]
+  },
+  "region_routes": {
+    "short_gorge": {
+      "anchors": ["outpost_south", "bridge_main", "gorge_center", "outpost_north"],
+      "width_m": 4.0,
+      "max_sustained_slope_deg": 18.0,
+      "max_peak_slope_deg": 28.0,
+      "risk": "alto"
+    },
+    "safe_east": {
+      "anchors": ["outpost_south", "bridge_minor", "camp", "portal_turbulent", "outpost_north"],
+      "width_m": 5.0,
+      "max_sustained_slope_deg": 12.0,
+      "max_peak_slope_deg": 18.0,
+      "risk": "moderado"
+    },
+    "mine_spur": {
+      "anchors": ["bridge_main", "mine", "cave_west"],
+      "width_m": 2.5,
+      "max_sustained_slope_deg": 16.0,
+      "max_peak_slope_deg": 24.0,
+      "risk": "baixo"
+    },
+    "observatory_trail": {
+      "anchors": ["gorge_center", "observatory", "wastes"],
+      "width_m": 2.5,
+      "max_sustained_slope_deg": 18.0,
+      "max_peak_slope_deg": 26.0,
+      "risk": "alto"
+    }
+  },
+  "distribution": {
+    "region": {
+      "broadleaf_count": 760,
+      "pine_count": 520,
+      "rock_count": 430,
+      "grass_count": 900,
+      "route_exclusion_m": {
+        "broadleaf": 13.0,
+        "pine": 10.0,
+        "rock": 8.0,
+        "grass": 6.5
+      },
+      "anchor_exclusion_m": 30.0,
+      "reserved_rectangles_m": {
+        "south_outpost_and_fields": [-175.0, -490.0, 185.0, -325.0],
+        "north_outpost": [-55.0, 375.0, 110.0, 485.0],
+        "mine_and_cave_entrances": [-455.0, -130.0, -285.0, 45.0],
+        "reactive_camp": [245.0, 15.0, 355.0, 125.0],
+        "regional_observatory": [-320.0, 145.0, -205.0, 265.0],
+        "wastes_ruins": [-415.0, 315.0, -285.0, 435.0]
+      }
+    },
+    "turbulent": {
+      "rock_attempts": 180,
+      "portal_exclusion_radius_m": 24.0
+    }
+  },
+  "hydrology": {
+    "atlas_lakes": [
+      {"id": "lago_valdora", "center_km": [-36.0, -7.0], "radii_km": [5.5, 2.8], "classification": "closed_basin"},
+      {"id": "lago_verdeferro", "center_km": [-61.0, 14.0], "radii_km": [4.2, 2.2], "classification": "closed_basin"}
+    ],
+    "region_river_crossings_m": [[-512.0, -166.0], [0.0, -145.0], [275.0, -118.0], [512.0, -94.0]],
+    "region_meander_amplitudes_m": [9.0, -7.0, 6.0],
+    "river_carve_width_m": 24.0,
+    "river_half_width_m": 8.5,
+    "river_surface_m": 10.12,
+    "lake_policy": "classify every disconnected basin as outlet-connected or explicitly closed"
+  },
+  "turbulent_anchors": {
+    "entry": [0.0, -112.0],
+    "portal_core": [0.0, 0.0],
+    "objective_ruins": [-58.0, 38.0],
+    "exit_east": [112.0, 82.0],
+    "exit_west": [-110.0, 96.0]
+  },
+  "materials": {
+    "palette": {
+      "emerald": "#245F50",
+      "teal": "#153F46",
+      "ochre": "#B77A35",
+      "terracotta": "#A24E35",
+      "cobalt": "#2E4F91",
+      "stone": "#76736D",
+      "amber": "#E3A64C",
+      "anomaly_cyan": "#42E0DE",
+      "anomaly_violet": "#7455A5"
+    },
+    "source_license": "CC0-1.0",
+    "source_root": "../modelos 3d animados/texturas"
+  }
+}

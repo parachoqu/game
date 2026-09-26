@@ -1,0 +1,222 @@
+{
+  "schema_version": "1.0.0",
+  "seeds": {
+    "atlas": 26092401,
+    "region": 26092402,
+    "turbulent": 26092403
+  },
+  "passed": true,
+  "checks": [
+    {
+      "id": "deterministic_generation",
+      "passed": true,
+      "details": {
+        "atlas": {
+          "height": "ebe8cfabb5aba286a1067e8571529f90adb7e6a17c9f92fb901a7582b0e2d56c",
+          "land": "b5635ef8a8b37e0b535a80a020022dbd2f6122f2928b1e6b3c7923eed47faa92",
+          "water": "85e6b9f9ca257872b42d8d640e527b77a56ed688498469302e376f90f1dd09b7",
+          "moisture": "245e281dfe571b4946a795cec02a4820e2c5a6722fc5de3a11c60932dab0bd09",
+          "slope": "16e548d6b03283e57704133e17046fb1065a0c74c8db62e174bf12522397af75",
+          "biome": "72441f5926a5933b80196c4cc6fe4b387a8bb98bc83519d641be69355067c9a2"
+        },
+        "region": {
+          "height": "6d4c803145c4df73a5b9663225ef68cb7745f83492f113c601cd9c1cff685f61",
+          "land": "6d32f6f9fea8f7e459ed03a5f026eea49e0b1e69eb46812bc6f4f7a2fdba5a30",
+          "water": "bc6b8f67c84a2467607ddb15c3a5b90233fff6116a5a5e4b793e8da297387321",
+          "moisture": "26f8b175143f49016a983dffca9da5a7a20c6bdfd0b48b6d445a596fbf148af3",
+          "slope": "94d1a4a7ebd6b66a2dd44f127676071763e59b43b3eeb765ccf69e4331889168",
+          "biome": "97e21adc17c14f44eb148e9226e07de1da1d42c70b32d3e54cca104c56bc92de"
+        },
+        "turbulent": {
+          "height": "6a70931fcb3535015450917b90e3e45311845b72257e858d2c84b7dd9ce549f4",
+          "land": "7e239d27f446d568a82a0632fd22725117a04e7f6239209bc96b83d2fcf2b5f2",
+          "water": "e8d091a7b2b421e9831a688be8960ccf59b58db74c4ad4244b2ccfa8938c6141",
+          "moisture": "835b0d953fb330a0778cf1c7481daf9450d089b44818a4e0b707ecc52a0c73ea",
+          "slope": "ee49f507166b42da0e9d70e73e1fac8d2e11d08ba605fa7a97451bb55bffc858",
+          "biome": "6b70e24d701b7301f89362162e789e375f1cad2ab99a53714519fdcae8f2552f"
+        }
+      }
+    },
+    {
+      "id": "shared_chunk_borders",
+      "passed": true,
+      "details": {
+        "comparisons": 24,
+        "max_height_error_m": 0.0
+      }
+    },
+    {
+      "id": "hydrology_outlets",
+      "passed": true,
+      "details": {
+        "components": 1,
+        "touches_west_edge": 17,
+        "touches_east_edge": 17,
+        "modeled_surface_max_uphill_m": 0.0,
+        "lakes": [],
+        "classification": "one open cross-region river; no closed lake basin in detailed region",
+        "atlas_lakes": [
+          {
+            "id": "lago_valdora",
+            "center_km": [
+              -36.0,
+              -7.0
+            ],
+            "radii_km": [
+              5.5,
+              2.8
+            ],
+            "classification": "closed_basin"
+          },
+          {
+            "id": "lago_verdeferro",
+            "center_km": [
+              -61.0,
+              14.0
+            ],
+            "radii_km": [
+              4.2,
+              2.2
+            ],
+            "classification": "closed_basin"
+          }
+        ],
+        "atlas_water_components": 3
+      }
+    },
+    {
+      "id": "route_widths_and_slopes",
+      "passed": true,
+      "details": {
+        "short_gorge": {
+          "points": 49,
+          "measured_max_slope_deg": 18.0,
+          "declared_sustained_deg": 18.0,
+          "declared_peak_deg": 28.0,
+          "width_m": 4.0
+        },
+        "safe_east": {
+          "points": 65,
+          "measured_max_slope_deg": 12.00000000000003,
+          "declared_sustained_deg": 12.0,
+          "declared_peak_deg": 18.0,
+          "width_m": 5.0
+        },
+        "mine_spur": {
+          "points": 33,
+          "measured_max_slope_deg": 16.000000000000004,
+          "declared_sustained_deg": 16.0,
+          "declared_peak_deg": 24.0,
+          "width_m": 2.5
+        },
+        "observatory_trail": {
+          "points": 33,
+          "measured_max_slope_deg": 18.000000000000018,
+          "declared_sustained_deg": 18.0,
+          "declared_peak_deg": 26.0,
+          "width_m": 2.5
+        }
+      }
+    },
+    {
+      "id": "route_graph_access",
+      "passed": true,
+      "details": {
+        "region_reached": [
+          "bridge_main",
+          "bridge_minor",
+          "camp",
+          "cave_west",
+          "gorge_center",
+          "mine",
+          "observatory",
+          "outpost_north",
+          "outpost_south",
+          "portal_turbulent",
+          "wastes"
+        ],
+        "region_required": [
+          "bridge_main",
+          "bridge_minor",
+          "camp",
+          "cave_west",
+          "mine",
+          "observatory",
+          "outpost_north",
+          "outpost_south",
+          "portal_turbulent",
+          "wastes"
+        ],
+        "turbulent_reached": [
+          "entry",
+          "exit_east",
+          "exit_west",
+          "objective_ruins",
+          "portal_core"
+        ],
+        "turbulent_required": [
+          "entry",
+          "exit_east",
+          "exit_west",
+          "objective_ruins",
+          "portal_core"
+        ]
+      }
+    },
+    {
+      "id": "instance_exclusion_masks",
+      "passed": true,
+      "details": {
+        "instances_checked": 2610,
+        "collisions": []
+      }
+    },
+    {
+      "id": "height_maps",
+      "passed": true,
+      "details": {
+        "atlas": {
+          "size": [
+            1024,
+            640
+          ],
+          "mode": "I;16",
+          "extrema": [
+            0,
+            65535
+          ]
+        },
+        "region": {
+          "size": [
+            1025,
+            1025
+          ],
+          "mode": "I;16",
+          "extrema": [
+            0,
+            65535
+          ]
+        },
+        "turbulent": {
+          "size": [
+            513,
+            513
+          ],
+          "mode": "I;16",
+          "extrema": [
+            0,
+            65535
+          ]
+        }
+      }
+    },
+    {
+      "id": "master_size",
+      "passed": true,
+      "details": {
+        "bytes": 351298658,
+        "limit_bytes": 2000000000
+      }
+    }
+  ]
+}

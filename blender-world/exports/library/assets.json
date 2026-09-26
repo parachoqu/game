@@ -1,0 +1,183 @@
+{
+  "assets": [
+    {
+      "asset_type": "arch",
+      "materials": [
+        "MAT_Stone_PBR_CC0"
+      ],
+      "name": "ASSET_Arch",
+      "production_level": "medium_detail_base",
+      "vertices": 24
+    },
+    {
+      "asset_type": "bridge",
+      "materials": [
+        "MAT_Stone_PBR_CC0",
+        "MAT_DarkWood"
+      ],
+      "name": "ASSET_Bridge",
+      "production_level": "medium_detail_base",
+      "vertices": 48
+    },
+    {
+      "asset_type": "broadleaf_tree",
+      "materials": [
+        "MAT_Bark_PBR_CC0",
+        "MAT_FoliageEmerald"
+      ],
+      "name": "ASSET_BroadleafTree",
+      "production_level": "medium_detail_base",
+      "vertices": 178
+    },
+    {
+      "asset_type": "camp",
+      "materials": [
+        "MAT_CampCloth",
+        "MAT_DarkWood",
+        "MAT_Ember"
+      ],
+      "name": "ASSET_Camp",
+      "production_level": "medium_detail_base",
+      "vertices": 100
+    },
+    {
+      "asset_type": "dead_tree",
+      "materials": [
+        "MAT_Bark_PBR_CC0"
+      ],
+      "name": "ASSET_DeadTree",
+      "production_level": "medium_detail_base",
+      "vertices": 66
+    },
+    {
+      "asset_type": "dock",
+      "materials": [
+        "MAT_DarkWood",
+        "MAT_AgedMetal"
+      ],
+      "name": "ASSET_Dock",
+      "production_level": "medium_detail_base",
+      "vertices": 64
+    },
+    {
+      "asset_type": "grass",
+      "materials": [
+        "MAT_Grass_PBR_CC0"
+      ],
+      "name": "ASSET_GrassClump",
+      "production_level": "medium_detail_base",
+      "vertices": 55
+    },
+    {
+      "asset_type": "market_stall",
+      "materials": [
+        "MAT_DarkWood",
+        "MAT_CobaltCloth"
+      ],
+      "name": "ASSET_MarketStall",
+      "production_level": "medium_detail_base",
+      "vertices": 48
+    },
+    {
+      "asset_type": "mine",
+      "materials": [
+        "MAT_Stone_PBR_CC0",
+        "MAT_DarkWood",
+        "MAT_CaveDark"
+      ],
+      "name": "ASSET_MineEntrance",
+      "production_level": "medium_detail_base",
+      "vertices": 48
+    },
+    {
+      "asset_type": "observatory",
+      "materials": [
+        "MAT_Stone_PBR_CC0",
+        "MAT_AgedMetal"
+      ],
+      "name": "ASSET_Observatory",
+      "production_level": "medium_detail_base",
+      "vertices": 112
+    },
+    {
+      "asset_type": "pine_tree",
+      "materials": [
+        "MAT_PineBark_PBR_CC0",
+        "MAT_PineFoliageTeal"
+      ],
+      "name": "ASSET_PineTree",
+      "production_level": "medium_detail_base",
+      "vertices": 114
+    },
+    {
+      "asset_type": "rock",
+      "materials": [
+        "MAT_Rock_PBR_CC0"
+      ],
+      "name": "ASSET_Rock",
+      "production_level": "medium_detail_base",
+      "vertices": 54
+    },
+    {
+      "asset_type": "roof",
+      "materials": [
+        "MAT_Terracotta"
+      ],
+      "name": "ASSET_Roof",
+      "production_level": "medium_detail_base",
+      "vertices": 16
+    },
+    {
+      "asset_type": "ruin",
+      "materials": [
+        "MAT_Stone_PBR_CC0"
+      ],
+      "name": "ASSET_Ruin",
+      "production_level": "medium_detail_base",
+      "vertices": 44
+    },
+    {
+      "asset_type": "shrub",
+      "materials": [
+        "MAT_FoliageEmerald"
+      ],
+      "name": "ASSET_Shrub",
+      "production_level": "medium_detail_base",
+      "vertices": 36
+    },
+    {
+      "asset_type": "tent",
+      "materials": [
+        "MAT_CampCloth",
+        "MAT_DarkWood"
+      ],
+      "name": "ASSET_Tent",
+      "production_level": "medium_detail_base",
+      "vertices": 16
+    },
+    {
+      "asset_type": "tower",
+      "materials": [
+        "MAT_Stone_PBR_CC0",
+        "MAT_Terracotta",
+        "MAT_CobaltCloth"
+      ],
+      "name": "ASSET_Tower",
+      "production_level": "medium_detail_base",
+      "vertices": 80
+    },
+    {
+      "asset_type": "wall",
+      "materials": [
+        "MAT_Stone_PBR_CC0",
+        "MAT_PlasterOchre"
+      ],
+      "name": "ASSET_Wall",
+      "production_level": "medium_detail_base",
+      "vertices": 32
+    }
+  ],
+  "characters_or_animals_included": false,
+  "scene_id": "BIBLIOTECA_LOCAL",
+  "schema_version": "1.0.0"
+}

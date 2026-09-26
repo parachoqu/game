@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0.0",
+  "passed": true,
+  "saved": false,
+  "signatures_before": {
+    "manual": "6af51febde1a1c935e3422e8c323e859222c991c60c62c4763cf1ccd4c0f176f",
+    "editable": "d75bb6aac24df557d1246c3e9e626e1893fb4fb0ef902aab47401685ad6fb5db"
+  },
+  "signatures_after": {
+    "manual": "6af51febde1a1c935e3422e8c323e859222c991c60c62c4763cf1ccd4c0f176f",
+    "editable": "d75bb6aac24df557d1246c3e9e626e1893fb4fb0ef902aab47401685ad6fb5db"
+  },
+  "versions_created": [
+    {
+      "kind": "atlas",
+      "seed": 26092401,
+      "version": 2,
+      "collection": "GEN_ATLAS__seed_26092401__v002",
+      "data_hash": "80af4265f39d82ce6480f56e05c752d3131fd537e6106a4191f404a4aae63e1b",
+      "height_shape": [
+        640,
+        1024
+      ]
+    },
+    {
+      "kind": "region",
+      "seed": 26092402,
+      "version": 2,
+      "collection": "GEN_REGION__seed_26092402__v002",
+      "data_hash": "d9c0e293ab188d0d5f6c03f1ad33fab5d53cfc89e05fee7984c14b1f307aa133",
+      "height_shape": [
+        1025,
+        1025
+      ]
+    },
+    {
+      "kind": "turbulent",
+      "seed": 26092403,
+      "version": 2,
+      "collection": "GEN_TURBULENT__seed_26092403__v002",
+      "data_hash": "49c1178fcf186a7cd97b3895cb9d324299b8d401529f6dac5ac186c438a0f720",
+      "height_shape": [
+        513,
+        513
+      ]
+    }
+  ],
+  "policy": "append procedural version; never modify BASE_EDITAVEL or ACABAMENTO_MANUAL"
+}

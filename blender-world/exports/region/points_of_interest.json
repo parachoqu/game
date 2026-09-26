@@ -1,0 +1,123 @@
+{
+  "points_of_interest": [
+    {
+      "id": "bridge_main",
+      "location_m": [
+        0.0,
+        -145.0,
+        10.86765
+      ],
+      "object": "POI_bridge_main"
+    },
+    {
+      "id": "bridge_minor",
+      "location_m": [
+        275.0,
+        -118.0,
+        15.48975
+      ],
+      "object": "POI_bridge_minor"
+    },
+    {
+      "id": "camp",
+      "location_m": [
+        300.0,
+        72.0,
+        72.7961
+      ],
+      "object": "POI_ReactiveCamp"
+    },
+    {
+      "id": "cave_west",
+      "location_m": [
+        -410.0,
+        -5.0,
+        56.84893
+      ],
+      "object": "POI_CaveWest_Entrance"
+    },
+    {
+      "id": "gorge_center",
+      "location_m": [
+        -25.0,
+        80.0,
+        23.03281
+      ],
+      "object": "POI_gorge_center"
+    },
+    {
+      "id": "market",
+      "location_m": [
+        40.0,
+        -375.0,
+        17.30417
+      ],
+      "object": "POI_market"
+    },
+    {
+      "id": "mine",
+      "location_m": [
+        -345.0,
+        -72.0,
+        63.50972
+      ],
+      "object": "POI_Mine_Entrance"
+    },
+    {
+      "id": "observatory",
+      "location_m": [
+        -260.0,
+        205.0,
+        108.52369
+      ],
+      "object": "POI_RegionalObservatory"
+    },
+    {
+      "id": "outpost_north",
+      "location_m": [
+        35.0,
+        425.0,
+        58.80675
+      ],
+      "object": "POI_outpost_north"
+    },
+    {
+      "id": "outpost_south",
+      "location_m": [
+        10.0,
+        -410.0,
+        16.46582
+      ],
+      "object": "POI_outpost_south"
+    },
+    {
+      "id": "portal_turbulent",
+      "location_m": [
+        315.0,
+        320.0,
+        97.4217
+      ],
+      "object": "POI_TurbulentPortal_Surface"
+    },
+    {
+      "id": "wastes",
+      "location_m": [
+        -350.0,
+        365.0,
+        97.48
+      ],
+      "object": "Wastes_Ruin_01"
+    },
+    {
+      "id": "wastes_satellite",
+      "location_m": [
+        -326.0,
+        383.0,
+        96.13536
+      ],
+      "object": "Wastes_Ruin_02"
+    }
+  ],
+  "scene_id": "REGIAO_COMERCIAL",
+  "schema_version": "1.0.0"
+}

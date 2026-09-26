@@ -1,0 +1,1423 @@
+DOCUMENTO-MESTRE / VERSÃO DE TRABALHO 2.0
+
+
+
+
+PROJETO
+GAME
+Mundo, trajetórias e sistemas
+
+
+Um MMORPG sandbox em que o jogador escolhe como viver, o
+mundo responde às ações coletivas e o Livro transforma
+acontecimentos em memória.
+
+
+
+
+TRAJETÓRIA                               CONSEQUÊNCIA                MEMÓRIA
+Escolhas de vida                         Mudanças no mundo           O Livro do personagem
+
+
+
+
+Reestruturação e complementação do contexto fornecido
+
+Base preservada • Novas propostas identificadas • Decisões abertas
+
+
+
+21 SETEMBRO 2026
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+LEITURA E NAVEGAÇÃO
+
+
+Uma visão, vinte capítulos
+Análise das oito páginas de projeto_game_mundo_e_sistemas (1).pdf. O anexo consolida ideias; não é a
+transcrição integral do chat anterior. Esta revisão preserva a direção registrada e acrescenta propostas de
+design, sem recuperar decisões ausentes do arquivo.
+
+BASE — direção registrada no anexo. PROPOSTA — complementação desta revisão. EM ABERTO — decisão
+necessária. Possibilidades do original continuam provisórias; nenhuma regra nova é apresentada como
+aprovada, implementada ou balanceada.
+
+
+01     Diagnóstico e identidade a preservar                                                                            3
+
+02     Visão do jogo e ciclos da experiência                                                                           4
+
+03     Personagem, treinamento e progressão                                                                            5
+
+04     Combate e linguagem da magia                                                                                    6
+
+05     Economia, produção e circulação de valor                                                                        7
+
+06     Peso, transporte e montarias                                                                                    8
+
+07     Zonas, derrota e recuperação                                                                                    9
+
+08     Durabilidade e saúde da economia                                                                                10
+
+09     Regiões Turbulentas                                                                                             11
+
+10     O Livro: memória, expressão e legado                                                                            12
+
+11     Mundo, geografia e culturas                                                                                     13
+
+12     Territórios reativos e ecologia de encontros                                                                    14
+
+13     Reinos, facções, guildas e diplomacia                                                                           15
+
+14     As estrelas e a história do mundo                                                                               16
+
+15     Narrativa regional e direção sensorial                                                                          17
+
+16     Uma região para representar o projeto                                                                           18
+
+17     Desenvolvimento por evidência                                                                                   19
+
+18     Exemplo de uma jornada conectada                                                                                20
+
+19     Decisões pendentes e ordem de fechamento                                                                        21
+
+20     Rastreabilidade do documento original                                                                           22
+
+Escopo: concepção e coerência entre sistemas. Orçamento, equipe, tecnologia, cronograma, capacidade de servidores e
+modelo comercial permanecem sem definição. Os critérios de teste são propostas; não há resultados de validação nesta
+revisão.
+
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                                            02
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 01
+
+
+Diagnóstico e identidade a preservar
+BASE — origem: seções 1–3, 7, 14, 19 e 22 do anexo. A proposta já possui uma identidade consistente: mundo aberto em
+terceira pessoa, liberdade profissional, progressão ligada a equipamento e treinamento, economia entre jogadores, diferentes
+níveis de risco e narrativa sem protagonista obrigatório. O desaparecimento das estrelas fornece uma história ao mundo; o
+Livro fornece uma história a cada personagem.
+
+O material original descreve bem o que o jogo pretende fazer o jogador sentir. Sua principal lacuna está nas
+relações entre as partes. Ainda falta explicar como o risco cria demanda econômica, como uma contribuição civil
+muda uma região, como alguém se recupera de uma perda e como o Livro distingue um acontecimento
+relevante de uma ação repetitiva.
+
+PROPOSTA — organizar a identidade em três compromissos.
+
+• Trajetória escolhida: combater, produzir, transportar e explorar precisam oferecer objetivos completos. Uma
+  atividade civil não deve funcionar apenas como preparação obrigatória para o combate.
+• Consequência compreensível: o jogador deve perceber o que mudou, quais ações contribuíram e como pode
+  responder. Um mundo que muda sem explicação parece arbitrário.
+• Memória significativa: os acontecimentos importantes deixam registros proporcionais à participação do
+  personagem. O Livro reconhece trabalhos, descobertas, relações e derrotas, além de vitórias.
+O diferencial pretendido mais forte é a conexão ação → consequência → memória. Liberdade, mundo vivo e
+escala ganham identidade quando servem a essa conexão. Isso é uma leitura do próprio projeto, não uma
+afirmação de ineditismo frente a outros jogos.
+
+  Tensão encontrada                                    Encaminhamento proposto
+
+  Liberdade de carreira × recompensa concentrada       Dar demanda e marcos próprios às atividades civis; reservar ao
+  em PvP                                               risco vantagens específicas.
+
+  Mundo monumental × conteúdo inicial viável           Representar o mundo em uma região densa e conectada antes de
+                                                       ampliar o mapa.
+
+  Punição × continuidade da jornada                    Perder bens em zonas previstas, preservando conhecimentos,
+                                                       história e meios básicos de recomeçar.
+
+  Anonimato × registro no Livro                        Registrar o encontro sem revelar automaticamente o adversário.
+
+  Política coletiva × domínio de grandes grupos        Separar instituições, limitar influência repetitiva e oferecer
+                                                       contribuições individuais.
+
+
+EM ABERTO: nome do jogo e do universo, público prioritário e intensidade pretendida da punição. Essas
+escolhas orientarão o balanceamento, mas não precisam impedir a organização conceitual.
+
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                                         03
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 02
+
+
+Visão do jogo e ciclos da experiência
+BASE — origem: seções 1, 2, 6 e 19. O personagem não recebe uma classe permanente nem uma missão universal que
+determine sua importância. Ele constrói uma trajetória dentro de um mundo antigo, habitado e sujeito a mudanças.
+
+PROPOSTA — promessa ao jogador. “Escolha uma vida, assuma seus riscos e deixe uma história em um mundo
+que continua mudando.” A promessa exige que decisões pequenas — que carga levar, a quem vender, que
+estrada usar — possam participar de acontecimentos maiores.
+
+Ciclo de uma sessão
+Escolher uma intenção → preparar equipamento e carga → agir no mundo → lidar com consequências →
+retornar, trocar ou reinvestir → consolidar a trajetória.
+
+O retorno não precisa ser sempre a uma cidade. Pode ser uma entrega, uma extração bem-sucedida, um
+encontro com aliados ou a conclusão de uma descoberta. Uma sessão também pode terminar em perda; nesse
+caso, o ciclo seguinte começa com escolhas de recuperação.
+
+Ciclos de médio e longo prazo
+• Médio prazo: dominar uma técnica, completar uma rota, construir reputação, equipar uma expedição ou
+  contribuir para um objetivo regional.
+• Longo prazo: tornar-se uma referência profissional, participar de acontecimentos históricos, explorar
+  fronteiras e acompanhar transformações do mundo.
+
+  Forma de jogar           Decisão recorrente                         Resultado que dá sentido à atividade
+
+  Produção                 O que fabricar, para quem e com quais      Clientes, especialização, reputação e
+                           materiais?                                 abastecimento.
+
+  Comércio                 Que margem compensa distância, carga e     Entregas, acesso a mercados e rotas
+                           risco?                                     reconhecidas.
+
+  Exploração               Prosseguir, registrar, compartilhar ou     Conhecimento, recursos, descobertas e
+                           retornar?                                  reconhecimento.
+
+  Combate                  Que preparação, alvo e risco aceitar?      Domínio, proteção de interesses, saque e
+                                                                      marcos.
+
+
+Os percursos se cruzam sem obrigar todos a fazer tudo. Um explorador identifica uma mina, produtores
+preparam ferramentas, transportadores abastecem a rota e combatentes disputam sua segurança.
+
+Critério de design proposto: cada atividade principal precisa ter uma decisão interessante, um destinatário para
+seu resultado e uma forma de reconhecimento. Se só aumenta um contador, ainda está incompleta.
+
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                                   04
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 03
+
+
+Personagem, treinamento e progressão
+BASE — origem: seção 3. Raça, profissão, treinamento e equipamento são conceitos separados. Um Orc não é
+obrigatoriamente guerreiro; um Elfo não é obrigatoriamente arqueiro; um Anão não é obrigatoriamente ferreiro. Armas e
+armaduras determinam grande parte do estilo atual, enquanto o conhecimento permanece na trajetória.
+
+PROPOSTA — cinco camadas complementares.
+
+  Camada                   Função                                        Limite de design
+
+  Origem e raça            História, aparência e relações culturais.     Não impedir profissões nem determinar uma
+                                                                         única função competitiva.
+
+  Conhecimento             Técnicas e possibilidades aprendidas.         Não desaparecer com a perda de equipamento.
+
+  Equipamento              Conjunto de ações e compromissos do           Não fornecer todas as vantagens ao mesmo
+                           momento.                                      tempo.
+
+  Profissão e              Qualidade, eficiência, confiança e acesso a   Permitir mudança de carreira e exercício de várias
+  reputação                serviços.                                     atividades.
+
+  Livro                    Memória e expressão da trajetória.            Não transformar toda conquista em bônus
+                                                                         obrigatório de poder.
+
+
+
+Aprender, dominar e preparar
+Aprender libera o uso básico de uma família de equipamentos ou receitas. Dominar amplia opções e eficiência
+dentro de limites. Preparar significa escolher o que levar e quais técnicas usar naquela saída. Os nomes
+“Swordsman I”, “Archer I” e “Alchemist II” do anexo são exemplos, não uma nomenclatura fechada.
+
+A especialização deve aprofundar escolhas, sem criar uma diferença de poder ilimitada entre veteranos e
+iniciantes. Uma pessoa experiente pode conhecer muitos caminhos, mas continua limitada pelo conjunto
+equipado, pela carga e pelas ações disponíveis.
+
+Trocar de estilo deve ser possível em condições claras: configuração livre em locais apropriados e restrições
+durante confrontos. A hipótese inicial é impedir trocas de conjunto em combate e exigir um intervalo seguro
+antes de reconfigurar. Isso preserva o compromisso de preparação sem criar classes permanentes.
+
+Recuperação após perdas
+A morte pode retirar bens nas zonas previstas, mas não apaga treinamentos, receitas conhecidas ou capítulos do
+Livro. Equipamentos básicos acessíveis e atividades de baixo risco devem permitir retomar a vida econômica.
+Essa recuperação precisa ter custo e escolhas, sem deixar o personagem preso à insolvência.
+
+EM ABERTO: atributos raciais, ritmo de aprendizado, limites de domínio, requisitos das receitas e forma de
+ensinar técnicas. Não se recomenda fechar árvores extensas antes de experimentar poucos estilos completos.
+
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                                          05
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 04
+
+
+Combate e linguagem da magia
+BASE — origem: seções 3.1, 4 e 15. Combate em terceira pessoa, com movimento fluido, animações com peso, quantidade
+limitada de habilidades e efeitos que permitam ler ameaças. Equipamentos possuem ações ativas e passivas. A magia pode ser
+compreendida de maneiras distintas pelas culturas.
+
+PROPOSTA — princípio de confronto. O jogador deve reconhecer uma ameaça, escolher uma resposta e
+assumir o custo dessa resposta. Ataque, defesa, deslocamento e recuperação precisam ter sinais perceptíveis.
+Peso não significa lentidão generalizada; significa compromisso identificável durante a ação.
+
+Conjunto inicial de ações
+Para o primeiro recorte, trabalhar com ataque básico, uma resposta defensiva, uma opção de mobilidade e
+poucas técnicas oferecidas pelo conjunto equipado. A quantidade exata de espaços permanece aberta. Arma
+define a intenção ofensiva; armadura altera proteção e utilidade; treinamento amplia alternativas de preparação.
+
+Cada técnica deve declarar alcance, sinal de preparação, momento de efeito, possibilidade de interrupção e
+recuperação. Controle de movimento precisa de limites contra encadeamentos que retirem toda a capacidade
+de reação. Habilidade defensiva não deve anular indefinidamente o custo de estar cercado.
+
+PvE e PvP com a mesma gramática
+Criaturas ensinam sinais que também ajudam a compreender confrontos entre jogadores: ataques direcionais,
+áreas perigosas, oportunidades de interrupção e momentos de retirada. Chefes podem combinar regras, mas
+não depender de efeitos visuais que escondam o que está acontecendo.
+
+A câmera em terceira pessoa precisa permitir ler obstáculos, adversários próximos e ataques por diferentes
+ângulos. Silhueta, som e contraste carregam informação; cor sozinha não deve determinar a compreensão de
+uma ameaça.
+
+Magia culturalmente diversa
+A proposta é compartilhar regras de combate legíveis, permitindo diferentes gestos, ferramentas, vocabulários e
+interpretações culturais. Isso evita transformar cada civilização em um sistema isolado e difícil de compreender.
+A aparência pode variar sem ocultar alcance, perigo ou função.
+
+EM ABERTO: mira e seleção de alvo, recursos como vigor ou mana, fogo amigo, colisões entre personagens,
+mobilidade, quantidade de habilidades e duração esperada de um confronto. Essas decisões antecedem a
+criação de muitas armas e escolas mágicas.
+
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                                       06
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 05
+
+
+Economia, produção e circulação de valor
+BASE — origem: seção 6. A economia é orientada pelos jogadores e conecta coleta, processamento, fabricação, culinária,
+alquimia, comércio e transporte. Uma pessoa pode ocupar várias posições. O anexo não determina que absolutamente todos
+os itens devam ser fabricados por jogadores.
+
+PROPOSTA — cadeia econômica inicial. Recursos entram por coleta e atividades do mundo; são refinados e
+transformados; circulam entre produtores e consumidores; saem por consumo, fabricação, reparos e destruição
+nas situações previstas. Cada etapa precisa gerar utilidade real.
+
+  Movimento                 Exemplos propostos                                Problema a observar
+
+  Entrada de materiais      Mineração, plantas, coleta de componentes e       Produção excessiva ou dependência de
+                            espólios.                                         um único grupo.
+
+  Transformação             Refino, ferramentas, armas, alimentos e           Etapas sem decisão ou com custo maior
+                            preparados.                                       que seu valor.
+
+  Circulação                Encomendas, mercados locais e transporte.         Rotas irrelevantes ou ausência de
+                                                                              compradores.
+
+  Retirada de materiais     Receitas, consumíveis e reparos.                  Acúmulo sem uso e queda permanente
+                                                                              de demanda.
+
+  Retirada de               Destruição regulada em perdas e desmontagem       Saque apenas transfere propriedade; não
+  equipamentos              voluntária.                                       reduz o estoque total.
+
+  Moeda                     Comissões limitadas de NPCs; taxas e serviços     Emissão sem limite, inflação ou falta de
+                            retiram moeda.                                    liquidez.
+
+
+
+Mercados e especialização
+Mercados locais, com compra e retirada no lugar onde o bem está, dão função ao transporte. Consultar preços
+de outra região pode ser permitido sem mover mercadorias automaticamente. Diferenças regionais de recursos,
+procura e processamento criam comércio; cada profissão deve manter uma base viável em áreas protegidas.
+
+Especialização pode melhorar previsibilidade, eficiência e opções de fabricação. Evitar que só uma qualidade
+extremamente rara tenha utilidade e torne todo o restante descarte. Equipamentos comuns precisam encontrar
+demanda de reposição e de acesso ao jogo.
+
+Uma carreira civil não deve exigir treinamento de combate para avançar. Insumos perigosos podem ser
+comprados ou obtidos com colaboração e escolta. Interdependência permite que pessoas com interesses
+diferentes trabalhem juntas.
+
+Reputação e contratos
+Encomendas padronizadas podem reservar pagamento e liberar a recompensa após uma entrega verificável. O
+sistema deve distinguir contratos garantidos pela interface de acordos informais entre pessoas. Avaliações de
+reputação devem se apoiar em relações reais, reduzindo a fabricação de prestígio entre contas combinadas.
+
+NPCs podem oferecer serviços e uma demanda básica limitada. Compras ilimitadas a preço fixo criariam uma
+fonte de moeda desconectada do mercado. A viabilidade de cada profissão deve ser observada ao longo de
+vários ciclos de produção e perda, não apenas em uma sessão de teste.
+
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                                         07
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 06
+
+
+Peso, transporte e montarias
+BASE — origem: seções 5 e 18. Peso e capacidade limitam o transporte. Bolsas, alforjes, montarias e passivas podem ampliar
+carga. Montarias incluem possibilidades convencionais, fantásticas e pré-históricas, com diferenças de função.
+
+PROPOSTA — logística como escolha de rota e compromisso. A carga deve afetar a decisão de saída antes de
+se tornar um problema durante o percurso. A interface informa peso atual, limite, efeito sobre deslocamento e
+capacidade da montaria.
+
+Uma configuração inicial simples usa três estados: carga normal, sobrecarga com penalidade compreensível e
+limite máximo que impede novas adições. Valores e intensidade ficam para balanceamento. Evitar múltiplas
+penalidades ocultas que tornem impossível entender por que o personagem se move lentamente.
+
+Papéis de montaria
+
+  Perfil proposto          Vantagem                                  Compromisso
+
+  Viagem                   Mobilidade e deslocamento entre           Menor capacidade de transporte.
+                           regiões.
+
+  Carga                    Volume útil e apoio ao comércio.          Maior exposição e retirada mais difícil.
+
+  Expedição                Adaptação a terreno e necessidades        Benefício situacional, sem superioridade universal.
+                           específicas.
+
+
+O primeiro recorte pode usar uma única montaria de carga. A diversidade de criaturas deve ampliar decisões
+depois que transporte, confronto e perda estiverem compreensíveis.
+
+Carga e derrota
+Como hipótese inicial, os alforjes pertencem ao inventário transportado e seguem as regras de saque da zona.
+Desmontar não envia bens automaticamente para um local seguro. Montar ou recolher a montaria exige uma
+condição segura, impedindo que ela funcione como fuga instantânea sem resposta.
+
+Para o protótipo, a montaria pode ser representada por um item equipado: em Full Loot, esse item entra na
+regra de perda; nas zonas com equipamento protegido, permanece com o dono. Esta é uma convenção
+provisória para manter a economia clara. Criação, domesticação, reprodução e morte permanente de animais
+não estão definidas.
+
+Valor do transporte
+Atalhos aumentam exposição; caminhos protegidos custam tempo; uma carga maior aumenta a margem e o
+valor em risco. Viagem rápida, se adotada, não deve apagar essas diferenças. A hipótese de trabalho é permitir
+deslocamentos pessoais restritos e impedir o transporte instantâneo de carga comercial entre mercados.
+
+EM ABERTO: caravanas, veículos, navegação, escoltas contratadas, recuperação de carga abandonada e regras
+de montaria após desconexão. São extensões posteriores à logística básica.
+
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                                           08
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 07
+
+
+Zonas, derrota e recuperação
+BASE — origem: seção 12. Existem áreas seguras, áreas de risco/PvP, regiões Full Loot e Regiões Turbulentas. As
+consequências exatas de morte, saque e durabilidade estão abertas.
+
+PROPOSTA — matriz inicial de regras, sujeita a teste. A segurança deve ser uma propriedade visível da área,
+compreensível antes da travessia. O nome definitivo das categorias pode mudar.
+
+  Zona                 Confronto entre jogadores              Consequência proposta da morte
+
+  Protegida            Sem ataque livre; duelos               Retorno a abrigo, desgaste e perda de tempo; sem saque de
+                       consensuais seguem regra própria.      bens.
+
+  Fronteira            Ataque de jogadores hostis, com        Inventário transportado saqueável; conjunto equipado
+                       sinalização e consequência criminal.   preservado.
+
+  Full Loot            Conflito aberto segundo regras         Inventário, equipamentos e item de montaria sujeitos a
+                       locais.                                saque e destruição regulada.
+
+  Turbulenta           Encontros individuais com              Proposta de Full Loot, com regras próprias de permanência
+                       identidades ocultadas.                 e saída.
+
+
+Na Fronteira, “inventário transportado” inclui o conteúdo de bolsas e alforjes e os equipamentos de reserva. O
+item que fornece capacidade, se equipado, pode integrar o conjunto protegido; essa proteção nunca se estende
+ao conteúdo. O conjunto equipado é definido no início do estado de combate; mover peças durante esse estado
+não deve permitir esconder a carga da regra de perda.
+
+Em todas as zonas, a consequência segue o regime do local, inclusive em mortes fatais por PvE, ambiente ou
+outros meios. Isso impede que morrer deliberadamente para criaturas funcione como proteção de carga em Full
+Loot.
+
+Derrubada, morte e retorno
+A hipótese de trabalho separa derrubada de morte. Uma derrubada abre uma oportunidade limitada de resgate;
+a morte consolida a perda prevista e permite retornar a um abrigo. Em zonas hostis, outros jogadores podem
+concluir a derrota segundo regras explícitas. No protótipo, essa etapa deve ser curta e simples, sem prolongar
+indefinidamente a impotência do jogador.
+
+Conhecimentos, Livro, reputações e bens armazenados fora da expedição não entram no saque do corpo. Itens
+vinculados e eventuais exceções precisam ser poucos e listados; “Full Loot” não deve esconder proteções
+extensas nem prometer perda da conta inteira.
+
+Fronteiras e crimes
+Entrar em uma zona de risco deve apresentar suas consequências, sem exigir aceitar pop-ups a cada passagem.
+Declarar hostilidade torna o agressor identificável; não exige que a vítima declare interesse em PvP. A política
+de crime pode afetar serviços e presença de guardas, mas não deve conceder ao agressor um lucro sem custo
+por perseguir iniciantes.
+
+Perigo ambiental e permissão de ataque são informações distintas: uma área protegida ainda pode ter PvE difícil.
+
+EM ABERTO: quedas de conexão, travessia durante combate, direitos de saque e duração do corpo.
+Desconectar não equivale a evacuar; essas regras precisam ser fechadas antes de testes com perdas
+persistentes.
+
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                                          09
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 08
+
+
+Durabilidade e saúde da economia
+BASE — origem: seções 6 e 12.1. Existe a intenção de desgaste, dano e possível quebra, mas ainda sem definição de reparos,
+destruição permanente ou proteção.
+
+PROPOSTA — separar três acontecimentos.
+
+• Desgaste de uso: reduz a condição do item. Ao chegar a zero, o item fica inutilizado até reparo, sem
+  destruição automática no primeiro modelo.
+• Transferência por saque: muda a posse, mantendo o item na economia.
+• Destruição em perda: retira uma parcela configurada somente dos bens elegíveis à perda naquela zona; nunca
+  atinge o conjunto protegido da Fronteira. Deve ter regra comunicada e balanceada separadamente do
+  desgaste.
+O reparo consome materiais e um serviço, conectando atividade de combate a profissões. Para o primeiro
+recorte, preservar a capacidade máxima após reparo evita empilhar punições antes de conhecer o custo real de
+reposição. Redução permanente de capacidade é uma alternativa futura, não parte da recomendação inicial.
+
+Limites para uma perda aceitável
+Uma perda deve ser entendida antes de ocorrer, manter uma possibilidade concreta de retorno e evitar duplicar
+cobrança pelo mesmo evento. Se um item for destruído no cálculo da morte, ele não pode reaparecer reparado
+para o dono nem ser contabilizado também como saque disponível.
+
+Destruição de itens mantém demanda, mas não justifica tornar todas as regiões hostis. Alimentos, preparados,
+materiais de construção quando existirem e reparos também sustentam trabalho civil. Por outro lado, consumo
+de materiais não resolve sozinho o acúmulo de equipamentos em áreas seguras; estoques, preços e uso
+precisam ser observados.
+
+Como convenção inicial, a moeda funciona como saldo protegido, sem saque do patrimônio financeiro total.
+Objetos de valor transportados continuam sujeitos à zona. Uma moeda física saqueável seria outra decisão de
+design, ainda não adotada aqui.
+
+Experimento econômico proposto
+Acompanhar um ciclo completo: coleta, fabricação, uso, reparo, venda, perda e reposição. Observar o tempo
+necessário para formar um conjunto viável, o custo de perder esse conjunto e a quantidade de compradores
+para produtos básicos.
+
+Se o recomeço for longo demais, ajustar custo, acesso e recuperação antes de reduzir toda a tensão do risco. Se
+os estoques crescerem sem limite, revisar consumo, variedade útil e retirada de itens; não criar um comprador
+infinito apenas para esconder a falta de demanda.
+
+EM ABERTO: taxas de desgaste e destruição, salvamento de componentes, quem pode reparar, penalidades de
+condição e itens protegidos. Nenhum percentual é fixado sem uma economia observável.
+
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                                        10
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 09
+
+
+Regiões Turbulentas
+BASE — origem: seção 13. São regiões anômalas com portais de localização variável, acesso individual, percepção distorcida
+de outras pessoas e atmosfera de maldição ou instabilidade. Full Loot é uma possibilidade. A ligação com as estrelas
+permanece aberta.
+
+PROPOSTA — uma expedição individual sob incerteza. O jogador entra para alcançar um objetivo, avaliar
+encontros e decidir quando sair. A tensão não depende apenas de caçar outros jogadores: transportar uma
+descoberta, reunir um componente ou investigar uma manifestação também cria exposição.
+
+Estrutura da incursão
+1. Localizar: encontrar um portal temporário e conhecer categoria de risco, restrições e condição de saída antes
+  de atravessar.
+2. Comprometer-se: entrar sozinho. A hipótese inicial proíbe montarias e carga de montaria dentro da região; o
+  conjunto permitido é verificado na entrada.
+3. Explorar: reconhecer ambiente, ameaças e oportunidades com informação limitada, mas suficiente para
+  tomar decisões.
+4. Escolher: continuar acumulando valor ou procurar uma saída disponível.
+5. Extrair ou perder: sair exige uma ação com duração e possibilidade de interrupção; a morte segue o Full Loot
+  proposto.
+O portal de entrada desaparecer não pode criar uma prisão sem regra. A duração da incursão e as alternativas
+de saída devem ser comunicadas. Caso exista colapso, seus sinais e consequências precisam ser explícitos antes
+da entrada. Uma proposta inicial usa várias saídas possíveis, evitando um único ponto obrigatório de
+emboscada.
+
+A saída retorna a um destino vinculado à origem da incursão, sem criar transporte gratuito entre mercados
+distantes. Desconexões e falhas gerais do serviço precisam de tratamento explícito; fechar o jogo não deve
+funcionar como extração instantânea.
+
+Anonimato com leitura de combate
+Ocultar nome, guilda, título e aparência identificável. Manter reconhecíveis família de arma, ação ofensiva,
+defesa e estado relevante. Silhuetas distorcidas não podem apagar a informação necessária para reagir.
+
+No Livro, registrar ambiente, objetivo, resultado e encontros sem divulgar automaticamente identidades ou
+horários públicos exatos. Dados necessários à moderação podem existir internamente sem aparecer aos
+jogadores. A revelação posterior de adversários continua sendo uma decisão aberta; a recomendação desta
+revisão é preservá-los anônimos.
+
+Recompensas e limites
+Recompensas podem oferecer componentes alternativos, descobertas, prestígio e oportunidades econômicas.
+Evitar que o acesso a toda progressão essencial dependa dessa atividade. Conjuntos razoáveis de equipamento
+precisam permitir participação, mesmo que a região continue perigosa.
+
+Entrada individual não garante ausência de acordos externos. Distribuição de entradas, destinos não
+selecionáveis e ausência de identificadores persistentes podem reduzir encontros combinados. Não se deve
+prometer “solo garantido” ou anonimato absoluto sem evidência. Portais, extração, lotação e conluio exigem um
+experimento próprio antes da expansão.
+
+EM ABERTO: reentrada após morte ou extração, possibilidade de retornar à mesma região e recuperação do
+próprio saque. Essas regras afetam tanto o risco quanto a coordenação entre participantes.
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                                         11
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 10
+
+
+O Livro: memória, expressão e legado
+BASE — origem: seção 7. O Livro registra a trajetória em vez de mostrar apenas números. Sua organização proposta inclui
+História, Feitos, Descobertas, Legado e Perfil. Inspeção biográfica e inspeção de equipamento são separadas; uma parte pode
+ser pública e outra pessoal.
+
+PROPOSTA — o Livro como curadoria de acontecimentos verificáveis. Ele não precisa narrar cada coleta ou
+ataque. Deve reconhecer primeiras experiências relevantes, domínio profissional, relações duradouras,
+expedições, contribuições coletivas e mudanças que alterem a trajetória.
+
+  Parte                Conteúdo proposto                                  Cuidado
+
+  História             Capítulos cronológicos e acontecimentos            Evitar uma lista infinita de notificações
+                       relacionados.                                      repetidas.
+
+  Feitos               Marcos de combate, trabalho, exploração e          Não reduzir mérito a dano ou golpe final.
+                       cooperação.
+
+  Descobertas          Locais, espécies, recursos e interpretações.       Não publicar coordenadas ou segredos
+                                                                          automaticamente.
+
+  Legado               Participação em obras e eventos, títulos e         Atribuir contribuição real, sem declarar autoria
+                       registros reconhecidos.                            exclusiva indevida.
+
+  Perfil               Origem, profissões, vínculos e reputações          Separar informação pública de histórico
+                       divulgadas.                                        sensível de jogo.
+
+
+
+Regra para um registro significativo
+Um acontecimento entra no Livro quando possui contexto, participação verificável e relevância para a trajetória.
+Repetições podem ser reunidas em um marco: uma temporada de entregas, por exemplo, em vez de uma página
+para cada pacote.
+
+Textos automáticos devem ser baseados em eventos confirmados e modelos de escrita controlados. O sistema
+não deve inventar motivos, diálogos, alianças ou heroísmo. Anotações do jogador podem existir, mas precisam
+ser identificadas como pessoais, separadas dos registros do mundo.
+
+Divulgação e reconhecimento
+Na configuração proposta, detalhes de mortes, rotas e descobertas ficam pessoais por padrão. O jogador
+escolhe marcos para exibir. Eventos coletivos reconhecem diferentes contribuições: produção, transporte,
+exploração, cura e combate, conforme a atividade efetivamente permitir.
+
+“Primeiro a descobrir” exige regra explícita: primeiro no servidor, na região, no ciclo ou apenas na própria
+trajetória. Na ausência de comprovação, usar “descobriu” em vez de atribuir pioneirismo global.
+
+Exemplo proposto de registro: “Participou do abastecimento que reabriu a passagem entre os dois entrepostos.
+Entregou ferramentas durante o período de isolamento.” O texto conecta pessoa e mundo sem afirmar que ela
+resolveu sozinha o acontecimento.
+
+Títulos e reconhecimento devem ser majoritariamente expressivos. Vincular cada página a poder de combate
+transformaria o Livro em uma lista obrigatória de tarefas e enfraqueceria a liberdade de trajetória.
+
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                                             12
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 11
+
+
+Mundo, geografia e culturas
+BASE — origem: seções 8–10 e 15. A direção atual prevê dois continentes: um principal, mais ocupado, com cinco ou mais
+reinos na visão de longo prazo; e outro menos ocupado, hostil e marcado por ruínas. Nomes, distribuição e identidades estão
+abertos. A fantasia medieval ocidental convive com culturas distintas, conectadas por séculos de contato.
+
+PROPOSTA — organizar o mapa a partir de relações. Antes de distribuir biomas, definir águas, relevo, áreas
+produtivas, assentamentos e razões para deslocamento. Reinos surgem dessas relações históricas e materiais;
+não precisam corresponder a um único bioma ou raça.
+
+Função dos continentes
+O continente principal sustenta redes de cidades, instituições, profissões e conflitos entre poderes
+reconhecidos. Deve comportar regiões seguras e perigosas; “ocupado” não significa uniformemente protegido.
+
+O segundo continente amplia distância, fragilidade das rotas e autonomia das expedições. “Menos ocupado” não
+significa sem povos, história ou legitimidade. Suas culturas não existem apenas para serem conquistadas.
+Construção e destruição de estruturas por jogadores permanecem possibilidades que exigem regras próprias de
+propriedade e recuperação.
+
+Ficha de criação de uma região
+• Base material: água, recursos, alimentos, clima, relevo e obstáculos.
+• Vida cotidiana: moradia, trabalho, mercados, deslocamento e serviços.
+• História própria: fundações, reformas, migrações, conflitos e convivências.
+• Poderes e vínculos: instituições, grupos internos, parceiros e disputas.
+• Magia e crença: práticas, divergências e usos cotidianos do extraordinário.
+• Pressão atual: problema ou oportunidade que permita intervenção dos jogadores.
+• Marca celeste: como a mudança das estrelas é percebida localmente.
+Cada cultura precisa de tensões internas, interesses próprios e relações de troca. Evitar que uma região inteira
+represente um único temperamento ou que uma raça funcione como equivalente automático de um reino.
+
+Escala percebida
+Paisagens distantes, camadas arquitetônicas e rotas justificadas podem transmitir escala antes de existir um
+mapa enorme. A divisão técnica em áreas deve respeitar passagens naturais e continuidade de trajetos.
+Tamanho não substitui densidade de decisões: uma longa estrada precisa ter valor de transporte, orientação ou
+descoberta.
+
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                                         13
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 12
+
+
+Territórios reativos e ecologia de encontros
+BASE — origem: seção 10. Biomas possuem acampamentos, cavernas, ruínas, minas e locais difíceis de encontrar. Criaturas
+podem patrulhar, caçar, dormir e reagir a ataques. Grupos maiores podem ter líderes, trabalhadores e estruturas.
+
+PROPOSTA — estados observáveis em vez de simulação irrestrita. Cada território possui uma população ou
+força representada por estados de atividade. Um acampamento pode estar estabelecido, pressionado,
+deslocado ou em recuperação. Cada estado altera algumas patrulhas, recursos e oportunidades.
+
+  Estado proposto          Sinal no mundo                                Oportunidade para jogadores
+
+  Estabelecido             Patrulhas, abastecimento e estruturas         Observar rotas, atacar ou evitar o território.
+                           ocupadas.
+
+  Pressionado              Recuo, defesa reforçada ou interrupção de     Concluir uma ofensiva ou explorar uma
+                           coleta.                                       passagem.
+
+  Deslocado                Trilhas novas, postos vazios e presença em    Investigar o destino e responder ao novo risco.
+                           outra área.
+
+  Recuperação              Pequenos grupos e reconstrução                Disputar acesso e decidir se intervém
+                           progressiva.                                  novamente.
+
+
+O mundo deve explicar essas mudanças por sinais, relatos e comportamento. Não é necessário manter cada
+criatura executando uma rotina detalhada longe de qualquer jogador. A profundidade deve aparecer no
+encontro e em suas consequências perceptíveis.
+
+Contenção e retorno
+A pressão dos jogadores não deve eliminar indefinidamente todo o conteúdo de uma região. Estados precisam
+de limites, recuperação e alternativas de encontro. Da mesma forma, ausência de participantes não deve
+destruir serviços essenciais ou deixar iniciantes sem acesso ao ciclo básico.
+
+Variações podem alterar composição, rotas e objetivos. A quantidade de participantes deve influenciar o desafio
+de modo compreensível, evitando simplesmente multiplicar vida e dano de todas as criaturas sem sinalização.
+
+Descoberta duradoura
+Segredos fixos tendem a se tornar conhecimento compartilhado. Para prolongar o valor da exploração, combinar
+geografia permanente com oportunidades variáveis: uma passagem temporariamente exposta, um recurso em
+outro estado, um relato incompleto ou uma reação de acampamento.
+
+O jogo não precisa impedir comunidades de documentar o mundo. Pode reconhecer o explorador por encontrar,
+interpretar e compartilhar algo dentro de um contexto. O Livro registra a descoberta do personagem mesmo
+quando ela não é inédita para todos.
+
+EM ABERTO: quais criaturas possuem organização social, grau de persistência dos estados, condições de
+recuperação e relação com objetivos políticos. Isso deve começar em um território pequeno.
+
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                                          14
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 13
+
+
+Reinos, facções, guildas e diplomacia
+BASE — origem: seções 9 e 11. A proposta inclui cinco ou mais reinos na visão completa, facções militares e filiação de
+jogadores. A política deve receber influência coletiva e coexistir com guildas. Não estão definidos governantes jogadores,
+eleições, controle total de reinos ou propriedade de territórios por guildas.
+
+PROPOSTA — separar responsabilidades antes de nomear os reinos.
+
+  Instituição                                           Papel inicial proposto
+
+  Reino                                                 Poder político do mundo, com leis, interesses e instituições
+                                                        persistentes.
+
+  Facção                                                Organização vinculada a objetivos de um reino, inicialmente
+                                                        militares e logísticos.
+
+  Guilda                                                Organização voluntária dos jogadores, com seus próprios
+                                                        interesses.
+
+  Reputação pessoal                                     Histórico de relações do personagem com cada instituição.
+
+  Relação diplomática                                   Estado entre poderes; não é a soma direta de reputações
+                                                        individuais.
+
+
+Uma hipótese inicial permite um compromisso militar ativo por vez, com mudança sujeita a intervalo e
+consequências conhecidas. Comércio e reputações podem existir com vários reinos. Guildas multirreino
+permanecem uma decisão aberta, pois podem criar conflitos entre objetivos coletivos e compromissos militares.
+
+Influência que também aceita contribuição civil
+Começar com um objetivo regional limitado: abastecer uma passagem, restaurar uma estrutura ou manter uma
+ligação comercial. Produção, transporte, reconhecimento e combate contribuem de maneiras distintas. Pessoas
+sem guilda precisam conseguir participar por canais visíveis.
+
+O resultado modifica uma relação ou condição concreta — disponibilidade de uma rota, presença militar, preço
+de um serviço ou acesso a um contrato. Um crime isolado não declara guerra por toda a população. Atos
+pessoais, ações de guilda e compromissos institucionais precisam de atribuição separada.
+
+Estados e limites
+Para o recorte inicial, usar poucos estados legíveis, como cooperação, tensão e hostilidade, com condições de
+mudança publicadas no contexto do jogo. Uma transição exige participação acumulada e uma janela de
+resolução; não oscila após cada entrega.
+
+Limites por contribuição repetida, custos reais e diversidade de objetivos reduzem o domínio por repetição
+trivial. Desvantagens populacionais precisam de caminhos alternativos de participação e recuperação.
+Recompensas não devem aumentar sem limite o poder do lado que já venceu.
+
+Mudança política não altera de surpresa a regra de perda de quem já está no local. Uma eventual mudança de
+regime exige aviso e oportunidade de retirada.
+
+Regra de compreensão proposta: qualquer mudança importante deve responder a quatro perguntas: o que
+mudou, quais ações contribuíram, quem foi afetado e quais respostas ainda são possíveis. O Livro registra
+participação comprovada; a história do reino registra o resultado coletivo.
+
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                                             15
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 14
+
+
+As estrelas e a história do mundo
+BASE — origem: seções 14 e 16. Estrelas desaparecem gradualmente, deixando vazios nas constelações. Rotas, rituais,
+estruturas e criaturas podem ser afetados. A causa é desconhecida e a história não exige adesão a uma campanha. Relação
+causal com as Regiões Turbulentas ainda não foi definida.
+
+PROPOSTA — separar verdade observada, interpretação e segredo de autoria.
+
+• Observação: algo verificável no mundo, como um ponto ausente no céu ou um instrumento registrando
+  desvio.
+• Interpretação: uma explicação defendida por pessoas ou instituições, que pode ser parcial ou conflitante.
+• Segredo de autoria: a explicação real, quando os desenvolvedores decidirem estabelecê-la. Deve manter
+  coerência entre pistas sem ser revelada automaticamente aos jogadores.
+Essa separação permite mistério sem transformar toda informação em engano. Culturas podem discordar sobre
+significado e resposta, ainda que reconheçam o mesmo fenômeno.
+
+Progressão sugerida do fenômeno
+
+  Fase conceitual           Manifestação possível                          Efeito jogável opcional
+
+  Indício                   Astrônomos percebem ausências isoladas.        Coleta de relatos, medição e primeiras
+                                                                           descobertas.
+
+  Repercussão               Referências e práticas deixam de coincidir.    Novas demandas, ajustes de rota e conflitos
+                                                                           locais.
+
+  Ruptura                   Estruturas ou fenômenos incomuns               Expedições, acesso a áreas e eventos
+                            aparecem.                                      regionais.
+
+  Novo estado               Instituições e comunidades se adaptam.         Mudanças persistentes e novos capítulos de
+                                                                           conteúdo.
+
+
+Essas fases são uma ferramenta de planejamento, não uma cosmologia aprovada nem uma sequência
+obrigatória para cada personagem. A operação do jogo controla a introdução de capítulos; contribuições dos
+jogadores podem alterar consequências locais dentro de limites definidos.
+
+Vida cotidiana sob um céu diferente
+Um comerciante pode perceber o fenômeno como custo de transporte; um artesão, como encomenda de
+instrumentos; um explorador, como uma passagem antes inacessível. Nenhum deles precisa aceitar uma missão
+principal para viver essas mudanças.
+
+Rupturas devem criar problemas com respostas possíveis. Retirar permanentemente uma profissão, serviço
+essencial ou rota sem alternativa converteria o mistério em perda de autonomia. Conteúdo novo precisa
+considerar também quem chega depois, oferecendo contexto suficiente para participar do mundo atual.
+
+EM ABERTO: causa, ritmo, possibilidade de reversão, agentes envolvidos e relação entre céu, magia e
+anomalias. Nenhuma entidade ou explicação definitiva é acrescentada nesta revisão.
+
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                                          16
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 15
+
+
+Narrativa regional e direção sensorial
+BASE — origem: seções 8, 15 e 16. Lore ambiental, histórias regionais, eventos de mundo e arcos opcionais apresentam um
+universo antigo. Pedra, terra pigmentada, madeira escura, metal envelhecido e cerâmica convivem com arcos, torres, pátios,
+canais, observatórios e fortalezas reformadas.
+
+PROPOSTA — cada lugar deve contar como é usado. Monumentalidade ganha sentido quando uma ponte
+recebe comércio, um templo oferece abrigo e uma fortaleza guarda marcas de ocupações diferentes. Objetos
+fantásticos devem participar da rotina e da economia, não existir apenas como decoração.
+
+Camadas de narrativa
+1. Ambiente: o jogador percebe uma situação sem interromper a atividade — marcas de água, ferramentas
+  abandonadas, um portão reforçado.
+2. Voz local: habitantes, documentos e serviços oferecem interpretações e interesses.
+3. Ação opcional: investigação, encomenda ou expedição permite participar.
+4. Consequência: o local, seus serviços ou seus vínculos mudam de forma reconhecível.
+5. Memória: o Livro registra apenas o envolvimento real do personagem.
+
+Linguagem visual e sonora
+Repetir padrões e inscrições com função reconhecível em arquitetura, vestuário, ferramentas e interfaces.
+Variar clima, técnica construtiva e materiais conforme a região, preservando evidências de troca entre culturas.
+Evitar que toda cidade pareça nova ou que toda ruína esteja completamente separada da vida contemporânea.
+
+O som ajuda a compreender distância, presença, ameaça e estado de um lugar. Uma rota abandonada pode ter
+menos tráfego; uma oficina ativa indica trabalho; uma anomalia apresenta uma assinatura distinta. Efeitos de
+combate devem preservar leitura mesmo em ambientes visualmente ricos.
+
+Interface a serviço das decisões
+Risco de zona, peso, condição de equipamento, destino de uma entrega e estado de hostilidade precisam ser
+claros. A fantasia pode orientar a aparência da interface, mas não justificar informação escondida. O Livro
+admite ritmo contemplativo; inventário, negociação e combate exigem acesso rápido.
+
+As Regiões Turbulentas precisam manter sinais de perigo acessíveis apesar da distorção. Cor, contorno, som e
+texto devem se complementar. Efeitos de névoa, movimento e luminosidade não devem impedir compreensão
+ou tornar obrigatória a exposição a efeitos intensos.
+
+EM ABERTO: estilo final de representação, proporção entre realismo e estilização, direção musical, interface e
+referências artísticas de cada região. Este texto define critérios de coerência, não um catálogo visual fechado.
+
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                                         17
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 16
+
+
+Uma região para representar o projeto
+PROPOSTA INTEGRAL — exemplo de recorte, sem nome definitivo. Uma região comercial entre dois
+entrepostos pode apresentar o jogo sem exigir dois continentes. O objetivo é conectar trabalho, transporte,
+conflito, descoberta e memória em uma área compreensível.
+
+Composição funcional
+• Um núcleo protegido: mercado, armazenamento, reparo, aprendizado básico e espaço para encontro.
+• Um segundo entreposto: demanda diferente, ponto de retorno e motivo concreto para transporte.
+• Uma área produtiva: recursos para uma cadeia curta de ferramentas, equipamento e consumíveis.
+• Uma passagem de Fronteira: caminho mais eficiente com exposição e alternativa mais segura.
+• Uma área Full Loot delimitada: objetivo de expedição e oportunidade econômica adicional.
+• Um acampamento reativo: poucos estados que afetem a passagem ou a coleta.
+• Uma estrutura antiga: descoberta opcional e indícios do fenômeno das estrelas.
+Esse conjunto é uma especificação de funções; não exige sete mapas separados. Distâncias, quantidade de
+pontos de coleta e circulação devem resultar das decisões de jogo desejadas, não de uma meta de quilômetros
+quadrados.
+
+Primeiro acontecimento integrado
+Um trecho da passagem deixa de ser confiável após mudanças locais. Surgem demandas de ferramentas,
+materiais e reconhecimento. Jogadores podem abastecer trabalhos, proteger viagens, explorar desvios ou
+aproveitar oportunidades de comércio.
+
+O resultado altera a condição da rota dentro de limites: abertura de uma passagem, presença de guardas ou
+oferta de contratos. Uma estrutura antiga próxima fornece pistas sobre o céu, sem ser declarada causa do
+problema. Pessoas podem contribuir para a solução prática sem investigar o mistério.
+
+Fora deste primeiro recorte
+Segundo continente completo, cinco reinos jogáveis, guerras de larga escala, destruição livre de cidades,
+navegação complexa, reprodução de montarias e simulação detalhada de todos os habitantes. Esses elementos
+permanecem na visão ou em discussão, condicionados à utilidade e viabilidade demonstradas.
+
+As Regiões Turbulentas merecem um experimento separado, pequeno e controlado, para observar anonimato,
+entrada individual e extração. Depois podem ser ligadas ao recorte principal por um portal. Essa separação de
+testes não transforma as Turbulentas em um jogo sem relação com o mundo.
+
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                              18
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 17
+
+
+Desenvolvimento por evidência
+BASE — origem: seção 17. A visão completa é maior do que a primeira versão deve ser. O anexo já recomenda um
+lançamento menor, com sistemas representativos. Ainda não há informação suficiente sobre equipe, orçamento ou
+infraestrutura para prometer uma data ou população simultânea.
+
+PROPOSTA — distinguir experimento, versão de teste e lançamento.
+
+  Etapa                       O que construir ou resolver                   Evidência para avançar
+
+  Regras fundamentais         Cenários de coleta, fabricação, transporte,   Consequências consistentes, inclusive
+                              morte, saque e registro.                      exceções e recuperação.
+
+  Recorte jogável             Poucos equipamentos, uma cadeia               Preparação e trajetória produzem escolhas
+                              econômica, risco e Livro mínimo.              reconhecíveis.
+
+  Teste online restrito       Troca, cooperação, disputa, perdas e          Transações e posse confiáveis; interações
+                              persistência.                                 melhoram o ciclo.
+
+  Experimentos dos            Uma mudança regional e uma Turbulenta         Participação compreensível, memória
+  diferenciais                limitada.                                     correta e anonimato funcional.
+
+  Versão de teste             Mais participantes, conteúdo e ciclos         Economia, recuperação, moderação e
+  ampliada                    econômicos.                                   operação sustentáveis no público testado.
+
+  Lançamento e                Escopo escolhido a partir dos resultados      Capacidade e qualidade compatíveis com a
+  expansão                    anteriores.                                   experiência anunciada.
+
+
+O Livro deve aparecer cedo, mesmo com poucos tipos de registro. PvP com perda também precisa ser
+experimentado antes de consolidar toda a economia. Um protótipo apenas de combate não valida a proposta
+completa; uma demonstração bonita do mundo tampouco valida um MMO.
+
+Critérios de observação
+• O jogador entende a perda possível antes de entrar em risco.
+• Um conjunto viável pode ser reposto por caminhos compreensíveis.
+• Produzir e transportar atendem a uma demanda identificável.
+• Trocar de estilo não exige abandonar toda a trajetória anterior.
+• Uma contribuição civil pode participar de um acontecimento relevante.
+• O Livro registra fatos corretos e uma história reconhecível.
+• Ignorar a investigação das estrelas ainda permite uma vida completa.
+• Baixa participação, concentração populacional e comportamento oportunista não destroem o ciclo básico.
+Metas numéricas devem ser definidas antes de cada teste, conforme tamanho do grupo e hipótese observada.
+Não há resultados de testes nesta revisão. Regras de autoridade sobre itens, prevenção de duplicação, quedas
+de conexão e suporte são requisitos de confiança para uma economia persistente, não detalhes adiáveis até o
+lançamento.
+
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                                        19
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 18
+
+
+Exemplo de uma jornada conectada
+PROPOSTA INTEGRAL — cenário ilustrativo, sem estabelecer personagens ou lugares oficiais.
+
+Uma personagem começa trabalhando com ferramentas e reparos. Aprende técnicas básicas de combate para
+circular e escolhe uma montaria de carga porque pretende abastecer outro entreposto. Seu equipamento atual
+expressa essa saída; não define uma classe permanente.
+
+No mercado, percebe demanda por ferramentas numa passagem em recuperação. Pode vender imediatamente
+a um comerciante, transportar pela estrada longa ou aceitar o caminho de Fronteira. Cada opção troca margem,
+tempo e exposição. O painel da região informa quais bens podem ser perdidos.
+
+Ela contrata ou combina uma escolta e leva uma carga proporcional ao que aceita arriscar. Durante o trajeto,
+encontra sinais de que o acampamento próximo foi pressionado. Parte das criaturas mudou de rota. A escolta
+decide investigar um desvio enquanto a transportadora conserva espaço para a entrega.
+
+A viagem pode terminar de duas formas igualmente válidas para o sistema. Se a entrega ocorrer, contribui para o
+abastecimento local. Se houver morte na Fronteira, o inventário transportado entra no saque, mas a
+personagem preserva seu conjunto equipado e o conhecimento. Bens armazenados permitem reorganizar o
+trabalho seguinte.
+
+Após várias contribuições, a passagem muda de estado. Outros participantes forneceram materiais, fizeram
+reconhecimento e combateram. O Livro de cada um registra seu envolvimento; nenhum recebe
+automaticamente autoria exclusiva da reabertura.
+
+Na estrutura antiga ao lado da estrada, observadores identificam uma diferença no céu. A personagem pode
+fabricar instrumentos para eles, acompanhar uma expedição ou continuar vendendo ferramentas. O fenômeno
+entra em sua vida por uma demanda concreta, sem obrigá-la a tornar-se investigadora.
+
+Mais tarde, ela decide entrar em uma Região Turbulenta. Guarda a montaria, prepara um conjunto que aceita
+perder e atravessa sozinha. Encontra uma figura cuja identidade não reconhece; consegue ler sua arma e seus
+movimentos. Retorna por uma saída após reunir um componente. O Livro registra a incursão e o resultado,
+preservando o anonimato do encontro.
+
+O que este exemplo precisa provar
+As atividades devem se conectar por escolhas e consequências, não por uma sequência obrigatória de missões.
+A personagem poderia ter ficado na oficina durante todo o acontecimento e ainda possuir objetivos, relações e
+registros relevantes.
+
+O cenário articula os sistemas propostos. Não comprova balanceamento, ausência de abusos ou viabilidade
+técnica; fornece situações concretas para revisar regras e observar protótipos.
+
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                               20
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 19
+
+
+Decisões pendentes e ordem de fechamento
+BASE — origem: seções 20 e 21. O anexo recomenda fechar regras físicas e de risco antes de encaixar identidades de reinos.
+A revisão mantém essa prioridade e acrescenta as dependências econômicas e de memória.
+
+
+  Prioridade     Decisão                              Resultado necessário
+
+  1              Derrota, saque, zonas e              Uma matriz sem ambiguidades para PvE, PvP, montaria, fronteira e
+                 desconexão                           retorno.
+
+  1              Combate e progressão básica          Definição de alvo, defesa, recursos, troca de conjunto e acesso a
+                                                      técnicas.
+
+  1              Economia e recuperação               Fontes de recursos e moeda, consumo, reposição e utilidade de
+                                                      produtos comuns.
+
+  1              Livro e divulgação                   Critérios de registro, atribuição de contribuição e dados públicos.
+
+  2              Turbulentas                          Entrada, saída, perda, duração, anonimato e resposta a encontros
+                                                      combinados.
+
+  2              Reinos e facções                     Vínculos possíveis, mudança de filiação, atribuição de atos e
+                                                      influência coletiva.
+
+  2              Recorte inicial                      Funções da região, equipamentos, profissões e acontecimentos que
+                                                      serão experimentados.
+
+  3              Universo e culturas                  Nomes, mapa amplo, histórias regionais, magia e identidade dos
+                                                      reinos.
+
+  3              Mistério de longo prazo              Verdade de autoria, pistas, limites da revelação e vínculo com as
+                                                      anomalias.
+
+  3              Operação e distribuição              Plataforma, capacidade pretendida, equipe, custos, suporte e
+                                                      modelo comercial.
+
+
+As prioridades não proíbem trabalho artístico ou narrativo em paralelo. Indicam quais decisões podem invalidar
+grande quantidade de conteúdo se forem adiadas.
+
+Como registrar uma decisão
+Cada decisão deve conter: problema, regra escolhida, motivo, exceções, sistemas afetados e evidência
+necessária. Alternativas descartadas merecem uma nota curta quando explicam um compromisso importante. A
+versão do documento deve ser atualizada quando uma proposta se tornar direção aprovada.
+
+Pontos que esta revisão deliberadamente mantém abertos
+Não atribui nome ao universo, aos continentes ou aos reinos. Não estabelece divindade, vilão ou causa para o
+desaparecimento das estrelas. Não assume que guildas governam cidades, que todas as estruturas são
+destrutíveis ou que agricultura, habitação, navegação e domesticação já possuem sistemas aprovados.
+
+A referência a Albion Online permanece uma referência estrutural de liberdade, economia, equipamento e risco
+registrada no anexo. O projeto precisa tomar decisões próprias para seu combate em terceira pessoa, cultura,
+política, Livro e fenômeno celeste.
+
+
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                                            21
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+CAPÍTULO 20
+
+
+Rastreabilidade do documento original
+BASE — índice de cobertura. Todas as 22 seções do anexo foram consideradas. A tabela permite localizar o conteúdo
+preservado, reorganizado ou ampliado. As regras novas são identificadas como propostas nos capítulos correspondentes.
+
+
+  Conteúdo do anexo                                   Página         Nesta revisão
+                                                      original
+
+  1. Visão geral; 2. Pilares                          1              01–02: identidade e ciclos da experiência.
+
+  3. Progressão; 3.1. Equipamento e treinamento       1–2            03–04: camadas de personagem e conjunto de
+                                                                     combate.
+
+  4. Combate                                          2              04 e 15: leitura, compromisso e direção sensorial.
+
+  5. Inventário, peso e capacidade                    2              06–07: logística e consequências de perda.
+
+  6. Economia                                         2              05 e 08: circulação, consumo e reposição.
+
+  7. Livro do personagem                              2–3            10: memória, atribuição e divulgação.
+
+  8. Mundo e direção visual                           3              11 e 15: culturas, materialidade e uso cotidiano.
+
+  9. Estrutura do mundo                               3–4            11 e 16: continentes e recorte representativo.
+
+  10. Biomas e acampamentos                           4              11–12: geografia, estados e descoberta.
+
+  11. Política dos reinos                             4–5            13: instituições e influência coletiva.
+
+  12. Zonas, morte, saque e desgaste                  5              07–08: matriz proposta e durabilidade.
+
+  13. Regiões Turbulentas                             5–6            09: incursão, saída e anonimato.
+
+  14. Desaparecimento das estrelas                    6              14: observação, interpretações e capítulos.
+
+  15. Civilizações e culturas                         6              04 e 11: magia, história e relações culturais.
+
+  16. Estrutura narrativa                             6–7            14–15: história do mundo e histórias regionais.
+
+  17. Escopo e desenvolvimento                        7              16–17: recorte, testes e expansão condicionada.
+
+  18. Montarias                                       7              06: papéis, capacidade e perda proposta.
+
+  19. Princípios de design                            7              01–02 e critérios distribuídos pela revisão.
+
+  20. Ideias abertas; 21. Próximo passo               7–8            19: decisões pendentes e suas dependências.
+
+  22. Resumo conceitual                               8              Premissa, 02 e 18: visão e jornada integrada.
+
+
+Limite de evidência: a análise usa o anexo fornecido e não depende de acesso ao chat original. Não foram feitas
+pesquisa de mercado, verificação de originalidade, estimativas técnicas ou validações com jogadores. Os
+exemplos, matrizes e etapas acrescentados são instrumentos de concepção para discussão e experimentação.
+
+Direção resultante: um mundo onde trabalho, viagem, conflito e descoberta geram acontecimentos
+compartilhados, enquanto cada personagem conserva uma trajetória própria. O Livro conecta a vida individual à
+história coletiva, sob um céu cuja transformação não exige que todos vivam da mesma maneira.
+
+
+Documento de concepção • Versão 2.0 • 21.09.2026                                                                          22
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+
+ CAPÍTULO 21
+
+
+
+ Armas e famílias de combate
+ BASE - complemento aos capítulos 03 e 04. O documento já estabelece que o equipamento determina grande
+ parte do conjunto de ações do momento e que a arma expressa a intenção ofensiva. Esta atualização registra
+ famílias de armas citadas para o projeto, sem fechar árvores, atributos ou balanceamento.
+
+ DIREÇÃO ATUAL - variedade sem classe obrigatória. Uma família de arma deve mudar alcance, ritmo,
+ compromisso, mobilidade e resposta defensiva do conjunto, sem definir permanentemente quem o
+ personagem é. O treinamento pode aprofundar uma família, e a troca de estilo continua condicionada às
+ regras de preparação e combate.
+
+   Família citada                  Papel de design a explorar                                             Situação
+
+   Espadas                         Família versátil, com espaço para cortes, estocadas, defesa e          Registrada
+                                   variações por formato.
+
+   Manoplas de batalha             Combate de curta distância, pressão corporal, mobilidade e técnicas    Registrada
+                                   físicas.
+
+   Maças                           Golpes contundentes e leitura de impacto; diferenças contra            Registrada
+                                   proteção ficam para balanceamento.
+
+   Machados                        Golpes comprometidos, variações de alcance e pressão ofensiva.         Registrada
+
+   Adagas                          Curto alcance, agilidade, reposicionamento e janelas de                Registrada
+                                   oportunidade.
+
+   Lanças                          Controle de distância, estocadas e relação forte com                   Registrada
+                                   posicionamento.
+
+   Foices                          Família de identidade própria; função exata de combate ainda precisa   Registrada / a definir
+                                   ser experimentada.
+
+   Martelos de guerra              Impacto pesado, compromisso de ação e possíveis funções de             Registrada
+                                   pressão ou controle.
+
+   Arcos                           Combate à distância com leitura de trajetória, preparação e            Registrada
+                                   posicionamento.
+
+   Bestas                          Combate à distância com cadência e preparação distintas do arco.       Registrada
+
+ Observação: arcos e bestas aparecem junto às armas de combatentes citadas no projeto, mas são famílias de combate à
+ distância. A lista não é catálogo final; outras famílias podem ser acrescentadas quando a gramática de combate estiver validada.
+
+ EM ABERTO: variantes dentro de cada família, uso de uma ou duas mãos, escudos e itens de mão secundária,
+ requisitos de treinamento, quantidade de técnicas por arma, relação com armaduras e comportamento em PvP
+ de larga escala.
+
+
+
+
+Adendo de concepção • Atualização 2.1 • 22.09.2026                                                                                 23
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+
+ CAPÍTULO 22
+
+
+
+ Escolas, tradições e expressões de
+ magia
+ BASE - complemento ao capítulo 04. A magia continua obedecendo a uma gramática de combate legível,
+ enquanto povos e tradições podem descrevê-la, ritualizá-la e representá-la de maneiras diferentes. As linhas
+ abaixo registram ideias atuais, não uma lista fechada de classes mágicas.
+
+ DIREÇÃO ATUAL - função compartilhada, expressão cultural. Alcance, perigo, preparação e resposta precisam
+ continuar reconhecíveis no PvE e no PvP, mesmo quando gestos, instrumentos, símbolos e nomes variam
+ entre culturas.
+
+   Linha de magia              Conceito atual                                                    Decisão pendente
+
+   Água / gelo                 Uma mesma tradição pode manipular água e sua mudança de           Definir se água, gelo ou ambos
+                               estado, permitindo efeitos de fluxo, contenção, frio ou           formam a identidade principal.
+                               congelamento.
+
+   Fogo / lava                 Calor, combustão e manifestações intensas; lava pode ser uma      Escala, persistência no terreno e
+                               expressão avançada ou específica, sem precisar virar uma          custo visual.
+                               escola separada.
+
+   Natureza                    Substitui provisoriamente uma escola literal de “terra”:          Limite entre natureza, cura e
+                               vegetação, crescimento, raízes, ciclo vital, proteção e relação   manipulação de terreno.
+                               com ambientes.
+
+   Vento / ar                  Ideia existente, mas ainda sem formato satisfatório. Pode         Decidir se merece escola própria
+                               aparecer como deslocamento, pressão, som, projéteis               ou expressão secundária.
+                               desviados ou técnica integrada a outras tradições.
+
+   Maldições                   Enfraquecimento, marcas, condições negativas, corrupção ou        Limites de controle, duração e
+                               efeitos persistentes com leitura clara e possibilidade de         contrajogo.
+                               resposta.
+
+   Metamorfose                 Alteração corporal e formas ligadas a animais ou seres            Formas permitidas, duração,
+                               mitológicos. A mesma transformação pode ter explicações           equipamento e relação com
+                               diferentes conforme tradição, pacto, linhagem ou técnica.         criaturas do mundo.
+
+   Cura / vital                Recuperação, estabilização, regeneração, proteção ou              Ritmo de cura e impacto em
+                               fortalecimento do corpo sem exigir associação automática ao       grupos e guerras.
+                               sagrado.
+
+   Sagrada                     Purificação, bênçãos, proteção e práticas ligadas a seres,        Definir entidades, tradições e
+                               crenças ou forças consideradas sagradas dentro do universo.       diferença mecânica em relação à
+                                                                                                 cura.
+
+ Metamorfose - nota de inspiração: a ideia de um combatente que assume forma animal, como um urso, pode
+ servir de referência temática sem obrigar uma única explicação. No universo do jogo, formas semelhantes
+ podem surgir por práticas diferentes e estar ligadas à mitologia própria das culturas.
+
+ Princípio de combinação: arma, armadura, treinamento e conhecimento mágico podem dialogar sem
+ determinar automaticamente uma profissão ou identidade permanente. As restrições concretas dependem da
+ decisão futura sobre classes e sobre quantas técnicas podem ser preparadas simultaneamente.
+
+
+
+
+Adendo de concepção • Atualização 2.1 • 22.09.2026                                                                                   24
+PROJETO GAME / MUNDO, TRAJETÓRIAS E SISTEMAS
+
+
+
+
+ CAPÍTULO 23
+
+
+
+ Classes e modelo de especialização -
+ a discutir
+ STATUS - EM ABERTO. O documento-base trabalha com a separação entre raça, profissão, treinamento e
+ equipamento e afirma que o personagem não recebe uma classe permanente. Esta atualização não substitui
+ essa direção por um sistema de classes. Ela registra que o tema será discutido pelos desenvolvedores antes de
+ se tornar regra do projeto.
+
+ A discussão precisa responder primeiro ao que “classe” significaria neste jogo. Ela pode ser uma identidade
+ permanente, um caminho de treinamento, um arquétipo de entrada, um rótulo de combinação atual ou
+ simplesmente não existir como sistema formal.
+
+   Modelo para discussão             Como funcionaria                                    Impacto sobre a liberdade atual
+
+   Sem classes formais               Equipamento, especializações, profissões e magia    Preserva integralmente a base atual;
+                                     formam o personagem diretamente.                    exige interface clara para orientar
+                                                                                         iniciantes.
+
+   Arquétipos de início              O jogador começa por uma orientação ou              Pode facilitar entrada sem criar prisão
+                                     treinamento sugerido e depois mistura ou            permanente, se não houver bônus
+                                     abandona esse caminho.                              exclusivos irreversíveis.
+
+   Trilhas de treinamento            Nomes como guerreiro, caçador ou praticante de      Mantém troca de estilo, mas pode criar
+                                     determinada magia organizam especializações         dependências se trilhas virarem
+                                     aprendidas.                                         requisitos rígidos.
+
+   Classe formal                     O personagem assume uma classe com regras,          É a opção que mais altera a filosofia
+                                     recursos ou acesso exclusivo.                       atual e precisa de justificativa forte
+                                                                                         antes de ser adotada.
+
+ Questões que precisam ser resolvidas na discussão:
+
+   1. Limites de uso                A classe limita quais armas ou magias podem ser usadas?
+
+   2. Mudança                       É possível mudar livremente, mudar com custo ou apenas criar outro personagem?
+
+   3. Nomenclatura                  “Guerreiro”, “mago”, “caçador” e termos semelhantes são classes, especializações, reputações
+                                    ou descrições do conjunto atual?
+
+   4. Habilidades                   O equipamento continua sendo a principal fonte de habilidades?
+
+   5. Liberdade                     Como impedir que uma escolha inicial invalide profissão, exploração e combinações
+                                    anteriores?
+
+   6. Sistemas afetados             Como a decisão afeta PvP, economia, Livro, aprendizado e balanceamento de grupos?
+
+ Encaminhamento sugerido para teste: antes de criar árvores extensas, experimentar poucas famílias
+ completas de arma e duas ou três linhas mágicas usando o modelo atual de equipamento e treinamento.
+ Depois comparar se uma camada formal de classes resolve um problema real ou apenas renomeia
+ combinações que já funcionam.
+
+ Rastreabilidade da atualização 2.1: complementa principalmente os capítulos 03, 04 e 19. Nenhuma nova linha mágica ou
+ alternativa de classe é apresentada como balanceada ou definitiva.
+
+
+
+
+Adendo de concepção • Atualização 2.1 • 22.09.2026                                                                                 25
+

@@ -1,0 +1,5 @@
+total 29704
+drwxrwxr-x 2 https https     4096 set 24 20:31 .
+drwxrwxr-x 8 https https     4096 set 24 00:25 ..
+-rw-rw-r-- 1 https https 15203609 set 24 20:27 projeto-game-demo.html
+-rw-rw-r-- 1 https https 15203773 set 24 20:27 Projeto_Game_Demo.html

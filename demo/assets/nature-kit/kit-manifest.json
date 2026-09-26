@@ -1,0 +1,1422 @@
+{
+  "kit_schema": "1.0.0",
+  "generated_by": "demo/tools/build-nature-kit.mjs",
+  "source": {
+    "package": "modelos 3d animados/Ultimate Nature Starter.unitypackage",
+    "title": "Ultimate Nature – Starter",
+    "author": "Innerverse Interactive",
+    "bytes": 171876065,
+    "unit_scale": 1,
+    "eula": "Standard Unity Asset Store EULA (https://unity.com/legal/as-terms)",
+    "eula_faq": "https://support.unity.com/hc/en-us/articles/34387186019988-Can-I-use-assets-from-the-Asset-Store-with-other-engines",
+    "note": "Ativos da Unity Asset Store. Os originais não são alterados nem redistribuídos. Apenas derivados convertidos e otimizados entram no runtime."
+  },
+  "model": {
+    "file": "nature-kit.glb",
+    "bytes": 996016,
+    "sha256": "f084648505f74b30970a91f55d2e1a34f01d24a8a2cd2f208b7b9f1c5d041fe6"
+  },
+  "materials": {
+    "palette": {
+      "texture": "palette",
+      "color": "#ffffff",
+      "alphaTest": 0,
+      "roughness": 0.88,
+      "foliage": false,
+      "doubleSided": false
+    },
+    "flowerLeaf": {
+      "texture": "flowerLeaf",
+      "color": "#709e38",
+      "alphaTest": 0.5,
+      "roughness": 1,
+      "foliage": true,
+      "doubleSided": true
+    },
+    "flower": {
+      "texture": "flower",
+      "color": "#8c6bd9",
+      "alphaTest": 0.5,
+      "roughness": 1,
+      "foliage": true,
+      "doubleSided": true
+    },
+    "branch": {
+      "texture": "branch",
+      "color": "#526e38",
+      "alphaTest": 0.5,
+      "roughness": 1,
+      "foliage": true,
+      "doubleSided": true
+    },
+    "leaves": {
+      "texture": "leaves",
+      "color": "#739438",
+      "alphaTest": 0.5,
+      "roughness": 1,
+      "foliage": true,
+      "doubleSided": true
+    },
+    "grass": {
+      "texture": "grass",
+      "color": "#849e33",
+      "alphaTest": 0.301,
+      "roughness": 1,
+      "foliage": true,
+      "doubleSided": true
+    },
+    "water": {
+      "texture": null,
+      "color": "#386e85",
+      "alphaTest": 0,
+      "roughness": 0.18,
+      "foliage": false,
+      "doubleSided": false
+    }
+  },
+  "textures": {
+    "palette": {
+      "file": "tex/palette.webp",
+      "size": 512,
+      "alpha": false,
+      "bytes": 20452,
+      "sha256": "694db21f4fe1c86ba4f54e24c160d25e64072b5fc00cb3b9060e21570757f2cd"
+    },
+    "branch": {
+      "file": "tex/branch.webp",
+      "size": 512,
+      "alpha": true,
+      "bytes": 17460,
+      "sha256": "598610774d67d6b45f6dae79d30b73ef3bef5b9a5806350991aaa5d0b815d1cc"
+    },
+    "leaves": {
+      "file": "tex/leaves.webp",
+      "size": 512,
+      "alpha": true,
+      "bytes": 9630,
+      "sha256": "653db27a4b5387d5d7ba91cccadf172641d60f63654bce6ca57f9a00aa1d89d9"
+    },
+    "grass": {
+      "file": "tex/grass.webp",
+      "size": 512,
+      "alpha": true,
+      "bytes": 31048,
+      "sha256": "20406782de47f26ad47f71bce00d41660a338e0696318139aea4fe15aec49cfc"
+    },
+    "flower": {
+      "file": "tex/flower.webp",
+      "size": 256,
+      "alpha": true,
+      "bytes": 36682,
+      "sha256": "e24b8d98a7c843d840fd2b6982bf101da14604d873a291b6685293bcb4281cd5"
+    },
+    "flowerLeaf": {
+      "file": "tex/flowerLeaf.webp",
+      "size": 256,
+      "alpha": true,
+      "bytes": 1002,
+      "sha256": "4956a64aba35ff69a3805526a6a243fa8de7394ec306f6d23dc686803a836b24"
+    },
+    "terrainGrass": {
+      "file": "tex/terrainGrass.webp",
+      "size": 512,
+      "alpha": false,
+      "bytes": 548,
+      "sha256": "22f52fe867191915fd784f863f74552b373d427fac5c1408d387724a8ad3bc04"
+    },
+    "terrainDirt": {
+      "file": "tex/terrainDirt.webp",
+      "size": 512,
+      "alpha": false,
+      "bytes": 544,
+      "sha256": "2d8ea42e55e8b3b86aa2713bc0975ba6e20442633affce2e2a946b4934da1d72"
+    }
+  },
+  "types": {
+    "pine": {
+      "variants": 1,
+      "foliage": "Branch",
+      "tint": null,
+      "role": "pine",
+      "items": [
+        {
+          "source": "UNS_Spruce_01",
+          "height": 12.466,
+          "radius": 4.034,
+          "base": -0.149,
+          "collider": 0.578,
+          "authoring_collider": {
+            "radius": 0.23,
+            "height": 12.5,
+            "center": [
+              0,
+              6,
+              0
+            ],
+            "direction": 1
+          },
+          "lod_screen_relative_heights": [
+            0.5003869,
+            0.29965863,
+            0.19594689,
+            0.046932496
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "pine_0_L0",
+              "triangles": 9729,
+              "from_lod": 0,
+              "height_m": 12.466,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "pine_0_L1",
+              "triangles": 3954,
+              "from_lod": 2,
+              "height_m": 12.512,
+              "height_diff_pct": 0.37
+            },
+            {
+              "level": 2,
+              "node": "pine_0_L2",
+              "triangles": 2632,
+              "from_lod": 3,
+              "height_m": 12.569,
+              "height_diff_pct": 0.83
+            }
+          ]
+        }
+      ]
+    },
+    "broad": {
+      "variants": 1,
+      "foliage": "Branch",
+      "tint": "#8fae63",
+      "role": "small_conifer",
+      "items": [
+        {
+          "source": "UNS_Spruce_02",
+          "height": 5.002,
+          "radius": 1.719,
+          "base": -0.09,
+          "collider": 0.784,
+          "authoring_collider": {
+            "radius": 0.09,
+            "height": 5.1354537,
+            "center": [
+              0,
+              2.3491118,
+              0
+            ],
+            "direction": 1
+          },
+          "lod_screen_relative_heights": [
+            0.1855831,
+            0.125,
+            0.07744418,
+            0.023897978
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "broad_0_L0",
+              "triangles": 5113,
+              "from_lod": 0,
+              "height_m": 5.002,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "broad_0_L1",
+              "triangles": 2076,
+              "from_lod": 2,
+              "height_m": 5.004,
+              "height_diff_pct": 0.04
+            },
+            {
+              "level": 2,
+              "node": "broad_0_L2",
+              "triangles": 1381,
+              "from_lod": 3,
+              "height_m": 5.021,
+              "height_diff_pct": 0.38
+            }
+          ]
+        }
+      ]
+    },
+    "dead": {
+      "variants": 1,
+      "foliage": null,
+      "tint": null,
+      "role": "dead",
+      "items": [
+        {
+          "source": "UNS_Spruce_01",
+          "height": 12.466,
+          "radius": 4.034,
+          "base": -0.149,
+          "collider": 0.578,
+          "authoring_collider": {
+            "radius": 0.23,
+            "height": 12.5,
+            "center": [
+              0,
+              6,
+              0
+            ],
+            "direction": 1
+          },
+          "lod_screen_relative_heights": [
+            0.5003869,
+            0.29965863,
+            0.19594689,
+            0.046932496
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "dead_0_L0",
+              "triangles": 2057,
+              "from_lod": 0,
+              "height_m": 12.466,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "dead_0_L1",
+              "triangles": 547,
+              "from_lod": 1,
+              "height_m": 12.475,
+              "height_diff_pct": 0.07
+            },
+            {
+              "level": 2,
+              "node": "dead_0_L2",
+              "triangles": 307,
+              "from_lod": 3,
+              "height_m": 12.569,
+              "height_diff_pct": 0.83
+            }
+          ]
+        }
+      ]
+    },
+    "bush": {
+      "variants": 1,
+      "foliage": "Leaves",
+      "tint": null,
+      "role": "bush",
+      "items": [
+        {
+          "source": "UNS_Bush",
+          "height": 1.526,
+          "radius": 1.064,
+          "base": -0.194,
+          "collider": 0,
+          "authoring_collider": {
+            "radius": 0.72,
+            "height": 1,
+            "center": [
+              0,
+              0.5,
+              0
+            ],
+            "direction": 1
+          },
+          "lod_screen_relative_heights": [
+            0.10363374,
+            0.050449338,
+            0.02710748,
+            0.01
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "bush_0_L0",
+              "triangles": 560,
+              "from_lod": 0,
+              "height_m": 1.526,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "bush_0_L1",
+              "triangles": 353,
+              "from_lod": 1,
+              "height_m": 1.526,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 2,
+              "node": "bush_0_L2",
+              "triangles": 105,
+              "from_lod": 3,
+              "height_m": 1.526,
+              "height_diff_pct": 0
+            }
+          ]
+        }
+      ]
+    },
+    "grass": {
+      "variants": 1,
+      "foliage": "Grass",
+      "tint": null,
+      "role": "grass",
+      "items": [
+        {
+          "source": "UNS_Grass",
+          "height": 0.5,
+          "radius": 1.003,
+          "base": -0.035,
+          "collider": 0,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 1
+          },
+          "lod_screen_relative_heights": [
+            0.10117156,
+            0.05972704,
+            0.03619388,
+            0.018400509
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "grass_0_L0",
+              "triangles": 280,
+              "from_lod": 0,
+              "height_m": 0.5,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "grass_0_L1",
+              "triangles": 172,
+              "from_lod": 1,
+              "height_m": 0.5,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 2,
+              "node": "grass_0_L2",
+              "triangles": 75,
+              "from_lod": 3,
+              "height_m": 0.5,
+              "height_diff_pct": 0
+            }
+          ]
+        }
+      ]
+    },
+    "flower": {
+      "variants": 1,
+      "foliage": "Flower",
+      "tint": null,
+      "role": "flower",
+      "items": [
+        {
+          "source": "UNS_Flower",
+          "height": 0.872,
+          "radius": 0.186,
+          "base": -0.028,
+          "collider": 0.009,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 1
+          },
+          "lod_screen_relative_heights": [
+            0.25,
+            0.14915624,
+            0.06884693,
+            0.013744898
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "flower_0_L0",
+              "triangles": 80,
+              "from_lod": 0,
+              "height_m": 0.872,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "flower_0_L1",
+              "triangles": 43,
+              "from_lod": 1,
+              "height_m": 0.873,
+              "height_diff_pct": 0.11
+            },
+            {
+              "level": 2,
+              "node": "flower_0_L2",
+              "triangles": 29,
+              "from_lod": 3,
+              "height_m": 0.872,
+              "height_diff_pct": 0
+            }
+          ]
+        }
+      ]
+    },
+    "mushroom": {
+      "variants": 1,
+      "foliage": null,
+      "tint": null,
+      "role": "mushroom",
+      "items": [
+        {
+          "source": "UNS_Mushroom_Patch",
+          "height": 0.37,
+          "radius": 0.272,
+          "base": -0.027,
+          "collider": 0.191,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 1
+          },
+          "lod_screen_relative_heights": [
+            0.100033164,
+            0.066044,
+            0.032829717,
+            0.01
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "mushroom_0_L0",
+              "triangles": 360,
+              "from_lod": 0,
+              "height_m": 0.37,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "mushroom_0_L1",
+              "triangles": 195,
+              "from_lod": 1,
+              "height_m": 0.37,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 2,
+              "node": "mushroom_0_L2",
+              "triangles": 66,
+              "from_lod": 3,
+              "height_m": 0.37,
+              "height_diff_pct": 0
+            }
+          ]
+        }
+      ]
+    },
+    "rock": {
+      "variants": 5,
+      "foliage": null,
+      "tint": null,
+      "role": "rock",
+      "items": [
+        {
+          "source": "UNS_Standard_Rock_01",
+          "height": 1.299,
+          "radius": 0.975,
+          "base": -0.521,
+          "collider": 0.935,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 1
+          },
+          "lod_screen_relative_heights": [
+            0.19829847,
+            0.10117156,
+            0.052890304,
+            0.019408165
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "rock_0_L0",
+              "triangles": 756,
+              "from_lod": 0,
+              "height_m": 1.299,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "rock_0_L1",
+              "triangles": 410,
+              "from_lod": 1,
+              "height_m": 1.296,
+              "height_diff_pct": 0.23
+            },
+            {
+              "level": 2,
+              "node": "rock_0_L2",
+              "triangles": 142,
+              "from_lod": 3,
+              "height_m": 1.287,
+              "height_diff_pct": 0.92
+            }
+          ]
+        },
+        {
+          "source": "UNS_Standard_Rock_02",
+          "height": 1.418,
+          "radius": 1.688,
+          "base": -0.632,
+          "collider": 1.513,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 1
+          },
+          "lod_screen_relative_heights": [
+            0.34415624,
+            0.18267347,
+            0.089,
+            0.03619388
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "rock_1_L0",
+              "triangles": 714,
+              "from_lod": 0,
+              "height_m": 1.418,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "rock_1_L1",
+              "triangles": 386,
+              "from_lod": 1,
+              "height_m": 1.415,
+              "height_diff_pct": 0.21
+            },
+            {
+              "level": 2,
+              "node": "rock_1_L2",
+              "triangles": 134,
+              "from_lod": 3,
+              "height_m": 1.419,
+              "height_diff_pct": 0.07
+            }
+          ]
+        },
+        {
+          "source": "UNS_Standard_Rock_03",
+          "height": 0.966,
+          "radius": 2.475,
+          "base": -0.162,
+          "collider": 0.869,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 1
+          },
+          "lod_screen_relative_heights": [
+            0.5143189,
+            0.25619388,
+            0.12782972,
+            0.054561228
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "rock_2_L0",
+              "triangles": 1116,
+              "from_lod": 0,
+              "height_m": 0.966,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "rock_2_L1",
+              "triangles": 606,
+              "from_lod": 1,
+              "height_m": 0.958,
+              "height_diff_pct": 0.83
+            },
+            {
+              "level": 2,
+              "node": "rock_2_L2",
+              "triangles": 210,
+              "from_lod": 3,
+              "height_m": 0.962,
+              "height_diff_pct": 0.41
+            }
+          ]
+        },
+        {
+          "source": "UNS_Standard_Rock_04",
+          "height": 2.779,
+          "radius": 1.043,
+          "base": -0.132,
+          "collider": 1.239,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 1
+          },
+          "lod_screen_relative_heights": [
+            0.30150002,
+            0.15054336,
+            0.07074744,
+            0.026579719
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "rock_3_L0",
+              "triangles": 672,
+              "from_lod": 0,
+              "height_m": 2.779,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "rock_3_L1",
+              "triangles": 364,
+              "from_lod": 1,
+              "height_m": 2.779,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 2,
+              "node": "rock_3_L2",
+              "triangles": 126,
+              "from_lod": 3,
+              "height_m": 2.808,
+              "height_diff_pct": 1.04
+            }
+          ]
+        },
+        {
+          "source": "UNS_Standard_Rock_05",
+          "height": 2.01,
+          "radius": 2.314,
+          "base": -0.102,
+          "collider": 2.157,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 1
+          },
+          "lod_screen_relative_heights": [
+            0.49905097,
+            0.24721746,
+            0.11777869,
+            0.047242988
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "rock_4_L0",
+              "triangles": 728,
+              "from_lod": 0,
+              "height_m": 2.01,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "rock_4_L1",
+              "triangles": 394,
+              "from_lod": 1,
+              "height_m": 2.005,
+              "height_diff_pct": 0.25
+            },
+            {
+              "level": 2,
+              "node": "rock_4_L2",
+              "triangles": 136,
+              "from_lod": 3,
+              "height_m": 2.001,
+              "height_diff_pct": 0.45
+            }
+          ]
+        }
+      ]
+    },
+    "cliff": {
+      "variants": 5,
+      "foliage": null,
+      "tint": null,
+      "role": "cliff",
+      "items": [
+        {
+          "source": "UNS_Rock_Cliff_01",
+          "height": 6.079,
+          "radius": 2.919,
+          "base": -0.293,
+          "collider": 3.199,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 1
+          },
+          "lod_screen_relative_heights": [
+            0.15193687,
+            0.10231632,
+            0.052890304,
+            0.015992986
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "cliff_0_L0",
+              "triangles": 940,
+              "from_lod": 0,
+              "height_m": 6.079,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "cliff_0_L1",
+              "triangles": 510,
+              "from_lod": 1,
+              "height_m": 6.065,
+              "height_diff_pct": 0.23
+            },
+            {
+              "level": 2,
+              "node": "cliff_0_L2",
+              "triangles": 176,
+              "from_lod": 3,
+              "height_m": 6.073,
+              "height_diff_pct": 0.1
+            }
+          ]
+        },
+        {
+          "source": "UNS_Rock_Cliff_02",
+          "height": 7.624,
+          "radius": 3.175,
+          "base": -0.322,
+          "collider": 3.425,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 1
+          },
+          "lod_screen_relative_heights": [
+            0.20311032,
+            0.13300829,
+            0.06790624,
+            0.020967472
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "cliff_1_L0",
+              "triangles": 938,
+              "from_lod": 0,
+              "height_m": 7.624,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "cliff_1_L1",
+              "triangles": 508,
+              "from_lod": 1,
+              "height_m": 7.589,
+              "height_diff_pct": 0.46
+            },
+            {
+              "level": 2,
+              "node": "cliff_1_L2",
+              "triangles": 176,
+              "from_lod": 3,
+              "height_m": 7.6,
+              "height_diff_pct": 0.31
+            }
+          ]
+        },
+        {
+          "source": "UNS_Rock_Cliff_03",
+          "height": 6.573,
+          "radius": 4.105,
+          "base": -0.289,
+          "collider": 5.13,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 1
+          },
+          "lod_screen_relative_heights": [
+            0.21622257,
+            0.14096747,
+            0.07267348,
+            0.023135839
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "cliff_2_L0",
+              "triangles": 1036,
+              "from_lod": 0,
+              "height_m": 6.573,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "cliff_2_L1",
+              "triangles": 562,
+              "from_lod": 1,
+              "height_m": 6.543,
+              "height_diff_pct": 0.46
+            },
+            {
+              "level": 2,
+              "node": "cliff_2_L2",
+              "triangles": 194,
+              "from_lod": 3,
+              "height_m": 6.526,
+              "height_diff_pct": 0.72
+            }
+          ]
+        },
+        {
+          "source": "UNS_Rock_Cliff_04",
+          "height": 5.206,
+          "radius": 6.656,
+          "base": -0.429,
+          "collider": 6.624,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 1
+          },
+          "lod_screen_relative_heights": [
+            0.35047957,
+            0.22974297,
+            0.1202532,
+            0.041171562
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "cliff_3_L0",
+              "triangles": 1748,
+              "from_lod": 0,
+              "height_m": 5.206,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "cliff_3_L1",
+              "triangles": 948,
+              "from_lod": 1,
+              "height_m": 5.206,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 2,
+              "node": "cliff_3_L2",
+              "triangles": 328,
+              "from_lod": 3,
+              "height_m": 5.206,
+              "height_diff_pct": 0
+            }
+          ]
+        },
+        {
+          "source": "UNS_Rock_Cliff_05",
+          "height": 6.575,
+          "radius": 4.272,
+          "base": -0.545,
+          "collider": 4.461,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 1
+          },
+          "lod_screen_relative_heights": [
+            0.22974297,
+            0.15193687,
+            0.08063266,
+            0.028387757
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "cliff_4_L0",
+              "triangles": 1254,
+              "from_lod": 0,
+              "height_m": 6.575,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "cliff_4_L1",
+              "triangles": 680,
+              "from_lod": 1,
+              "height_m": 6.491,
+              "height_diff_pct": 1.28
+            },
+            {
+              "level": 2,
+              "node": "cliff_4_L2",
+              "triangles": 236,
+              "from_lod": 3,
+              "height_m": 6.575,
+              "height_diff_pct": 0
+            }
+          ]
+        }
+      ]
+    },
+    "pebble": {
+      "variants": 5,
+      "foliage": null,
+      "tint": null,
+      "role": "pebble",
+      "items": [
+        {
+          "source": "UNS_Tiny_Rock_01",
+          "height": 0.238,
+          "radius": 0.175,
+          "base": -0.115,
+          "collider": 0.196,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 1
+          },
+          "lod_screen_relative_heights": [
+            0.049624998,
+            0.026579719,
+            0.014181759,
+            0.0060440046
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "pebble_0_L0",
+              "triangles": 98,
+              "from_lod": 0,
+              "height_m": 0.238,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "pebble_0_L1",
+              "triangles": 52,
+              "from_lod": 1,
+              "height_m": 0.235,
+              "height_diff_pct": 1.26
+            },
+            {
+              "level": 2,
+              "node": "pebble_0_L2",
+              "triangles": 18,
+              "from_lod": 3,
+              "height_m": 0.238,
+              "height_diff_pct": 0
+            }
+          ]
+        },
+        {
+          "source": "UNS_Tiny_Rock_02",
+          "height": 0.259,
+          "radius": 0.252,
+          "base": -0.123,
+          "collider": 0.303,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 1
+          },
+          "lod_screen_relative_heights": [
+            0.06790624,
+            0.038288906,
+            0.0215,
+            0.009727041
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "pebble_1_L0",
+              "triangles": 102,
+              "from_lod": 0,
+              "height_m": 0.259,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "pebble_1_L1",
+              "triangles": 54,
+              "from_lod": 1,
+              "height_m": 0.259,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 2,
+              "node": "pebble_1_L2",
+              "triangles": 18,
+              "from_lod": 3,
+              "height_m": 0.259,
+              "height_diff_pct": 0
+            }
+          ]
+        },
+        {
+          "source": "UNS_Tiny_Rock_03",
+          "height": 0.27,
+          "radius": 0.14,
+          "base": -0.125,
+          "collider": 0.163,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 1
+          },
+          "lod_screen_relative_heights": [
+            0.041171562,
+            0.022038903,
+            0.010479592,
+            0.003850127
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "pebble_2_L0",
+              "triangles": 132,
+              "from_lod": 0,
+              "height_m": 0.27,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "pebble_2_L1",
+              "triangles": 70,
+              "from_lod": 1,
+              "height_m": 0.267,
+              "height_diff_pct": 1.11
+            },
+            {
+              "level": 2,
+              "node": "pebble_2_L2",
+              "triangles": 24,
+              "from_lod": 3,
+              "height_m": 0.27,
+              "height_diff_pct": 0
+            }
+          ]
+        },
+        {
+          "source": "UNS_Tiny_Rock_04",
+          "height": 0.296,
+          "radius": 0.297,
+          "base": -0.137,
+          "collider": 0.309,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 1
+          },
+          "lod_screen_relative_heights": [
+            0.076602034,
+            0.046461735,
+            0.023693878,
+            0.010100127
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "pebble_3_L0",
+              "triangles": 108,
+              "from_lod": 0,
+              "height_m": 0.296,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "pebble_3_L1",
+              "triangles": 58,
+              "from_lod": 1,
+              "height_m": 0.296,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 2,
+              "node": "pebble_3_L2",
+              "triangles": 20,
+              "from_lod": 3,
+              "height_m": 0.296,
+              "height_diff_pct": 0
+            }
+          ]
+        },
+        {
+          "source": "UNS_Tiny_Rock_05",
+          "height": 0.305,
+          "radius": 0.289,
+          "base": -0.125,
+          "collider": 0.345,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 1
+          },
+          "lod_screen_relative_heights": [
+            0.07170727,
+            0.047242988,
+            0.022584183,
+            0.010479592
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "pebble_4_L0",
+              "triangles": 108,
+              "from_lod": 0,
+              "height_m": 0.305,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "pebble_4_L1",
+              "triangles": 58,
+              "from_lod": 1,
+              "height_m": 0.305,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 2,
+              "node": "pebble_4_L2",
+              "triangles": 20,
+              "from_lod": 3,
+              "height_m": 0.302,
+              "height_diff_pct": 0.98
+            }
+          ]
+        }
+      ]
+    },
+    "log": {
+      "variants": 1,
+      "foliage": null,
+      "tint": null,
+      "role": "log",
+      "items": [
+        {
+          "source": "UNS_Log",
+          "height": 0.48,
+          "radius": 1.251,
+          "base": -0.021,
+          "collider": 0.432,
+          "authoring_collider": {
+            "radius": 0.2,
+            "height": 2.5,
+            "center": [
+              0,
+              0.15,
+              0
+            ],
+            "direction": 0
+          },
+          "lod_screen_relative_heights": [
+            0.14640114,
+            0.10462499,
+            0.048030615,
+            0.020441325
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "log_0_L0",
+              "triangles": 710,
+              "from_lod": 0,
+              "height_m": 0.48,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "log_0_L1",
+              "triangles": 384,
+              "from_lod": 1,
+              "height_m": 0.474,
+              "height_diff_pct": 1.25
+            },
+            {
+              "level": 2,
+              "node": "log_0_L2",
+              "triangles": 133,
+              "from_lod": 3,
+              "height_m": 0.48,
+              "height_diff_pct": 0
+            }
+          ]
+        }
+      ]
+    },
+    "stump": {
+      "variants": 1,
+      "foliage": null,
+      "tint": null,
+      "role": "stump",
+      "items": [
+        {
+          "source": "UNS_Stump",
+          "height": 0.983,
+          "radius": 0.576,
+          "base": -0.116,
+          "collider": 0.617,
+          "authoring_collider": {
+            "radius": 0.33,
+            "height": 0.95,
+            "center": [
+              0,
+              0.37,
+              0
+            ],
+            "direction": 1
+          },
+          "lod_screen_relative_heights": [
+            0.09890114,
+            0.05372258,
+            0.028387757,
+            0.01
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "stump_0_L0",
+              "triangles": 646,
+              "from_lod": 0,
+              "height_m": 0.983,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "stump_0_L1",
+              "triangles": 350,
+              "from_lod": 1,
+              "height_m": 0.979,
+              "height_diff_pct": 0.41
+            },
+            {
+              "level": 2,
+              "node": "stump_0_L2",
+              "triangles": 120,
+              "from_lod": 3,
+              "height_m": 0.977,
+              "height_diff_pct": 0.61
+            }
+          ]
+        }
+      ]
+    },
+    "branch": {
+      "variants": 1,
+      "foliage": null,
+      "tint": null,
+      "role": "branch",
+      "items": [
+        {
+          "source": "UNS_Branch",
+          "height": 0.047,
+          "radius": 0.808,
+          "base": -0.022,
+          "collider": 0.2,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 1
+          },
+          "lod_screen_relative_heights": [
+            0.25,
+            0.15054336,
+            0.09777551,
+            0.03217602
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "branch_0_L0",
+              "triangles": 189,
+              "from_lod": 0,
+              "height_m": 0.047,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "branch_0_L1",
+              "triangles": 103,
+              "from_lod": 1,
+              "height_m": 0.047,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 2,
+              "node": "branch_0_L2",
+              "triangles": 32,
+              "from_lod": 3,
+              "height_m": 0.047,
+              "height_diff_pct": 0
+            }
+          ]
+        }
+      ]
+    },
+    "mountain": {
+      "variants": 1,
+      "foliage": null,
+      "tint": null,
+      "role": "mountain",
+      "items": [
+        {
+          "source": "UNS_Mountain",
+          "height": 45.009,
+          "radius": 27.232,
+          "base": -1.077,
+          "collider": 33.053,
+          "authoring_collider": {
+            "type": "MeshCollider",
+            "count": 5
+          },
+          "lod_screen_relative_heights": [
+            0.14640114,
+            0.09890114,
+            0.052890304,
+            0.020967472
+          ],
+          "levels": [
+            {
+              "level": 0,
+              "node": "mountain_0_L0",
+              "triangles": 2260,
+              "from_lod": 0,
+              "height_m": 45.009,
+              "height_diff_pct": 0
+            },
+            {
+              "level": 1,
+              "node": "mountain_0_L1",
+              "triangles": 1226,
+              "from_lod": 1,
+              "height_m": 45.031,
+              "height_diff_pct": 0.05
+            },
+            {
+              "level": 2,
+              "node": "mountain_0_L2",
+              "triangles": 424,
+              "from_lod": 3,
+              "height_m": 44.611,
+              "height_diff_pct": 0.88
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "sky": {
+    "file": "sky-env.webp",
+    "width": 256,
+    "height": 128,
+    "encoding": "rgbe_webp_lossless",
+    "formula": "linear = rgb / 255 * 2^(a*255 - 128)",
+    "source_resolution": [
+      16384,
+      8192
+    ],
+    "peak_luminance": 7291.2058,
+    "colors": {
+      "zenith": "#b8c0d7",
+      "horizon": "#a8b0c4",
+      "ground": "#686d7d"
+    },
+    "bytes": 39592,
+    "sha256": "7febd1edac839e61ac192d3a9b5ad8dca4a3f5a596da7e6484c66c6440b93b98"
+  }
+}

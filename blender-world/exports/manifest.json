@@ -1,0 +1,479 @@
+{
+  "blender_version": "5.0.1",
+  "export_files": [
+    "atlas/atlas_mundo.glb",
+    "library/environment_kit.glb",
+    "region/architecture.glb",
+    "region/chunks/region_0_0.glb",
+    "region/chunks/region_0_1.glb",
+    "region/chunks/region_0_2.glb",
+    "region/chunks/region_0_3.glb",
+    "region/chunks/region_1_0.glb",
+    "region/chunks/region_1_1.glb",
+    "region/chunks/region_1_2.glb",
+    "region/chunks/region_1_3.glb",
+    "region/chunks/region_2_0.glb",
+    "region/chunks/region_2_1.glb",
+    "region/chunks/region_2_2.glb",
+    "region/chunks/region_2_3.glb",
+    "region/chunks/region_3_0.glb",
+    "region/chunks/region_3_1.glb",
+    "region/chunks/region_3_2.glb",
+    "region/chunks/region_3_3.glb",
+    "region/environment.glb",
+    "region/nature.glb",
+    "region/routes.glb",
+    "region/waterworks.glb",
+    "turbulent/turbulenta_01.glb",
+    "library/assets.json",
+    "materials.json",
+    "region/instances.json",
+    "region/points_of_interest.json",
+    "region/routes.json",
+    "turbulent/points_of_interest.json",
+    "turbulent/instances.json",
+    "turbulent/routes.json"
+  ],
+  "export_policy": {
+    "axis": "Y-up glTF",
+    "demo_consumes_manifest": false,
+    "glb_compression": "uncompressed because Debian Blender package has no Draco shared library",
+    "master_coordinates_preserved": true
+  },
+  "generator": "Projeto Game Blender World",
+  "height_encoding": {
+    "atlas": {
+      "encoding": "linear_uint16",
+      "max": 4.500805377960205,
+      "min": -0.6800000071525574
+    },
+    "region": {
+      "encoding": "linear_uint16",
+      "max": 116.12261962890625,
+      "min": 7.234659194946289
+    },
+    "turbulent": {
+      "encoding": "linear_uint16",
+      "max": 34.80337142944336,
+      "min": -0.24131429195404053
+    }
+  },
+  "library": {
+    "glb": "library/environment_kit.glb",
+    "inventory": "library/assets.json",
+    "materials": "materials.json"
+  },
+  "scenes": {
+    "ATLAS_MUNDO": {
+      "biome_mask": "maps/atlas_biome.png",
+      "bounds_km": [
+        -110.0,
+        -70.0,
+        110.0,
+        70.0
+      ],
+      "glb": "atlas/atlas_mundo.glb",
+      "heightmap_exr": "maps/atlas_height.exr",
+      "landmarks": {
+        "expedition_coast": [
+          48.0,
+          -3.0
+        ],
+        "observatory_second_continent": [
+          72.0,
+          15.0
+        ],
+        "region_commercial": [
+          -31.0,
+          -12.0
+        ]
+      },
+      "realms": [
+        {
+          "id": "valdora",
+          "identity": "bacias habitadas e comercio fluvial",
+          "name": "Valdora",
+          "status": "PROPOSTA"
+        },
+        {
+          "id": "serrabruma",
+          "identity": "cordilheiras passagens e mineracao",
+          "name": "Serrabruma",
+          "status": "PROPOSTA"
+        },
+        {
+          "id": "verdeferro",
+          "identity": "bosques e colinas produtivas",
+          "name": "Verdeferro",
+          "status": "PROPOSTA"
+        },
+        {
+          "id": "marevia",
+          "identity": "costas estuarios e entrepostos maritimos",
+          "name": "Marevia",
+          "status": "PROPOSTA"
+        },
+        {
+          "id": "pedrassol",
+          "identity": "planaltos interiores mais secos",
+          "name": "Pedrassol",
+          "status": "PROPOSTA"
+        },
+        {
+          "id": "altavela",
+          "identity": "territorios antigos ruinas e observatorios",
+          "name": "Altavela",
+          "status": "PROPOSTA"
+        }
+      ],
+      "unit_meters": 1000.0,
+      "water_bodies": {
+        "lakes": [
+          {
+            "center_km": [
+              -36.0,
+              -7.0
+            ],
+            "classification": "closed_basin",
+            "id": "lago_valdora",
+            "radii_km": [
+              5.5,
+              2.8
+            ]
+          },
+          {
+            "center_km": [
+              -61.0,
+              14.0
+            ],
+            "classification": "closed_basin",
+            "id": "lago_verdeferro",
+            "radii_km": [
+              4.2,
+              2.2
+            ]
+          }
+        ],
+        "ocean": {
+          "classification": "open_ocean"
+        }
+      }
+    },
+    "REGIAO_COMERCIAL": {
+      "anchors": {
+        "bridge_main": [
+          0.0,
+          -145.0
+        ],
+        "bridge_minor": [
+          275.0,
+          -118.0
+        ],
+        "camp": [
+          300.0,
+          72.0
+        ],
+        "cave_west": [
+          -410.0,
+          -5.0
+        ],
+        "gorge_center": [
+          -25.0,
+          80.0
+        ],
+        "market": [
+          40.0,
+          -375.0
+        ],
+        "mine": [
+          -345.0,
+          -72.0
+        ],
+        "observatory": [
+          -260.0,
+          205.0
+        ],
+        "outpost_north": [
+          35.0,
+          425.0
+        ],
+        "outpost_south": [
+          10.0,
+          -410.0
+        ],
+        "portal_turbulent": [
+          315.0,
+          320.0
+        ],
+        "wastes": [
+          -350.0,
+          365.0
+        ]
+      },
+      "biome_mask": "maps/region_biome.png",
+      "bounds_m": [
+        -512.0,
+        -512.0,
+        512.0,
+        512.0
+      ],
+      "chunks": [
+        {
+          "col": 0,
+          "file": "region/chunks/region_0_0.glb",
+          "id": "region_0_0",
+          "row": 0
+        },
+        {
+          "col": 1,
+          "file": "region/chunks/region_1_0.glb",
+          "id": "region_1_0",
+          "row": 0
+        },
+        {
+          "col": 2,
+          "file": "region/chunks/region_2_0.glb",
+          "id": "region_2_0",
+          "row": 0
+        },
+        {
+          "col": 3,
+          "file": "region/chunks/region_3_0.glb",
+          "id": "region_3_0",
+          "row": 0
+        },
+        {
+          "col": 0,
+          "file": "region/chunks/region_0_1.glb",
+          "id": "region_0_1",
+          "row": 1
+        },
+        {
+          "col": 1,
+          "file": "region/chunks/region_1_1.glb",
+          "id": "region_1_1",
+          "row": 1
+        },
+        {
+          "col": 2,
+          "file": "region/chunks/region_2_1.glb",
+          "id": "region_2_1",
+          "row": 1
+        },
+        {
+          "col": 3,
+          "file": "region/chunks/region_3_1.glb",
+          "id": "region_3_1",
+          "row": 1
+        },
+        {
+          "col": 0,
+          "file": "region/chunks/region_0_2.glb",
+          "id": "region_0_2",
+          "row": 2
+        },
+        {
+          "col": 1,
+          "file": "region/chunks/region_1_2.glb",
+          "id": "region_1_2",
+          "row": 2
+        },
+        {
+          "col": 2,
+          "file": "region/chunks/region_2_2.glb",
+          "id": "region_2_2",
+          "row": 2
+        },
+        {
+          "col": 3,
+          "file": "region/chunks/region_3_2.glb",
+          "id": "region_3_2",
+          "row": 2
+        },
+        {
+          "col": 0,
+          "file": "region/chunks/region_0_3.glb",
+          "id": "region_0_3",
+          "row": 3
+        },
+        {
+          "col": 1,
+          "file": "region/chunks/region_1_3.glb",
+          "id": "region_1_3",
+          "row": 3
+        },
+        {
+          "col": 2,
+          "file": "region/chunks/region_2_3.glb",
+          "id": "region_2_3",
+          "row": 3
+        },
+        {
+          "col": 3,
+          "file": "region/chunks/region_3_3.glb",
+          "id": "region_3_3",
+          "row": 3
+        }
+      ],
+      "functional_sets": {
+        "architecture": "region/architecture.glb",
+        "environment": "region/environment.glb",
+        "nature": "region/nature.glb",
+        "routes": "region/routes.glb",
+        "waterworks": "region/waterworks.glb"
+      },
+      "heightmap_exr": "maps/region_height.exr",
+      "heightmap_png16": "maps/region_height.png",
+      "instances": "region/instances.json",
+      "points_of_interest": "region/points_of_interest.json",
+      "route_geometry": "region/routes.json",
+      "routes": {
+        "mine_spur": {
+          "anchors": [
+            "bridge_main",
+            "mine",
+            "cave_west"
+          ],
+          "max_peak_slope_deg": 24.0,
+          "max_sustained_slope_deg": 16.0,
+          "risk": "baixo",
+          "width_m": 2.5
+        },
+        "observatory_trail": {
+          "anchors": [
+            "gorge_center",
+            "observatory",
+            "wastes"
+          ],
+          "max_peak_slope_deg": 26.0,
+          "max_sustained_slope_deg": 18.0,
+          "risk": "alto",
+          "width_m": 2.5
+        },
+        "safe_east": {
+          "anchors": [
+            "outpost_south",
+            "bridge_minor",
+            "camp",
+            "portal_turbulent",
+            "outpost_north"
+          ],
+          "max_peak_slope_deg": 18.0,
+          "max_sustained_slope_deg": 12.0,
+          "risk": "moderado",
+          "width_m": 5.0
+        },
+        "short_gorge": {
+          "anchors": [
+            "outpost_south",
+            "bridge_main",
+            "gorge_center",
+            "outpost_north"
+          ],
+          "max_peak_slope_deg": 28.0,
+          "max_sustained_slope_deg": 18.0,
+          "risk": "alto",
+          "width_m": 4.0
+        }
+      },
+      "unit_meters": 1.0,
+      "water_bodies": {
+        "lakes": [],
+        "main_river": {
+          "classification": "open_boundary_to_boundary",
+          "crossings_m": [
+            [
+              -512.0,
+              -166.0
+            ],
+            [
+              0.0,
+              -145.0
+            ],
+            [
+              275.0,
+              -118.0
+            ],
+            [
+              512.0,
+              -94.0
+            ]
+          ]
+        }
+      },
+      "water_mask": "maps/region_water.png"
+    },
+    "TURBULENTA_01": {
+      "anchors": {
+        "entry": [
+          0.0,
+          -112.0
+        ],
+        "exit_east": [
+          112.0,
+          82.0
+        ],
+        "exit_west": [
+          -110.0,
+          96.0
+        ],
+        "objective_ruins": [
+          -58.0,
+          38.0
+        ],
+        "portal_core": [
+          0.0,
+          0.0
+        ]
+      },
+      "bounds_m": [
+        -128.0,
+        -128.0,
+        128.0,
+        128.0
+      ],
+      "glb": "turbulent/turbulenta_01.glb",
+      "heightmap_exr": "maps/turbulent_height.exr",
+      "instances": "turbulent/instances.json",
+      "points_of_interest": "turbulent/points_of_interest.json",
+      "route_geometry": "turbulent/routes.json",
+      "routes": {
+        "alternate_exit": {
+          "anchors": [
+            "portal_core",
+            "exit_west"
+          ],
+          "max_peak_slope_deg": 28.0,
+          "max_sustained_slope_deg": 20.0,
+          "risk": "turbulenta",
+          "width_m": 2.5
+        },
+        "anomalous_crossing": {
+          "anchors": [
+            "entry",
+            "portal_core",
+            "objective_ruins",
+            "exit_east"
+          ],
+          "max_peak_slope_deg": 28.0,
+          "max_sustained_slope_deg": 18.0,
+          "risk": "turbulenta",
+          "width_m": 3.0
+        }
+      },
+      "unit_meters": 1.0
+    }
+  },
+  "schema_version": "1.0.0",
+  "seeds": {
+    "atlas": 26092401,
+    "region": 26092402,
+    "turbulent": 26092403
+  },
+  "source_data": {
+    "atlas": "../source/data/atlas.npz",
+    "region": "../source/data/region.npz",
+    "turbulent": "../source/data/turbulent.npz"
+  },
+  "status": "PREPARACAO_FUTURA_SEM_INTEGRACAO_NA_DEMO"
+}

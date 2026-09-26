@@ -1,0 +1,116 @@
+{
+  "alta": {
+    "mercado": {
+      "median": 3705.1,
+      "p95": 15106.7,
+      "tris": 4926156,
+      "calls": 904
+    },
+    "ponte_principal": {
+      "median": 3560.7,
+      "p95": 9182,
+      "tris": 2773334,
+      "calls": 419
+    },
+    "garganta": {
+      "median": 3913.4,
+      "p95": 9606.5,
+      "tris": 2357696,
+      "calls": 314
+    },
+    "bosque": {
+      "median": 3908,
+      "p95": 10053.8,
+      "tris": 2705640,
+      "calls": 432
+    },
+    "entreposto_norte": {
+      "median": 5291.6,
+      "p95": 9738.6,
+      "tris": 910906,
+      "calls": 96
+    },
+    "ermos": {
+      "median": 2676.2,
+      "p95": 3549.6,
+      "tris": 295156,
+      "calls": 124
+    }
+  },
+  "media": {
+    "mercado": {
+      "median": 2436.9,
+      "p95": 11056.3,
+      "tris": 4269432,
+      "calls": 976
+    },
+    "ponte_principal": {
+      "median": 3130.3,
+      "p95": 8379.5,
+      "tris": 2312406,
+      "calls": 373
+    },
+    "garganta": {
+      "median": 2617,
+      "p95": 7160.4,
+      "tris": 1740279,
+      "calls": 258
+    },
+    "bosque": {
+      "median": 3114.8,
+      "p95": 8403.1,
+      "tris": 2148438,
+      "calls": 383
+    },
+    "entreposto_norte": {
+      "median": 4525.7,
+      "p95": 9048.1,
+      "tris": 865066,
+      "calls": 83
+    },
+    "ermos": {
+      "median": 1337.9,
+      "p95": 2083.9,
+      "tris": 287156,
+      "calls": 114
+    }
+  },
+  "baixa": {
+    "mercado": {
+      "median": 5887.4,
+      "p95": 11603.3,
+      "tris": 2820040,
+      "calls": 866
+    },
+    "ponte_principal": {
+      "median": 4854.5,
+      "p95": 9910.1,
+      "tris": 1953141,
+      "calls": 330
+    },
+    "garganta": {
+      "median": 2184.2,
+      "p95": 4699,
+      "tris": 916976,
+      "calls": 211
+    },
+    "bosque": {
+      "median": 4296.9,
+      "p95": 8429.5,
+      "tris": 1506935,
+      "calls": 318
+    },
+    "entreposto_norte": {
+      "median": 4363.6,
+      "p95": 8473.9,
+      "tris": 650101,
+      "calls": 69
+    },
+    "ermos": {
+      "median": 519,
+      "p95": 1002.1,
+      "tris": 168861,
+      "calls": 93
+    }
+  }
+}

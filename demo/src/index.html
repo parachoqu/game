@@ -1,0 +1,107 @@
+<title>Projeto Game Demo</title>
+<style>/*__CSS__*/</style>
+
+<canvas id="game" aria-label="Mundo do jogo"></canvas>
+<div id="fx-layer" aria-hidden="true"></div>
+<div id="vignette" aria-hidden="true"></div>
+<div id="crosshair" hidden aria-hidden="true"><i class="ring"></i><i class="tk n"></i><i class="tk s"></i><i class="tk w"></i><i class="tk e"></i><i class="dot"></i><i class="bracket bl"></i><i class="bracket br"></i><div class="hitmarker" id="hitmarker"><i class="hm nw"></i><i class="hm ne"></i><i class="hm sw"></i><i class="hm se"></i></div><span class="range-tag" id="cross-range"></span></div>
+
+<div id="hud" hidden>
+  <section id="vitals" aria-label="Personagem">
+    <div class="who"><strong id="hud-name">—</strong><span id="hud-title"></span></div>
+    <div class="bar hp"><i id="hp-fill"></i><span id="hp-text"></span></div>
+    <div class="bar vg"><i id="vg-fill"></i><span id="vg-text"></span></div>
+    <div id="chips"></div>
+  </section>
+
+  <section id="zone" aria-live="polite">
+    <div class="zline"><b id="zone-mark"></b><span id="zone-name"></span><em id="zone-place"></em></div>
+    <p id="zone-rule"></p>
+  </section>
+
+  <section id="corner">
+    <div class="mapwrap" id="mapwrap"><canvas id="minimap" width="176" height="176"></canvas><button type="button" class="north" id="cam-north" title="Recentralizar a câmera: norte e inclinação padrão">N</button><button type="button" class="mini-size" id="mini-size" title="Ampliar o minimapa (M)" aria-pressed="false">+</button></div>
+    <div id="clock"></div>
+    <div id="widgets"></div>
+  </section>
+
+  <div id="toasts" aria-live="polite"></div>
+  <div id="prompt" hidden></div>
+  <div id="channel" hidden><span id="channel-label"></span><div class="track"><i id="channel-fill"></i></div></div>
+
+  <section id="actionbar" aria-label="Ações">
+    <div class="slot wide"><kbd>Clique</kbd><span><span id="ab-basic">Atacar</span> e usar</span></div>
+    <div class="slot"><kbd>Direito</kbd><span>Mirar</span></div>
+    <div class="slot"><kbd>Espaço</kbd><span>Pular</span></div>
+    <div class="slot"><kbd>C</kbd><span>Esquivar</span></div>
+    <div class="slot skill" id="ab-q"><kbd>Q</kbd><span></span><i class="cd"></i></div>
+    <div class="slot skill" id="ab-e"><kbd>E</kbd><span></span><i class="cd"></i></div>
+    <button type="button" class="slot click" id="ab-pot"><kbd>1</kbd><span>Poção <b></b></span><i class="cd"></i></button>
+    <button type="button" class="slot click" id="ab-mount"><kbd>R</kbd><span id="ab-mount-label">Montaria</span></button>
+    <div class="weapon" id="ab-weapon"></div>
+  </section>
+
+  <section id="load" aria-label="Carga">
+    <div class="coins"><b id="coins"></b> moedas</div>
+    <div class="loadrow"><span>Bolsa</span><div class="lbar"><i id="load-fill"></i><em class="mark100"></em></div><span id="load-text"></span></div>
+    <div class="loadrow" id="saddle-row" hidden><span>Alforjes</span><div class="lbar saddle"><i id="saddle-fill"></i></div><span id="saddle-text"></span></div>
+    <div id="load-state"></div>
+  </section>
+
+  <nav id="keys" aria-label="Atalhos">
+    <span><kbd>WASD</kbd>Andar</span><span><kbd>Shift</kbd>Correr</span><span><kbd>Ctrl</kbd>Agachar</span><span><kbd>Shift</kbd>+<kbd>Espaço</kbd>Salto</span><span><kbd>Direito</kbd>Mirar</span><span><kbd>Arraste</kbd>Girar a câmera</span><span><kbd>Tab</kbd>Menu</span><span><kbd>Tab</kbd>+<kbd>1</kbd><kbd>2</kbd><kbd>3</kbd>Câmera</span><span><kbd>I</kbd>Inventário</span><span><kbd>B</kbd>Livro</span><span><kbd>M</kbd>Ampliar minimapa</span><span><kbd>F</kbd>Interagir</span><span><kbd>Esc</kbd>Pausa</span>
+  </nav>
+</div>
+
+<div id="down" hidden><strong>Derrubado</strong><p id="down-text"></p><div class="track"><i id="down-fill"></i></div></div>
+<div id="caption" hidden><h3 id="cap-title"></h3><p id="cap-text"></p><button type="button" id="cap-close" class="btn">Voltar <kbd>F</kbd></button></div>
+
+<nav id="menubar" aria-label="Menu" hidden></nav>
+<div id="panel" role="dialog" aria-modal="true" hidden></div>
+<div id="book" role="dialog" aria-modal="true" aria-label="O Livro" hidden></div>
+
+<div id="screen-loading" class="screen">
+  <div class="lo">
+    <p class="eyebrow">Demo de recorte · Documento-Mestre v2.1</p>
+    <h2 class="lo-mark">Projeto Game</h2>
+    <p class="lo-sub">Montando o recorte do Vale.</p>
+    <div class="lo-frame">
+      <ol class="lo-phases" id="boot-phases"></ol>
+      <div id="boot-load" aria-live="polite">
+        <div class="track" id="boot-track"><i id="boot-fill"></i></div>
+        <span id="boot-text">Preparando o mundo…</span>
+      </div>
+    </div>
+    <div id="boot-lore" aria-hidden="true"></div>
+  </div>
+</div>
+
+<div id="screen-title" class="screen" hidden>
+  <div class="title-inner">
+    <p class="eyebrow">Demo de recorte · Documento-Mestre v2.1</p>
+    <h1>Projeto Game</h1>
+    <p class="promise">Escolha uma vida, assuma seus riscos e deixe uma história em um mundo que continua mudando.</p>
+    <div class="triad"><span><b>Trajetória</b>escolhas de vida</span><span><b>Consequência</b>mudanças no mundo</span><span><b>Memória</b>o Livro do personagem</span></div>
+    <div class="actions">
+      <button type="button" class="btn primary" id="btn-new" disabled>Nova trajetória</button>
+      <button type="button" class="btn" id="btn-continue" hidden>Continuar trajetória</button>
+    </div>
+    <p class="fine">Nomes, números e regras são provisórios: instrumentos para discutir o projeto, não decisões aprovadas.</p>
+    <p class="fine credits">Modelos 3D: Mixamo (personagens e caminhada) · cavalo e leoa por WildMesh 3D, CC BY-NC 4.0. Créditos completos no menu de pausa (Esc).</p>
+  </div>
+  <p id="small-note">Esta demo usa teclado e mouse. Em telas pequenas, a leitura do mundo fica comprometida.</p>
+</div>
+
+<div id="screen-create" class="screen" hidden>
+  <form class="create" id="create-form" autocomplete="off">
+    <p class="eyebrow">Nova trajetória</p>
+    <h2>Quem chega ao Entreposto do Vale?</h2>
+    <label class="field" for="c-name">Nome<input id="c-name" name="name" maxlength="22" required></label>
+    <fieldset><legend>Personagem <small>escolha o modelo 3D</small></legend><div class="cards" id="c-models"></div></fieldset>
+    <fieldset><legend>Origem <small>define história e traços, não profissão</small></legend><div class="cards" id="c-origins"></div></fieldset>
+    <fieldset><legend>Primeiro conhecimento <small>outros podem ser aprendidos depois</small></legend><div class="cards" id="c-starts"></div></fieldset>
+    <div class="actions"><button type="button" class="btn" id="c-back">Voltar</button><button type="submit" class="btn primary">Começar no Vale</button></div>
+  </form>
+</div>
+
+<script>/*__JS__*/</script>

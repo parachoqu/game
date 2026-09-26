@@ -1,0 +1,105 @@
+{
+  "schema_version": "1.0.0",
+  "environment_only": true,
+  "characters_or_animals_included": false,
+  "sources": [
+    {
+      "id": "sparse_grass",
+      "local_path": "../modelos 3d animados/texturas/terreno/sparse_grass",
+      "type": "PBR texture set",
+      "license": "CC0-1.0",
+      "publisher": "Poly Haven",
+      "license_url": "https://polyhaven.com/license",
+      "provenance_note": "Existing local project texture set; license policy verified against the official Poly Haven license page on 2026-09-24."
+    },
+    {
+      "id": "rocky_trail_02",
+      "local_path": "../modelos 3d animados/texturas/terreno/rocky_trail_02",
+      "type": "PBR texture set",
+      "license": "CC0-1.0",
+      "publisher": "Poly Haven",
+      "license_url": "https://polyhaven.com/license",
+      "provenance_note": "Existing local project texture set; license policy verified against the official Poly Haven license page on 2026-09-24."
+    },
+    {
+      "id": "forrest_ground_01",
+      "local_path": "../modelos 3d animados/texturas/terreno/forrest_ground_01",
+      "type": "PBR texture set",
+      "license": "CC0-1.0",
+      "publisher": "Poly Haven",
+      "license_url": "https://polyhaven.com/license",
+      "provenance_note": "Existing local project texture set; license policy verified against the official Poly Haven license page on 2026-09-24."
+    },
+    {
+      "id": "river_small_rocks",
+      "local_path": "../modelos 3d animados/texturas/terreno/river_small_rocks",
+      "type": "PBR texture set",
+      "license": "CC0-1.0",
+      "publisher": "Poly Haven",
+      "license_url": "https://polyhaven.com/license",
+      "provenance_note": "Existing local project texture set; license policy verified against the official Poly Haven license page on 2026-09-24."
+    },
+    {
+      "id": "dark_rock",
+      "local_path": "../modelos 3d animados/texturas/rochas/dark_rock",
+      "type": "PBR texture set",
+      "license": "CC0-1.0",
+      "publisher": "Poly Haven",
+      "license_url": "https://polyhaven.com/license",
+      "provenance_note": "Existing local project texture set; license policy verified against the official Poly Haven license page on 2026-09-24."
+    },
+    {
+      "id": "rock_3",
+      "local_path": "../modelos 3d animados/texturas/rochas/rock_3",
+      "type": "PBR texture set",
+      "license": "CC0-1.0",
+      "publisher": "Poly Haven",
+      "license_url": "https://polyhaven.com/license",
+      "provenance_note": "Existing local project texture set; license policy verified against the official Poly Haven license page on 2026-09-24."
+    },
+    {
+      "id": "bark_brown_02",
+      "local_path": "../modelos 3d animados/texturas/cascas/bark_brown_02",
+      "type": "PBR texture set",
+      "license": "CC0-1.0",
+      "publisher": "Poly Haven",
+      "license_url": "https://polyhaven.com/license",
+      "provenance_note": "Existing local project texture set; license policy verified against the official Poly Haven license page on 2026-09-24."
+    },
+    {
+      "id": "pine_bark",
+      "local_path": "../modelos 3d animados/texturas/cascas/pine_bark",
+      "type": "PBR texture set",
+      "license": "CC0-1.0",
+      "publisher": "Poly Haven",
+      "license_url": "https://polyhaven.com/license",
+      "provenance_note": "Existing local project texture set; license policy verified against the official Poly Haven license page on 2026-09-24."
+    }
+  ],
+  "procedural_assets": {
+    "license": "project-authored procedural geometry",
+    "types": [
+      "broadleaf_tree",
+      "pine_tree",
+      "dead_tree",
+      "shrub",
+      "grass",
+      "rock",
+      "bridge",
+      "dock",
+      "wall",
+      "arch",
+      "roof",
+      "tower",
+      "tent",
+      "market_stall",
+      "mine",
+      "observatory",
+      "camp",
+      "ruin"
+    ]
+  },
+  "limitations": [
+    "Individual downloaded archive receipts were not present in the local folders; the report records the project naming/source convention and the publisher-wide CC0 policy."
+  ]
+}

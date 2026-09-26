@@ -1,0 +1,148 @@
+{
+  "metodo": "image_gen integrado",
+  "pdf_origem_sha256": "21e3007b299db7f189a48bf2ba6b521caaa94d1b6316d2fffcb96d348b9d4b4c",
+  "pdf_origem_paginas": 25,
+  "imagens": [
+    {
+      "id": "01",
+      "arquivo": "imagens/01-entrepostos.png",
+      "dimensoes": [
+        1536,
+        1024
+      ],
+      "bytes": 3105733,
+      "sha256": "aca17f09a1eb314f9f903bec858d21422887d3aa898317892dc56cb043428126"
+    },
+    {
+      "id": "02",
+      "arquivo": "imagens/02-observatorio-ruinas.png",
+      "dimensoes": [
+        1536,
+        1024
+      ],
+      "bytes": 3182642,
+      "sha256": "3296db57dc5b3aae51e99852b2a27d9bc9ffb5198ba29e1cb0a015c006e32abb"
+    },
+    {
+      "id": "03",
+      "arquivo": "imagens/03-regiao-turbulenta.png",
+      "dimensoes": [
+        1536,
+        1024
+      ],
+      "bytes": 3395670,
+      "sha256": "2603f1a0db42ebfe33f790477428fd776ea8a5b14ae5b2f48009dbfa7633fc16"
+    },
+    {
+      "id": "04",
+      "arquivo": "imagens/04-kit-arquitetura.png",
+      "dimensoes": [
+        1536,
+        1024
+      ],
+      "bytes": 2577606,
+      "sha256": "e481d1f95178832a62768b28c5a941d495e7b616cd869bb9e12a6cf80806c202"
+    },
+    {
+      "id": "05",
+      "arquivo": "imagens/05-recursos-mina.png",
+      "dimensoes": [
+        1536,
+        1024
+      ],
+      "bytes": 3337371,
+      "sha256": "2372d0f4bea50cd943e39ccca81d533896a4ccbe8fe870787ee556eb613cf2aa"
+    },
+    {
+      "id": "06",
+      "arquivo": "imagens/06-acampamento-reativo.png",
+      "dimensoes": [
+        1536,
+        1024
+      ],
+      "bytes": 2969147,
+      "sha256": "4b6ba605458cefe80eacce062b417d20f01789aa35fbfa06b9358a0d412ed10f"
+    },
+    {
+      "id": "07",
+      "arquivo": "imagens/07-orc-artesa.png",
+      "dimensoes": [
+        1536,
+        1024
+      ],
+      "bytes": 2405772,
+      "sha256": "bcbe8c1ccfd6be2717225b73d438dd27daf9f92542169ce48a6ae28e339e032c"
+    },
+    {
+      "id": "08",
+      "arquivo": "imagens/08-elfa-viajante.png",
+      "dimensoes": [
+        1536,
+        1024
+      ],
+      "bytes": 2246742,
+      "sha256": "0438a785b13553a96cdbc39cb720ed87e1597dae14d4e9aea3f4caaeb6bce50b"
+    },
+    {
+      "id": "09",
+      "arquivo": "imagens/09-anao-estudioso.png",
+      "dimensoes": [
+        1536,
+        1024
+      ],
+      "bytes": 2559759,
+      "sha256": "af046f7e161dd7b648ac95381b5165574fd1f15c320a3bb3250e7f417ae30f29"
+    },
+    {
+      "id": "10",
+      "arquivo": "imagens/10-arsenal-01.png",
+      "dimensoes": [
+        1536,
+        1024
+      ],
+      "bytes": 2317090,
+      "sha256": "037859be728a3ecdb5455c604b14074a70addbcefc9a75bb2206c34d04f0a1fb"
+    },
+    {
+      "id": "11",
+      "arquivo": "imagens/11-arsenal-02.png",
+      "dimensoes": [
+        1536,
+        1024
+      ],
+      "bytes": 2026423,
+      "sha256": "e90b8158d03a08559b4893eaf01e9c9ec3e7205742874ccfc5c4b285d382a93b"
+    },
+    {
+      "id": "12",
+      "arquivo": "imagens/12-montaria-carga.png",
+      "dimensoes": [
+        1536,
+        1024
+      ],
+      "bytes": 2530717,
+      "sha256": "5a2f2287309ec697a1a7e209dd88bc01488d6fc98726f65f8976f14e03903afd"
+    },
+    {
+      "id": "13",
+      "arquivo": "imagens/13-livro-jornada.png",
+      "dimensoes": [
+        1536,
+        1024
+      ],
+      "bytes": 2814025,
+      "sha256": "0693b8025dfe874e1499010e5026393002112c57b0d7e3498e5949056ff2e447"
+    },
+    {
+      "id": "14",
+      "arquivo": "imagens/14-expressoes-magia.png",
+      "dimensoes": [
+        1536,
+        1024
+      ],
+      "bytes": 2580083,
+      "sha256": "8458798639eedee20c91af9591c4fc3984cb19c60a1dc757560c0d1b8022bf82"
+    }
+  ],
+  "revisao_visual": "14 pranchas inspecionadas; pormenores 07 e 08 descritos no guia; vistas conceituais sem garantia de projecao ortografica exata"
+}

@@ -1,0 +1,277 @@
+{
+  "generatedFrom": "modelos 3d animados/texturas/manifesto.json",
+  "originalFilesUnchanged": true,
+  "format": "webp",
+  "files": [
+    {
+      "assetId": "sparse_grass",
+      "file": "sparse_grass_col_1024.webp",
+      "width": 1024,
+      "height": 1024,
+      "content": "cor sRGB",
+      "bytes": 210934,
+      "sha256": "2a85a6e429b0af5df9aec5c8ae2d1fda44f49055b2b9399261c469ed548c6cc6"
+    },
+    {
+      "assetId": "sparse_grass",
+      "file": "sparse_grass_nrm_512.webp",
+      "width": 512,
+      "height": 512,
+      "content": "normal (linear)",
+      "bytes": 151858,
+      "sha256": "83b9cb6314e20e3bfc8cc2cddf893e9a2afd8c88bfef2c6ce62d06c7934343b2"
+    },
+    {
+      "assetId": "sparse_grass",
+      "file": "sparse_grass_hr_512.webp",
+      "width": 512,
+      "height": 512,
+      "content": "altura (R) + rugosidade (G)",
+      "bytes": 18556,
+      "sha256": "585ae8b74ed5469bd300a7aa608653de82bcbae2b27523658207a8dd1572b31f"
+    },
+    {
+      "assetId": "rocky_trail_02",
+      "file": "rocky_trail_02_col_1024.webp",
+      "width": 1024,
+      "height": 1024,
+      "content": "cor sRGB",
+      "bytes": 193534,
+      "sha256": "ed33e3fd2626f0650a694a0e99ec53be7f7bc19ffa4e73b767c7125c9583f68b"
+    },
+    {
+      "assetId": "rocky_trail_02",
+      "file": "rocky_trail_02_nrm_512.webp",
+      "width": 512,
+      "height": 512,
+      "content": "normal (linear)",
+      "bytes": 147246,
+      "sha256": "1393ac91597fc1ba944cfd2a5259f02129cebd9af15437ad7d64fb1d8b7e9141"
+    },
+    {
+      "assetId": "rocky_trail_02",
+      "file": "rocky_trail_02_hr_512.webp",
+      "width": 512,
+      "height": 512,
+      "content": "altura (R) + rugosidade (G)",
+      "bytes": 17584,
+      "sha256": "91ce55f71790fe42689c9d0ff127d23551cc657156a0298bbb2ea283938eeca8"
+    },
+    {
+      "assetId": "forrest_ground_01",
+      "file": "forrest_ground_01_col_1024.webp",
+      "width": 1024,
+      "height": 1024,
+      "content": "cor sRGB",
+      "bytes": 365210,
+      "sha256": "f3b7100088333afc39768d6c0abaeb571c2f6c2e925299e4dba3b3a1c567bf0f"
+    },
+    {
+      "assetId": "forrest_ground_01",
+      "file": "forrest_ground_01_nrm_512.webp",
+      "width": 512,
+      "height": 512,
+      "content": "normal (linear)",
+      "bytes": 155998,
+      "sha256": "e426ce01fcf28ccfb76883812023099e25832ffe72be9cfb67995a58a45bda27"
+    },
+    {
+      "assetId": "forrest_ground_01",
+      "file": "forrest_ground_01_hr_512.webp",
+      "width": 512,
+      "height": 512,
+      "content": "altura (R) + rugosidade (G)",
+      "bytes": 19892,
+      "sha256": "24eb21513945fd163508f3dc5606b20dd3094ffa799f2b238d477fd4f21bc254"
+    },
+    {
+      "assetId": "river_small_rocks",
+      "file": "river_small_rocks_col_1024.webp",
+      "width": 1024,
+      "height": 1024,
+      "content": "cor sRGB",
+      "bytes": 285334,
+      "sha256": "7aa7b16d940cfb63cf3e6c5fd34c7036cf9fb46f57481d466943694123b22d42"
+    },
+    {
+      "assetId": "river_small_rocks",
+      "file": "river_small_rocks_nrm_512.webp",
+      "width": 512,
+      "height": 512,
+      "content": "normal (linear)",
+      "bytes": 162518,
+      "sha256": "3dfa75fa501c7b4482a6995a5b88d9c844e78b57a8c403e24a09f45f70247336"
+    },
+    {
+      "assetId": "river_small_rocks",
+      "file": "river_small_rocks_hr_512.webp",
+      "width": 512,
+      "height": 512,
+      "content": "altura (R) + rugosidade (G)",
+      "bytes": 16420,
+      "sha256": "8e2d375f66ddd32c61fc6bb1c6af73a5e4fc1066406aab3eb8fc6ee0b22e2ce9"
+    },
+    {
+      "assetId": "rock_3",
+      "file": "rock_3_col_1024.webp",
+      "width": 1024,
+      "height": 1024,
+      "content": "cor sRGB",
+      "bytes": 350512,
+      "sha256": "2e9d65e6f353b380efcb32b3b950950200812c94d70ac89a6673f8a9c0babb74"
+    },
+    {
+      "assetId": "rock_3",
+      "file": "rock_3_nrm_1024.webp",
+      "width": 1024,
+      "height": 1024,
+      "content": "normal (linear)",
+      "bytes": 507154,
+      "sha256": "5423aa4cf018092c1db6c81e0403e139b04d44f40f0b26debd290f094184091f"
+    },
+    {
+      "assetId": "rock_3",
+      "file": "rock_3_hr_512.webp",
+      "width": 512,
+      "height": 512,
+      "content": "altura (R) + rugosidade (G)",
+      "bytes": 20592,
+      "sha256": "2d774150979cbbbc8620eb78e951d3179f5aaeff00093b6743d425cde2aa5cd3"
+    },
+    {
+      "assetId": "dark_rock",
+      "file": "dark_rock_col_1024.webp",
+      "width": 1024,
+      "height": 1024,
+      "content": "cor sRGB",
+      "bytes": 43936,
+      "sha256": "aa1256995d9f7c8d433f21505d3b055b814d826319d9096bc9951e52ac07ed8d"
+    },
+    {
+      "assetId": "dark_rock",
+      "file": "dark_rock_nrm_1024.webp",
+      "width": 1024,
+      "height": 1024,
+      "content": "normal (linear)",
+      "bytes": 404118,
+      "sha256": "17dd4d3f2a7913f86fcc85d329393b6c34b159159995a06fde0bcf054ccf459b"
+    },
+    {
+      "assetId": "dark_rock",
+      "file": "dark_rock_hr_512.webp",
+      "width": 512,
+      "height": 512,
+      "content": "altura (R) + rugosidade (G)",
+      "bytes": 19240,
+      "sha256": "00c9c2aea9643afdc95732e104a09179752f9d010fc303d36e266e2553e3b109"
+    },
+    {
+      "assetId": "bark_brown_02",
+      "file": "bark_brown_02_col_1024.webp",
+      "width": 1024,
+      "height": 1024,
+      "content": "cor sRGB",
+      "bytes": 311436,
+      "sha256": "f12b090b94e68d97ab947cf6cfef90b3fe6a0ea5e21deb046a07748a0e6a5f5c"
+    },
+    {
+      "assetId": "bark_brown_02",
+      "file": "bark_brown_02_nrm_1024.webp",
+      "width": 1024,
+      "height": 1024,
+      "content": "normal (linear)",
+      "bytes": 513406,
+      "sha256": "a507a6fdfd84b853f5e2a9220d79fd230f70f4bc5c5fe844b9e47424225e4db1"
+    },
+    {
+      "assetId": "bark_brown_02",
+      "file": "bark_brown_02_hr_512.webp",
+      "width": 512,
+      "height": 512,
+      "content": "altura (R) + rugosidade (G)",
+      "bytes": 13220,
+      "sha256": "9b7358e7f0adaeaf699b5eeb01c32b0a75933dfd96ee1621d7ddac2086113e0e"
+    },
+    {
+      "assetId": "pine_bark",
+      "file": "pine_bark_col_1024.webp",
+      "width": 1024,
+      "height": 1024,
+      "content": "cor sRGB",
+      "bytes": 154960,
+      "sha256": "4d407e087242778dff0dd5b002a62542034b56571118f5bfb38eb8abf22ae695"
+    },
+    {
+      "assetId": "pine_bark",
+      "file": "pine_bark_nrm_1024.webp",
+      "width": 1024,
+      "height": 1024,
+      "content": "normal (linear)",
+      "bytes": 489188,
+      "sha256": "4929ef3bb00b855548810827c0a78fe41ec589401a2da410e10bec65f5c259ee"
+    },
+    {
+      "assetId": "pine_bark",
+      "file": "pine_bark_hr_512.webp",
+      "width": 512,
+      "height": 512,
+      "content": "altura (R) + rugosidade (G)",
+      "bytes": 17512,
+      "sha256": "1b38a14abe39eb4b7f15d9972f8ac2d179a30caa7f945d9a97cbb4ea8bb5f690"
+    },
+    {
+      "assetId": "island_tree_03",
+      "file": "island_tree_03_col_512.webp",
+      "width": 512,
+      "height": 512,
+      "content": "cor sRGB + recorte no alfa",
+      "bytes": 28972,
+      "sha256": "a7fa0e3cb2ae0680e6cd2adc6fd384061cf4c995abd8eee70fbc1ab5eae17dd4"
+    },
+    {
+      "assetId": "island_tree_03",
+      "file": "island_tree_03_nrm_512.webp",
+      "width": 512,
+      "height": 512,
+      "content": "normal (linear)",
+      "bytes": 27812,
+      "sha256": "58c7748e8bf93acde25260618496ad1c9592905e580a2adbd86048152665b953"
+    },
+    {
+      "assetId": "island_tree_03",
+      "file": "island_tree_03_rgh_256.webp",
+      "width": 256,
+      "height": 256,
+      "content": "rugosidade",
+      "bytes": 8674,
+      "sha256": "d314f2433ce2c84fd9af086966d730c86d717f7f24e099b98e94d911a1802186"
+    },
+    {
+      "assetId": "pine_tree_01",
+      "file": "pine_tree_01_col_512.webp",
+      "width": 512,
+      "height": 512,
+      "content": "cor sRGB + recorte no alfa",
+      "bytes": 96548,
+      "sha256": "1f2b611befb879ad28d3d30183ad624d4a6f891ff8f1147e30e19578f4ac9833"
+    },
+    {
+      "assetId": "pine_tree_01",
+      "file": "pine_tree_01_nrm_512.webp",
+      "width": 512,
+      "height": 512,
+      "content": "normal (linear)",
+      "bytes": 82876,
+      "sha256": "1fc8140a67f5cb5a56870a693e16db94e7a97807af4bc741b23fc7dfc88b1cd4"
+    },
+    {
+      "assetId": "pine_tree_01",
+      "file": "pine_tree_01_rgh_256.webp",
+      "width": 256,
+      "height": 256,
+      "content": "rugosidade",
+      "bytes": 6218,
+      "sha256": "d57c97093f281302eafa3315acf4b80867c8c31c0d72cc65b04ba9291342990a"
+    }
+  ]
+}

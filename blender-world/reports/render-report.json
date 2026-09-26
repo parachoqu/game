@@ -1,0 +1,207 @@
+{
+  "blender_version": "5.0.1",
+  "hip_probe": {
+    "available": false,
+    "devices": [
+      {
+        "name": "AMD Ryzen 5 4500 6-Core Processor",
+        "type": "CPU"
+      }
+    ],
+    "reason": "HIP runtime not exposed by Cycles"
+  },
+  "final_engine": "BLENDER_EEVEE",
+  "fallback_reason": "HIP runtime not exposed by Cycles",
+  "resolution_validation": [
+    2560,
+    1440
+  ],
+  "resolution_final": [
+    3840,
+    2160
+  ],
+  "validation_renders": [
+    {
+      "scene": "ATLAS_MUNDO",
+      "camera": "CAM_01_ATLAS_FISICO",
+      "file": "renders/validation/01_atlas_fisico.png",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "engine": "BLENDER_EEVEE",
+      "seconds": 76.524,
+      "bytes": 3756595
+    },
+    {
+      "scene": "ATLAS_MUNDO",
+      "camera": "CAM_02_ATLAS_POLITICO",
+      "file": "renders/validation/02_atlas_politico.png",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "engine": "BLENDER_EEVEE",
+      "seconds": 74.498,
+      "bytes": 3878537
+    },
+    {
+      "scene": "ATLAS_MUNDO",
+      "camera": "CAM_03_CONTINENTE_PRINCIPAL",
+      "file": "renders/validation/03_continente_principal.png",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "engine": "BLENDER_EEVEE",
+      "seconds": 78.263,
+      "bytes": 3447112
+    },
+    {
+      "scene": "ATLAS_MUNDO",
+      "camera": "CAM_04_SEGUNDO_CONTINENTE",
+      "file": "renders/validation/04_segundo_continente.png",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "engine": "BLENDER_EEVEE",
+      "seconds": 70.591,
+      "bytes": 3368381
+    },
+    {
+      "scene": "REGIAO_COMERCIAL",
+      "camera": "CAM_05_REGION_AEREA",
+      "file": "renders/validation/05_regiao_aerea.png",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "engine": "BLENDER_EEVEE",
+      "seconds": 74.89,
+      "bytes": 4213533
+    },
+    {
+      "scene": "REGIAO_COMERCIAL",
+      "camera": "CAM_06_VALE_ENTREPOSTO",
+      "file": "renders/validation/06_vale_entreposto.png",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "engine": "BLENDER_EEVEE",
+      "seconds": 82.657,
+      "bytes": 3890990
+    },
+    {
+      "scene": "REGIAO_COMERCIAL",
+      "camera": "CAM_07_BOSQUE_MINA",
+      "file": "renders/validation/07_bosque_mina.png",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "engine": "BLENDER_EEVEE",
+      "seconds": 68.487,
+      "bytes": 3207885
+    },
+    {
+      "scene": "REGIAO_COMERCIAL",
+      "camera": "CAM_08_GARGANTA",
+      "file": "renders/validation/08_garganta.png",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "engine": "BLENDER_EEVEE",
+      "seconds": 67.155,
+      "bytes": 3913582
+    },
+    {
+      "scene": "REGIAO_COMERCIAL",
+      "camera": "CAM_09_ACAMPAMENTO_OBSERVATORIO",
+      "file": "renders/validation/09_acampamento_observatorio.png",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "engine": "BLENDER_EEVEE",
+      "seconds": 75.038,
+      "bytes": 3961554
+    },
+    {
+      "scene": "REGIAO_COMERCIAL",
+      "camera": "CAM_10_ERMOS_ENTREPOSTO_NORTE",
+      "file": "renders/validation/10_ermos_entreposto_norte.png",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "engine": "BLENDER_EEVEE",
+      "seconds": 86.947,
+      "bytes": 4136982
+    },
+    {
+      "scene": "TURBULENTA_01",
+      "camera": "CAM_11_TURBULENTA_AEREA",
+      "file": "renders/validation/11_turbulenta_aerea.png",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "engine": "BLENDER_EEVEE",
+      "seconds": 59.876,
+      "bytes": 3523253
+    },
+    {
+      "scene": "TURBULENTA_01",
+      "camera": "CAM_12_TURBULENTA_PORTAL",
+      "file": "renders/validation/12_turbulenta_portal.png",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "engine": "BLENDER_EEVEE",
+      "seconds": 55.049,
+      "bytes": 3340060
+    }
+  ],
+  "final_renders": [
+    {
+      "scene": "ATLAS_MUNDO",
+      "camera": "CAM_03_CONTINENTE_PRINCIPAL",
+      "file": "renders/final/final_atlas.png",
+      "resolution": [
+        3840,
+        2160
+      ],
+      "engine": "BLENDER_EEVEE",
+      "seconds": 130.776,
+      "bytes": 7512143
+    },
+    {
+      "scene": "REGIAO_COMERCIAL",
+      "camera": "CAM_06_VALE_ENTREPOSTO",
+      "file": "renders/final/final_regiao_comercial.png",
+      "resolution": [
+        3840,
+        2160
+      ],
+      "engine": "BLENDER_EEVEE",
+      "seconds": 118.599,
+      "bytes": 8426251
+    },
+    {
+      "scene": "TURBULENTA_01",
+      "camera": "CAM_12_TURBULENTA_PORTAL",
+      "file": "renders/final/final_turbulenta.png",
+      "resolution": [
+        3840,
+        2160
+      ],
+      "engine": "BLENDER_EEVEE",
+      "seconds": 100.157,
+      "bytes": 7323243
+    }
+  ]
+}

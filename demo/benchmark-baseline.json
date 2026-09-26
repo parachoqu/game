@@ -1,0 +1,38 @@
+{
+  "mercado": {
+    "median": 1,
+    "p95": 1.3,
+    "tris": 0,
+    "calls": 0
+  },
+  "ponte_principal": {
+    "median": 1,
+    "p95": 1.3,
+    "tris": 0,
+    "calls": 0
+  },
+  "garganta": {
+    "median": 0.9,
+    "p95": 1.2,
+    "tris": 0,
+    "calls": 0
+  },
+  "bosque": {
+    "median": 1.1,
+    "p95": 1.4,
+    "tris": 0,
+    "calls": 0
+  },
+  "entreposto_norte": {
+    "median": 1,
+    "p95": 1.2,
+    "tris": 0,
+    "calls": 0
+  },
+  "ermos": {
+    "median": 1,
+    "p95": 1.4,
+    "tris": 0,
+    "calls": 0
+  }
+}

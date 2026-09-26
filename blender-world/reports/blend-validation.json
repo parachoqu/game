@@ -1,0 +1,361 @@
+{
+  "schema_version": "1.0.0",
+  "blender_version": "5.0.1",
+  "blend_file": "/home/https/Área de trabalho/workspace/rpg/blender-world/MUNDO_MESTRE.blend",
+  "passed": true,
+  "counts": {
+    "objects": 226,
+    "materials": 34,
+    "images": 24,
+    "node_groups": 5
+  },
+  "checks": [
+    {
+      "id": "five_scenes",
+      "passed": true,
+      "details": [
+        "ATLAS_MUNDO",
+        "BIBLIOTECA_LOCAL",
+        "REGIAO_COMERCIAL",
+        "TURBULENTA_01",
+        "VALIDACAO"
+      ]
+    },
+    {
+      "id": "workflow_collections",
+      "passed": true,
+      "details": [
+        "ACABAMENTO_MANUAL",
+        "BASE_EDITAVEL",
+        "FONTES_PROCEDURAIS",
+        "PREPARACAO_EXPORTACAO"
+      ]
+    },
+    {
+      "id": "packed_images",
+      "passed": true,
+      "details": [
+        {
+          "name": "bark_brown_02_diff_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "bark_brown_02_nor_gl_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "bark_brown_02_rough_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "dark_rock_diff_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "dark_rock_nor_gl_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "dark_rock_rough_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "forrest_ground_01_diff_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "forrest_ground_01_nor_gl_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "forrest_ground_01_rough_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "pine_bark_diff_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "pine_bark_nor_gl_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "pine_bark_rough_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "river_small_rocks_diff_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "river_small_rocks_nor_gl_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "river_small_rocks_rough_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "rock_3_diff_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "rock_3_nor_gl_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "rock_3_rough_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "rocky_trail_02_diff_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "rocky_trail_02_nor_gl_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "rocky_trail_02_rough_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "sparse_grass_diff_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "sparse_grass_nor_gl_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        {
+          "name": "sparse_grass_rough_2k.png",
+          "packed": true,
+          "size": [
+            2048,
+            2048
+          ]
+        }
+      ]
+    },
+    {
+      "id": "valid_object_transforms",
+      "passed": true,
+      "details": []
+    },
+    {
+      "id": "sixteen_region_chunks",
+      "passed": true,
+      "details": [
+        "region_0_0",
+        "region_0_1",
+        "region_0_2",
+        "region_0_3",
+        "region_1_0",
+        "region_1_1",
+        "region_1_2",
+        "region_1_3",
+        "region_2_0",
+        "region_2_1",
+        "region_2_2",
+        "region_2_3",
+        "region_3_0",
+        "region_3_1",
+        "region_3_2",
+        "region_3_3"
+      ]
+    },
+    {
+      "id": "river_surface_and_outlets",
+      "passed": true,
+      "details": {
+        "west_x": -512.0,
+        "east_x": 512.0,
+        "surface_range_m": 0.0
+      }
+    },
+    {
+      "id": "modeled_route_slopes",
+      "passed": true,
+      "details": {
+        "short_gorge": {
+          "measured_max_slope_deg": 18.000002388368657,
+          "declared_sustained_deg": 18.0
+        },
+        "safe_east": {
+          "measured_max_slope_deg": 12.000016153258002,
+          "declared_sustained_deg": 12.0
+        },
+        "mine_spur": {
+          "measured_max_slope_deg": 16.000003242103116,
+          "declared_sustained_deg": 16.0
+        },
+        "observatory_trail": {
+          "measured_max_slope_deg": 18.0000166643642,
+          "declared_sustained_deg": 18.0
+        }
+      }
+    },
+    {
+      "id": "scale_references",
+      "passed": true,
+      "details": {
+        "human_reference_height_m": 1.7999999523162842,
+        "bridge_dimensions_m": [
+          10.0,
+          4.800000190734863,
+          6.75
+        ],
+        "wall_dimensions_m": [
+          6.400000095367432,
+          1.2000000476837158,
+          4.199999809265137
+        ]
+      }
+    },
+    {
+      "id": "validation_cameras",
+      "passed": true,
+      "details": {
+        "count": 12,
+        "minimum_clip_end": 5000.0
+      }
+    },
+    {
+      "id": "environment_asset_library",
+      "passed": true,
+      "details": [
+        "arch",
+        "bridge",
+        "broadleaf_tree",
+        "camp",
+        "dead_tree",
+        "dock",
+        "grass",
+        "market_stall",
+        "mine",
+        "observatory",
+        "pine_tree",
+        "rock",
+        "roof",
+        "ruin",
+        "shrub",
+        "tent",
+        "tower",
+        "wall"
+      ]
+    },
+    {
+      "id": "manual_layers_present",
+      "passed": true,
+      "details": [
+        "ACABAMENTO_MANUAL",
+        "ATLAS__ACABAMENTO_MANUAL",
+        "LIBRARY__ACABAMENTO_MANUAL",
+        "REGION__ACABAMENTO_MANUAL",
+        "TURBULENT__ACABAMENTO_MANUAL",
+        "VALIDATION__ACABAMENTO_MANUAL"
+      ]
+    },
+    {
+      "id": "resource_limits",
+      "passed": true,
+      "details": {
+        "blend_bytes": 351298658,
+        "peak_memory_kb_during_validation": 1861572,
+        "memory_limit_kb": 12582912
+      }
+    }
+  ]
+}

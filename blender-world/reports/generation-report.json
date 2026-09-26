@@ -1,0 +1,82 @@
+{
+  "deterministic": true,
+  "files": {
+    "manifest": "exports/manifest.json",
+    "maps": [
+      "atlas_biome.png",
+      "atlas_height.png",
+      "atlas_water.png",
+      "region_biome.png",
+      "region_height.png",
+      "region_water.png",
+      "turbulent_biome.png",
+      "turbulent_height.png",
+      "turbulent_water.png"
+    ],
+    "source_data": [
+      "atlas.npz",
+      "region.npz",
+      "turbulent.npz"
+    ]
+  },
+  "hashes": {
+    "atlas": {
+      "biome": "72441f5926a5933b80196c4cc6fe4b387a8bb98bc83519d641be69355067c9a2",
+      "height": "ebe8cfabb5aba286a1067e8571529f90adb7e6a17c9f92fb901a7582b0e2d56c",
+      "land": "b5635ef8a8b37e0b535a80a020022dbd2f6122f2928b1e6b3c7923eed47faa92",
+      "moisture": "245e281dfe571b4946a795cec02a4820e2c5a6722fc5de3a11c60932dab0bd09",
+      "slope": "16e548d6b03283e57704133e17046fb1065a0c74c8db62e174bf12522397af75",
+      "water": "85e6b9f9ca257872b42d8d640e527b77a56ed688498469302e376f90f1dd09b7"
+    },
+    "region": {
+      "biome": "97e21adc17c14f44eb148e9226e07de1da1d42c70b32d3e54cca104c56bc92de",
+      "height": "6d4c803145c4df73a5b9663225ef68cb7745f83492f113c601cd9c1cff685f61",
+      "land": "6d32f6f9fea8f7e459ed03a5f026eea49e0b1e69eb46812bc6f4f7a2fdba5a30",
+      "moisture": "26f8b175143f49016a983dffca9da5a7a20c6bdfd0b48b6d445a596fbf148af3",
+      "slope": "94d1a4a7ebd6b66a2dd44f127676071763e59b43b3eeb765ccf69e4331889168",
+      "water": "bc6b8f67c84a2467607ddb15c3a5b90233fff6116a5a5e4b793e8da297387321"
+    },
+    "turbulent": {
+      "biome": "6b70e24d701b7301f89362162e789e375f1cad2ab99a53714519fdcae8f2552f",
+      "height": "6a70931fcb3535015450917b90e3e45311845b72257e858d2c84b7dd9ce549f4",
+      "land": "7e239d27f446d568a82a0632fd22725117a04e7f6239209bc96b83d2fcf2b5f2",
+      "moisture": "835b0d953fb330a0778cf1c7481daf9450d089b44818a4e0b707ecc52a0c73ea",
+      "slope": "ee49f507166b42da0e9d70e73e1fac8d2e11d08ba605fa7a97451bb55bffc858",
+      "water": "e8d091a7b2b421e9831a688be8960ccf59b58db74c4ad4244b2ccfa8938c6141"
+    }
+  },
+  "height_ranges": {
+    "atlas": [
+      -0.6800000071525574,
+      4.500805377960205
+    ],
+    "region": [
+      7.234659194946289,
+      116.12261962890625
+    ],
+    "turbulent": [
+      -0.24131429195404053,
+      34.80337142944336
+    ]
+  },
+  "schema_version": "1.0.0",
+  "seeds": {
+    "atlas": 26092401,
+    "region": 26092402,
+    "turbulent": 26092403
+  },
+  "shapes": {
+    "atlas": [
+      640,
+      1024
+    ],
+    "region": [
+      1025,
+      1025
+    ],
+    "turbulent": [
+      513,
+      513
+    ]
+  }
+}

@@ -1,0 +1,332 @@
+{
+  "materials": [
+    {
+      "guid": "bf347159a764ca24981a4a8fdde2dcec",
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Demo/Showcase/Grid/Materials/UNS_Grid.mat"
+    },
+    {
+      "guid": "b725cacc7387b1f4e991c4bdfcd832c8",
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Shared/Palettes/Materials/UNS_Color_Palette.mat"
+    },
+    {
+      "guid": "0abb308d27287d24c8430daeffdc8e46",
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Sky/Materials/UNS_Skybox_Panoramic.mat"
+    },
+    {
+      "guid": "03e2616f5befa194da5c803432a7da3a",
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Sky/Materials/UNS_Skybox_Procedural.mat"
+    },
+    {
+      "guid": "9c0a1cda53d749f40a30a84ed1657377",
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Trees/Fir/Materials/UNS_Spruce_Tree_Branch.mat"
+    },
+    {
+      "guid": "143c45bbb5ae694479b1566df4a4f9a2",
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Vegetation/Bushes/Materials/UNS_Bush_Leaves.mat"
+    },
+    {
+      "guid": "be6a741af13d50f41b8befdd255bf584",
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Vegetation/Flowers/Materials/UNS_Flower_Leaf.mat"
+    },
+    {
+      "guid": "e9427a28f20c6f24083418e09b767a8d",
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Vegetation/Flowers/Materials/UNS_Flower.mat"
+    },
+    {
+      "guid": "9f69fd57086ff5046914a8b32350a1cb",
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Vegetation/Grass/Materials/UNS_Grass.mat"
+    },
+    {
+      "guid": "94ea32e4f0f6cab4e98928aadb7d9992",
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Water/Materials/UNS_Water.mat"
+    }
+  ],
+  "prefabs": {
+    "UNS_Branch": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Props/Branches/Prefabs/UNS_Branch.prefab",
+      "screenRelativeHeights": [
+        0.25,
+        0.15054336,
+        0.09777551,
+        0.03217602
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Log": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Props/Logs/Prefabs/UNS_Log.prefab",
+      "screenRelativeHeights": [
+        0.14640114,
+        0.10462499,
+        0.048030615,
+        0.020441325
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Stump": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Props/Logs/Prefabs/UNS_Stump.prefab",
+      "screenRelativeHeights": [
+        0.09890114,
+        0.05372258,
+        0.028387757,
+        0.01
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Rock_Cliff_01": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Rocks/Cliffs/Prefabs/UNS_Rock_Cliff_01.prefab",
+      "screenRelativeHeights": [
+        0.15193687,
+        0.10231632,
+        0.052890304,
+        0.015992986
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Rock_Cliff_02": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Rocks/Cliffs/Prefabs/UNS_Rock_Cliff_02.prefab",
+      "screenRelativeHeights": [
+        0.20311032,
+        0.13300829,
+        0.06790624,
+        0.020967472
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Rock_Cliff_03": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Rocks/Cliffs/Prefabs/UNS_Rock_Cliff_03.prefab",
+      "screenRelativeHeights": [
+        0.21622257,
+        0.14096747,
+        0.07267348,
+        0.023135839
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Rock_Cliff_04": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Rocks/Cliffs/Prefabs/UNS_Rock_Cliff_04.prefab",
+      "screenRelativeHeights": [
+        0.35047957,
+        0.22974297,
+        0.1202532,
+        0.041171562
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Rock_Cliff_05": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Rocks/Cliffs/Prefabs/UNS_Rock_Cliff_05.prefab",
+      "screenRelativeHeights": [
+        0.22974297,
+        0.15193687,
+        0.08063266,
+        0.028387757
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Standard_Rock_01": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Rocks/Forest/Prefabs/UNS_Standard_Rock_01.prefab",
+      "screenRelativeHeights": [
+        0.19829847,
+        0.10117156,
+        0.052890304,
+        0.019408165
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Standard_Rock_02": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Rocks/Forest/Prefabs/UNS_Standard_Rock_02.prefab",
+      "screenRelativeHeights": [
+        0.34415624,
+        0.18267347,
+        0.089,
+        0.03619388
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Standard_Rock_03": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Rocks/Forest/Prefabs/UNS_Standard_Rock_03.prefab",
+      "screenRelativeHeights": [
+        0.5143189,
+        0.25619388,
+        0.12782972,
+        0.054561228
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Standard_Rock_04": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Rocks/Forest/Prefabs/UNS_Standard_Rock_04.prefab",
+      "screenRelativeHeights": [
+        0.30150002,
+        0.15054336,
+        0.07074744,
+        0.026579719
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Standard_Rock_05": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Rocks/Forest/Prefabs/UNS_Standard_Rock_05.prefab",
+      "screenRelativeHeights": [
+        0.49905097,
+        0.24721746,
+        0.11777869,
+        0.047242988
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Mountain": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Rocks/Mountain/Prefabs/UNS_Mountain.prefab",
+      "screenRelativeHeights": [
+        0.14640114,
+        0.09890114,
+        0.052890304,
+        0.020967472
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Tiny_Rock_01": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Rocks/River/Prefabs/UNS_Tiny_Rock_01.prefab",
+      "screenRelativeHeights": [
+        0.049624998,
+        0.026579719,
+        0.014181759,
+        0.0060440046
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Tiny_Rock_02": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Rocks/River/Prefabs/UNS_Tiny_Rock_02.prefab",
+      "screenRelativeHeights": [
+        0.06790624,
+        0.038288906,
+        0.0215,
+        0.009727041
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Tiny_Rock_03": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Rocks/River/Prefabs/UNS_Tiny_Rock_03.prefab",
+      "screenRelativeHeights": [
+        0.041171562,
+        0.022038903,
+        0.010479592,
+        0.003850127
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Tiny_Rock_04": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Rocks/River/Prefabs/UNS_Tiny_Rock_04.prefab",
+      "screenRelativeHeights": [
+        0.076602034,
+        0.046461735,
+        0.023693878,
+        0.010100127
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Tiny_Rock_05": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Rocks/River/Prefabs/UNS_Tiny_Rock_05.prefab",
+      "screenRelativeHeights": [
+        0.07170727,
+        0.047242988,
+        0.022584183,
+        0.010479592
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Spruce_01": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Trees/Fir/Prefabs/UNS_Spruce_01.prefab",
+      "screenRelativeHeights": [
+        0.5003869,
+        0.29965863,
+        0.19594689,
+        0.046932496
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Spruce_02": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Trees/Fir/Prefabs/UNS_Spruce_02.prefab",
+      "screenRelativeHeights": [
+        0.1855831,
+        0.125,
+        0.07744418,
+        0.023897978
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Bush": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Vegetation/Bushes/Prefabs/UNS_Bush.prefab",
+      "screenRelativeHeights": [
+        0.10363374,
+        0.050449338,
+        0.02710748,
+        0.01
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Flower": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Vegetation/Flowers/Prefabs/UNS_Flower.prefab",
+      "screenRelativeHeights": [
+        0.25,
+        0.14915624,
+        0.06884693,
+        0.013744898
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Grass": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Vegetation/Grass/Prefabs/UNS_Grass.prefab",
+      "screenRelativeHeights": [
+        0.10117156,
+        0.05972704,
+        0.03619388,
+        0.018400509
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Mushroom_Patch": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Vegetation/Mushrooms/Prefabs/UNS_Mushroom_Patch.prefab",
+      "screenRelativeHeights": [
+        0.100033164,
+        0.066044,
+        0.032829717,
+        0.01
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    },
+    "UNS_Water_Detailed": {
+      "path": "Assets/InnerverseInteractive/Ultimate Nature – Starter/Environment/Water/Prefabs/UNS_Water_Detailed.prefab",
+      "screenRelativeHeights": [
+        0.5831327,
+        0.4379063,
+        0.2898291,
+        0.01
+      ],
+      "fadeMode": "1",
+      "animateCrossFade": "1"
+    }
+  }
+}

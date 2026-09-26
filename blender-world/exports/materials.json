@@ -1,0 +1,304 @@
+{
+  "materials": [
+    {
+      "images": [],
+      "name": "MAT_AgedMetal",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_AnomalyCyan",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_AnomalyCyanSurface",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_AnomalyViolet",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_AtlasBiome",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [
+        {
+          "name": "bark_brown_02_diff_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        },
+        {
+          "name": "bark_brown_02_rough_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        },
+        {
+          "name": "bark_brown_02_nor_gl_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        }
+      ],
+      "name": "MAT_Bark_PBR_CC0",
+      "source_license": "CC0-1.0"
+    },
+    {
+      "images": [],
+      "name": "MAT_CampCloth",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_CaveDark",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_CobaltCloth",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_DarkWood",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_Ember",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_FoliageEmerald",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [
+        {
+          "name": "forrest_ground_01_diff_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        },
+        {
+          "name": "forrest_ground_01_rough_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        },
+        {
+          "name": "forrest_ground_01_nor_gl_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        }
+      ],
+      "name": "MAT_ForestGround_PBR_CC0",
+      "source_license": "CC0-1.0"
+    },
+    {
+      "images": [
+        {
+          "name": "sparse_grass_diff_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        },
+        {
+          "name": "sparse_grass_rough_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        },
+        {
+          "name": "sparse_grass_nor_gl_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        }
+      ],
+      "name": "MAT_Grass_PBR_CC0",
+      "source_license": "CC0-1.0"
+    },
+    {
+      "images": [],
+      "name": "MAT_OceanDeep",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [
+        {
+          "name": "pine_bark_diff_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        },
+        {
+          "name": "pine_bark_rough_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        },
+        {
+          "name": "pine_bark_nor_gl_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        }
+      ],
+      "name": "MAT_PineBark_PBR_CC0",
+      "source_license": "CC0-1.0"
+    },
+    {
+      "images": [],
+      "name": "MAT_PineFoliageTeal",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_PlasterOchre",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_ProductiveFieldGreen",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_ProductiveFieldOchre",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_Realm_Altavela",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_Realm_Marevia",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_Realm_Pedrassol",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_Realm_Serrabruma",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_Realm_Valdora",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_Realm_Verdeferro",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_RegionBiome",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [
+        {
+          "name": "river_small_rocks_diff_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        },
+        {
+          "name": "river_small_rocks_rough_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        },
+        {
+          "name": "river_small_rocks_nor_gl_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        }
+      ],
+      "name": "MAT_Riverbed_PBR_CC0",
+      "source_license": "CC0-1.0"
+    },
+    {
+      "images": [
+        {
+          "name": "rocky_trail_02_diff_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        },
+        {
+          "name": "rocky_trail_02_rough_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        },
+        {
+          "name": "rocky_trail_02_nor_gl_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        }
+      ],
+      "name": "MAT_Road_PBR_CC0",
+      "source_license": "CC0-1.0"
+    },
+    {
+      "images": [
+        {
+          "name": "dark_rock_diff_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        },
+        {
+          "name": "dark_rock_rough_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        },
+        {
+          "name": "dark_rock_nor_gl_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        }
+      ],
+      "name": "MAT_Rock_PBR_CC0",
+      "source_license": "CC0-1.0"
+    },
+    {
+      "images": [
+        {
+          "name": "rock_3_diff_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        },
+        {
+          "name": "rock_3_rough_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        },
+        {
+          "name": "rock_3_nor_gl_2k.png",
+          "packed": true,
+          "source": "CC0_PBR"
+        }
+      ],
+      "name": "MAT_Stone_PBR_CC0",
+      "source_license": "CC0-1.0"
+    },
+    {
+      "images": [],
+      "name": "MAT_Terracotta",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_TurbulentGround",
+      "source_license": "procedural_project_material"
+    },
+    {
+      "images": [],
+      "name": "MAT_WaterTeal",
+      "source_license": "procedural_project_material"
+    }
+  ],
+  "palette_direction": "serious natural PBR with controlled emerald teal ochre terracotta cobalt amber cyan violet accents",
+  "schema_version": "1.0.0"
+}

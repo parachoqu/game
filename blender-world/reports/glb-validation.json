@@ -1,0 +1,1872 @@
+{
+  "schema_version": "1.0.0",
+  "blender_version": "5.0.1",
+  "passed": true,
+  "expected_glbs": 24,
+  "validated_glbs": 24,
+  "peak_memory_kb": 1089724,
+  "memory_limit_kb": 12582912,
+  "records": [
+    {
+      "file": "atlas/atlas_mundo.glb",
+      "bytes": 79448836,
+      "objects": 40,
+      "meshes": 40,
+      "vertices": 146415,
+      "triangles": 259134,
+      "materials": [
+        "MAT_AgedMetal",
+        "MAT_AnomalyViolet",
+        "MAT_AtlasBiome",
+        "MAT_CampCloth",
+        "MAT_CaveDark",
+        "MAT_CobaltCloth",
+        "MAT_DarkWood",
+        "MAT_Ember",
+        "MAT_OceanDeep",
+        "MAT_Realm_Altavela",
+        "MAT_Realm_Marevia",
+        "MAT_Realm_Pedrassol",
+        "MAT_Realm_Serrabruma",
+        "MAT_Realm_Valdora",
+        "MAT_Realm_Verdeferro",
+        "MAT_Road_PBR_CC0",
+        "MAT_Stone_PBR_CC0",
+        "MAT_Terracotta",
+        "MAT_WaterTeal"
+      ],
+      "bounds": {
+        "min": [
+          -114.0,
+          -74.0,
+          -0.6800000071525574
+        ],
+        "max": [
+          114.0,
+          74.0,
+          4.4994401931762695
+        ]
+      },
+      "origins": {
+        "ATLAS_Terrain": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ATLAS_Ocean": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ATLAS_River_01": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ATLAS_River_02": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ATLAS_River_03": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REALM_Valdora_Boundary": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REALM_Valdora_Label": [
+          -34.0,
+          -16.0,
+          1.992036
+        ],
+        "REALM_Serrabruma_Boundary": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REALM_Serrabruma_Label": [
+          -15.0,
+          18.0,
+          3.208332
+        ],
+        "REALM_Verdeferro_Boundary": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REALM_Verdeferro_Label": [
+          -67.0,
+          7.0,
+          1.43819
+        ],
+        "REALM_Marevia_Boundary": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REALM_Marevia_Label": [
+          -42.0,
+          -35.0,
+          0.622761
+        ],
+        "REALM_Pedrassol_Boundary": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REALM_Pedrassol_Label": [
+          2.0,
+          -5.0,
+          1.381055
+        ],
+        "REALM_Altavela_Boundary": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REALM_Altavela_Label": [
+          -77.0,
+          31.0,
+          0.554953
+        ],
+        "RISK_serrabruma_passes": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "RISK_altavela_ruins": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "RISK_second_continent_interior": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ANOMALY_regional_turbulent": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ANOMALY_second_continent_signal": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ATLAS_Capital_Valdora": [
+          -33.0,
+          -17.0,
+          1.606488
+        ],
+        "ATLAS_Cidade_Verdeferro": [
+          -57.0,
+          10.0,
+          1.452586
+        ],
+        "ATLAS_Passagem_Serrabruma": [
+          -12.0,
+          24.0,
+          1.483516
+        ],
+        "ATLAS_Mina_Verdeferro": [
+          -61.0,
+          6.0,
+          1.632912
+        ],
+        "ATLAS_Porto_Marevia": [
+          -39.0,
+          -38.0,
+          0.258365
+        ],
+        "ATLAS_Entreposto_Marevia": [
+          -15.0,
+          -34.0,
+          0.710448
+        ],
+        "ATLAS_Fortaleza_Pedrassol": [
+          4.0,
+          -2.0,
+          1.073488
+        ],
+        "ATLAS_Observatorio_Altavela": [
+          -74.0,
+          30.0,
+          0.214616
+        ],
+        "ATLAS_Ruinas_Altavela": [
+          -66.0,
+          38.0,
+          0.10703
+        ],
+        "ATLAS_Observatorio_Segundo_Continente": [
+          72.0,
+          15.0,
+          1.853376
+        ],
+        "ATLAS_Ruinas_Segundo_Continente": [
+          87.0,
+          8.0,
+          2.446648
+        ],
+        "ATLAS_Expedicao_Segundo_Continente": [
+          51.0,
+          -4.0,
+          0.783578
+        ],
+        "ATLAS_ROUTE_Valdora_Verdeferro": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ATLAS_ROUTE_Valdora_Serrabruma": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ATLAS_ROUTE_Valdora_Marevia": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ATLAS_ROUTE_Valdora_Pedrassol": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ATLAS_ROUTE_Altavela_Passagem": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ATLAS_ROUTE_Second_Expedition": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "library/environment_kit.glb",
+      "bytes": 196116500,
+      "objects": 18,
+      "meshes": 18,
+      "vertices": 4016,
+      "triangles": 1874,
+      "materials": [
+        "MAT_AgedMetal",
+        "MAT_Bark_PBR_CC0",
+        "MAT_CampCloth",
+        "MAT_CaveDark",
+        "MAT_CobaltCloth",
+        "MAT_DarkWood",
+        "MAT_Ember",
+        "MAT_FoliageEmerald",
+        "MAT_Grass_PBR_CC0",
+        "MAT_PineBark_PBR_CC0",
+        "MAT_PineFoliageTeal",
+        "MAT_PlasterOchre",
+        "MAT_Rock_PBR_CC0",
+        "MAT_Stone_PBR_CC0",
+        "MAT_Terracotta"
+      ],
+      "bounds": {
+        "min": [
+          -27.0,
+          -22.84324073791504,
+          -2.5
+        ],
+        "max": [
+          23.475000381469727,
+          18.399999618530273,
+          13.0
+        ]
+      },
+      "origins": {
+        "ASSET_BroadleafTree": [
+          -22.0,
+          15.0,
+          0.0
+        ],
+        "ASSET_PineTree": [
+          -14.0,
+          15.0,
+          0.0
+        ],
+        "ASSET_DeadTree": [
+          -6.0,
+          15.0,
+          0.0
+        ],
+        "ASSET_Shrub": [
+          2.0,
+          15.0,
+          0.0
+        ],
+        "ASSET_GrassClump": [
+          10.0,
+          15.0,
+          0.0
+        ],
+        "ASSET_Rock": [
+          18.0,
+          15.0,
+          0.0
+        ],
+        "ASSET_Bridge": [
+          -22.0,
+          3.0,
+          0.0
+        ],
+        "ASSET_Dock": [
+          -14.0,
+          3.0,
+          0.0
+        ],
+        "ASSET_Wall": [
+          -6.0,
+          3.0,
+          0.0
+        ],
+        "ASSET_Arch": [
+          2.0,
+          3.0,
+          0.0
+        ],
+        "ASSET_Roof": [
+          10.0,
+          3.0,
+          0.0
+        ],
+        "ASSET_Tower": [
+          18.0,
+          3.0,
+          0.0
+        ],
+        "ASSET_Tent": [
+          -22.0,
+          -10.0,
+          0.0
+        ],
+        "ASSET_MarketStall": [
+          -12.0,
+          -10.0,
+          0.0
+        ],
+        "ASSET_MineEntrance": [
+          -2.0,
+          -10.0,
+          0.0
+        ],
+        "ASSET_Observatory": [
+          8.0,
+          -10.0,
+          0.0
+        ],
+        "ASSET_Camp": [
+          18.0,
+          -10.0,
+          0.0
+        ],
+        "ASSET_Ruin": [
+          -22.0,
+          -22.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/architecture.glb",
+      "bytes": 75272388,
+      "objects": 55,
+      "meshes": 55,
+      "vertices": 7160,
+      "triangles": 3246,
+      "materials": [
+        "MAT_AgedMetal",
+        "MAT_AnomalyCyanSurface",
+        "MAT_CampCloth",
+        "MAT_CaveDark",
+        "MAT_CobaltCloth",
+        "MAT_DarkWood",
+        "MAT_Ember",
+        "MAT_PlasterOchre",
+        "MAT_ProductiveFieldGreen",
+        "MAT_ProductiveFieldOchre",
+        "MAT_Rock_PBR_CC0",
+        "MAT_Stone_PBR_CC0",
+        "MAT_Terracotta"
+      ],
+      "bounds": {
+        "min": [
+          -413.77642822265625,
+          -470.0,
+          5.024999618530273
+        ],
+        "max": [
+          319.55999755859375,
+          466.3348388671875,
+          126.52368927001953
+        ]
+      },
+      "origins": {
+        "South_ProductiveField_01": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "South_ProductiveField_02": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "South_ProductiveField_03": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "South_ProductiveField_04": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "SouthHouse_01_Facade": [
+          -35.0,
+          -426.0,
+          15.465821
+        ],
+        "SouthHouse_01_Rear": [
+          -35.0,
+          -417.694336,
+          15.465821
+        ],
+        "SouthHouse_01_Roof": [
+          -35.0,
+          -421.799988,
+          21.625822
+        ],
+        "SouthHouse_02_Facade": [
+          48.0,
+          -418.0,
+          15.465821
+        ],
+        "SouthHouse_02_Rear": [
+          48.0,
+          -410.649506,
+          15.465821
+        ],
+        "SouthHouse_02_Roof": [
+          48.0,
+          -414.25,
+          20.96582
+        ],
+        "SouthHouse_03_Facade": [
+          -22.0,
+          -372.0,
+          15.465821
+        ],
+        "SouthHouse_03_Rear": [
+          -22.0,
+          -366.057037,
+          15.465821
+        ],
+        "SouthHouse_03_Roof": [
+          -22.0,
+          -368.700012,
+          20.30582
+        ],
+        "SouthHouse_04_Facade": [
+          55.0,
+          -365.0,
+          15.465821
+        ],
+        "SouthHouse_04_Rear": [
+          55.0,
+          -359.734497,
+          15.465821
+        ],
+        "SouthHouse_04_Roof": [
+          55.0,
+          -362.0,
+          19.865822
+        ],
+        "SouthMarket_01": [
+          20.0,
+          -386.0,
+          15.465821
+        ],
+        "SouthMarket_02": [
+          36.0,
+          -388.0,
+          15.465821
+        ],
+        "SouthWorkshop_Facade": [
+          -62.0,
+          -372.0,
+          16.219742
+        ],
+        "SouthWorkshop_Rear": [
+          -62.0,
+          -365.140106,
+          16.219742
+        ],
+        "SouthWorkshop_Roof": [
+          -62.0,
+          -368.459991,
+          21.411741
+        ],
+        "SouthWarehouse_Facade": [
+          72.0,
+          -378.0,
+          15.504033
+        ],
+        "SouthWarehouse_Rear": [
+          72.0,
+          -368.171204,
+          15.504033
+        ],
+        "SouthWarehouse_Roof": [
+          72.0,
+          -373.049988,
+          22.764032
+        ],
+        "SouthStable": [
+          74.0,
+          -430.0,
+          15.207035
+        ],
+        "SouthOutpost_Tower": [
+          -53.0,
+          -384.0,
+          15.465821
+        ],
+        "SouthOutpost_Dock": [
+          105.0,
+          -167.0,
+          8.5
+        ],
+        "NorthHouse_01_Facade": [
+          3.0,
+          413.0,
+          57.806751
+        ],
+        "NorthHouse_01_Rear": [
+          3.0,
+          418.932617,
+          57.806751
+        ],
+        "NorthHouse_01_Roof": [
+          3.0,
+          416.0,
+          62.206753
+        ],
+        "NorthHouse_02_Facade": [
+          65.0,
+          425.0,
+          57.806751
+        ],
+        "NorthHouse_02_Rear": [
+          65.0,
+          430.880402,
+          57.806751
+        ],
+        "NorthHouse_02_Roof": [
+          65.0,
+          428.0,
+          62.206753
+        ],
+        "NorthHouse_03_Facade": [
+          25.0,
+          459.0,
+          57.806751
+        ],
+        "NorthHouse_03_Rear": [
+          25.0,
+          464.402679,
+          57.806751
+        ],
+        "NorthHouse_03_Roof": [
+          25.0,
+          462.0,
+          62.206753
+        ],
+        "NorthOutpost_Tower": [
+          93.0,
+          415.0,
+          57.806751
+        ],
+        "Bridge_Main": [
+          0.0,
+          -145.0,
+          8.4
+        ],
+        "Bridge_Minor": [
+          275.0,
+          -118.0,
+          8.9
+        ],
+        "POI_Mine_Entrance": [
+          -345.0,
+          -72.0,
+          63.509716
+        ],
+        "Mine_Rock_00": [
+          -360.0,
+          -64.0,
+          62.994053
+        ],
+        "Mine_Rock_01": [
+          -355.0,
+          -60.0,
+          63.693581
+        ],
+        "Mine_Rock_02": [
+          -350.0,
+          -64.0,
+          63.991959
+        ],
+        "Mine_Rock_03": [
+          -345.0,
+          -60.0,
+          64.389427
+        ],
+        "Mine_Rock_04": [
+          -340.0,
+          -64.0,
+          64.221054
+        ],
+        "Mine_Rock_05": [
+          -335.0,
+          -60.0,
+          64.646538
+        ],
+        "Mine_Rock_06": [
+          -330.0,
+          -64.0,
+          64.521767
+        ],
+        "POI_CaveWest_Entrance": [
+          -410.0,
+          -5.0,
+          56.848934
+        ],
+        "POI_ReactiveCamp": [
+          300.0,
+          72.0,
+          72.796097
+        ],
+        "POI_RegionalObservatory": [
+          -260.0,
+          205.0,
+          108.523689
+        ],
+        "Wastes_Ruin_01": [
+          -350.0,
+          365.0,
+          97.480003
+        ],
+        "Wastes_Ruin_02": [
+          -326.0,
+          383.0,
+          96.135361
+        ],
+        "Wastes_Ruin_03": [
+          -378.0,
+          391.0,
+          89.343719
+        ],
+        "POI_TurbulentPortal_Surface": [
+          315.0,
+          320.0,
+          97.4217
+        ],
+        "POI_TurbulentPortal_Arch": [
+          315.0,
+          320.399994,
+          97.4217
+        ]
+      }
+    },
+    {
+      "file": "region/chunks/region_0_0.glb",
+      "bytes": 202940,
+      "objects": 1,
+      "meshes": 1,
+      "vertices": 4225,
+      "triangles": 8192,
+      "materials": [
+        "MAT_RegionBiome"
+      ],
+      "bounds": {
+        "min": [
+          -512.0,
+          -512.0,
+          7.882769584655762
+        ],
+        "max": [
+          -256.0,
+          -256.0,
+          54.951385498046875
+        ]
+      },
+      "origins": {
+        "REGION_Terrain_0_0": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/chunks/region_0_1.glb",
+      "bytes": 202936,
+      "objects": 1,
+      "meshes": 1,
+      "vertices": 4225,
+      "triangles": 8192,
+      "materials": [
+        "MAT_RegionBiome"
+      ],
+      "bounds": {
+        "min": [
+          -512.0,
+          -256.0,
+          11.859155654907227
+        ],
+        "max": [
+          -256.0,
+          0.0,
+          72.77513122558594
+        ]
+      },
+      "origins": {
+        "REGION_Terrain_0_1": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/chunks/region_0_2.glb",
+      "bytes": 202936,
+      "objects": 1,
+      "meshes": 1,
+      "vertices": 4225,
+      "triangles": 8192,
+      "materials": [
+        "MAT_RegionBiome"
+      ],
+      "bounds": {
+        "min": [
+          -512.0,
+          0.0,
+          45.53114318847656
+        ],
+        "max": [
+          -256.0,
+          256.0,
+          116.12261962890625
+        ]
+      },
+      "origins": {
+        "REGION_Terrain_0_2": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/chunks/region_0_3.glb",
+      "bytes": 202940,
+      "objects": 1,
+      "meshes": 1,
+      "vertices": 4225,
+      "triangles": 8192,
+      "materials": [
+        "MAT_RegionBiome"
+      ],
+      "bounds": {
+        "min": [
+          -512.0,
+          256.0,
+          53.93301773071289
+        ],
+        "max": [
+          -256.0,
+          512.0,
+          115.80884552001953
+        ]
+      },
+      "origins": {
+        "REGION_Terrain_0_3": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/chunks/region_1_0.glb",
+      "bytes": 202936,
+      "objects": 1,
+      "meshes": 1,
+      "vertices": 4225,
+      "triangles": 8192,
+      "materials": [
+        "MAT_RegionBiome"
+      ],
+      "bounds": {
+        "min": [
+          -256.0,
+          -512.0,
+          7.2475104331970215
+        ],
+        "max": [
+          0.0,
+          -256.0,
+          50.58232116699219
+        ]
+      },
+      "origins": {
+        "REGION_Terrain_1_0": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/chunks/region_1_1.glb",
+      "bytes": 202932,
+      "objects": 1,
+      "meshes": 1,
+      "vertices": 4225,
+      "triangles": 8192,
+      "materials": [
+        "MAT_RegionBiome"
+      ],
+      "bounds": {
+        "min": [
+          -256.0,
+          -256.0,
+          9.82416820526123
+        ],
+        "max": [
+          0.0,
+          0.0,
+          70.21733093261719
+        ]
+      },
+      "origins": {
+        "REGION_Terrain_1_1": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/chunks/region_1_2.glb",
+      "bytes": 202936,
+      "objects": 1,
+      "meshes": 1,
+      "vertices": 4225,
+      "triangles": 8192,
+      "materials": [
+        "MAT_RegionBiome"
+      ],
+      "bounds": {
+        "min": [
+          -256.0,
+          0.0,
+          13.104671478271484
+        ],
+        "max": [
+          0.0,
+          256.0,
+          109.94984436035156
+        ]
+      },
+      "origins": {
+        "REGION_Terrain_1_2": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/chunks/region_1_3.glb",
+      "bytes": 202936,
+      "objects": 1,
+      "meshes": 1,
+      "vertices": 4225,
+      "triangles": 8192,
+      "materials": [
+        "MAT_RegionBiome"
+      ],
+      "bounds": {
+        "min": [
+          -256.0,
+          256.0,
+          52.94913101196289
+        ],
+        "max": [
+          0.0,
+          512.0,
+          109.886962890625
+        ]
+      },
+      "origins": {
+        "REGION_Terrain_1_3": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/chunks/region_2_0.glb",
+      "bytes": 202936,
+      "objects": 1,
+      "meshes": 1,
+      "vertices": 4225,
+      "triangles": 8192,
+      "materials": [
+        "MAT_RegionBiome"
+      ],
+      "bounds": {
+        "min": [
+          0.0,
+          -512.0,
+          10.682073593139648
+        ],
+        "max": [
+          256.0,
+          -256.0,
+          33.78766632080078
+        ]
+      },
+      "origins": {
+        "REGION_Terrain_2_0": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/chunks/region_2_1.glb",
+      "bytes": 202932,
+      "objects": 1,
+      "meshes": 1,
+      "vertices": 4225,
+      "triangles": 8192,
+      "materials": [
+        "MAT_RegionBiome"
+      ],
+      "bounds": {
+        "min": [
+          0.0,
+          -256.0,
+          9.888747215270996
+        ],
+        "max": [
+          256.0,
+          0.0,
+          51.246482849121094
+        ]
+      },
+      "origins": {
+        "REGION_Terrain_2_1": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/chunks/region_2_2.glb",
+      "bytes": 202932,
+      "objects": 1,
+      "meshes": 1,
+      "vertices": 4225,
+      "triangles": 8192,
+      "materials": [
+        "MAT_RegionBiome"
+      ],
+      "bounds": {
+        "min": [
+          0.0,
+          0.0,
+          14.75489330291748
+        ],
+        "max": [
+          256.0,
+          256.0,
+          100.82073974609375
+        ]
+      },
+      "origins": {
+        "REGION_Terrain_2_2": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/chunks/region_2_3.glb",
+      "bytes": 202932,
+      "objects": 1,
+      "meshes": 1,
+      "vertices": 4225,
+      "triangles": 8192,
+      "materials": [
+        "MAT_RegionBiome"
+      ],
+      "bounds": {
+        "min": [
+          0.0,
+          256.0,
+          49.99185562133789
+        ],
+        "max": [
+          256.0,
+          512.0,
+          100.79833984375
+        ]
+      },
+      "origins": {
+        "REGION_Terrain_2_3": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/chunks/region_3_0.glb",
+      "bytes": 202936,
+      "objects": 1,
+      "meshes": 1,
+      "vertices": 4225,
+      "triangles": 8192,
+      "materials": [
+        "MAT_RegionBiome"
+      ],
+      "bounds": {
+        "min": [
+          256.0,
+          -512.0,
+          20.71109962463379
+        ],
+        "max": [
+          512.0,
+          -256.0,
+          40.017295837402344
+        ]
+      },
+      "origins": {
+        "REGION_Terrain_3_0": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/chunks/region_3_1.glb",
+      "bytes": 202936,
+      "objects": 1,
+      "meshes": 1,
+      "vertices": 4225,
+      "triangles": 8192,
+      "materials": [
+        "MAT_RegionBiome"
+      ],
+      "bounds": {
+        "min": [
+          256.0,
+          -256.0,
+          12.590167999267578
+        ],
+        "max": [
+          512.0,
+          0.0,
+          63.086002349853516
+        ]
+      },
+      "origins": {
+        "REGION_Terrain_3_1": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/chunks/region_3_2.glb",
+      "bytes": 202936,
+      "objects": 1,
+      "meshes": 1,
+      "vertices": 4225,
+      "triangles": 8192,
+      "materials": [
+        "MAT_RegionBiome"
+      ],
+      "bounds": {
+        "min": [
+          256.0,
+          0.0,
+          51.246482849121094
+        ],
+        "max": [
+          512.0,
+          256.0,
+          107.82901000976562
+        ]
+      },
+      "origins": {
+        "REGION_Terrain_3_2": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/chunks/region_3_3.glb",
+      "bytes": 202940,
+      "objects": 1,
+      "meshes": 1,
+      "vertices": 4225,
+      "triangles": 8192,
+      "materials": [
+        "MAT_RegionBiome"
+      ],
+      "bounds": {
+        "min": [
+          256.0,
+          256.0,
+          58.76942825317383
+        ],
+        "max": [
+          512.0,
+          512.0,
+          107.81513214111328
+        ]
+      },
+      "origins": {
+        "REGION_Terrain_3_3": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/environment.glb",
+      "bytes": 128254360,
+      "objects": 78,
+      "meshes": 78,
+      "vertices": 75746,
+      "triangles": 134938,
+      "materials": [
+        "MAT_AgedMetal",
+        "MAT_AnomalyCyanSurface",
+        "MAT_CampCloth",
+        "MAT_CaveDark",
+        "MAT_CobaltCloth",
+        "MAT_DarkWood",
+        "MAT_Ember",
+        "MAT_PlasterOchre",
+        "MAT_ProductiveFieldGreen",
+        "MAT_ProductiveFieldOchre",
+        "MAT_RegionBiome",
+        "MAT_Road_PBR_CC0",
+        "MAT_Rock_PBR_CC0",
+        "MAT_Stone_PBR_CC0",
+        "MAT_Terracotta",
+        "MAT_WaterTeal"
+      ],
+      "bounds": {
+        "min": [
+          -512.8140869140625,
+          -512.0,
+          5.024999618530273
+        ],
+        "max": [
+          512.1859741210938,
+          512.0,
+          126.52368927001953
+        ]
+      },
+      "origins": {
+        "REGION_Terrain_0_0": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REGION_Terrain_1_0": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REGION_Terrain_2_0": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REGION_Terrain_3_0": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REGION_Terrain_0_1": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REGION_Terrain_1_1": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REGION_Terrain_2_1": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REGION_Terrain_3_1": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REGION_Terrain_0_2": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REGION_Terrain_1_2": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REGION_Terrain_2_2": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REGION_Terrain_3_2": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REGION_Terrain_0_3": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REGION_Terrain_1_3": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REGION_Terrain_2_3": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REGION_Terrain_3_3": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REGION_MainRiver": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ROUTE_short_gorge": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ROUTE_safe_east": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ROUTE_mine_spur": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ROUTE_observatory_trail": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "South_ProductiveField_01": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "South_ProductiveField_02": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "South_ProductiveField_03": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "South_ProductiveField_04": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "SouthHouse_01_Facade": [
+          -35.0,
+          -426.0,
+          15.465821
+        ],
+        "SouthHouse_01_Rear": [
+          -35.0,
+          -417.694336,
+          15.465821
+        ],
+        "SouthHouse_01_Roof": [
+          -35.0,
+          -421.799988,
+          21.625822
+        ],
+        "SouthHouse_02_Facade": [
+          48.0,
+          -418.0,
+          15.465821
+        ],
+        "SouthHouse_02_Rear": [
+          48.0,
+          -410.649506,
+          15.465821
+        ],
+        "SouthHouse_02_Roof": [
+          48.0,
+          -414.25,
+          20.96582
+        ],
+        "SouthHouse_03_Facade": [
+          -22.0,
+          -372.0,
+          15.465821
+        ],
+        "SouthHouse_03_Rear": [
+          -22.0,
+          -366.057037,
+          15.465821
+        ],
+        "SouthHouse_03_Roof": [
+          -22.0,
+          -368.700012,
+          20.30582
+        ],
+        "SouthHouse_04_Facade": [
+          55.0,
+          -365.0,
+          15.465821
+        ],
+        "SouthHouse_04_Rear": [
+          55.0,
+          -359.734497,
+          15.465821
+        ],
+        "SouthHouse_04_Roof": [
+          55.0,
+          -362.0,
+          19.865822
+        ],
+        "SouthMarket_01": [
+          20.0,
+          -386.0,
+          15.465821
+        ],
+        "SouthMarket_02": [
+          36.0,
+          -388.0,
+          15.465821
+        ],
+        "SouthWorkshop_Facade": [
+          -62.0,
+          -372.0,
+          16.219742
+        ],
+        "SouthWorkshop_Rear": [
+          -62.0,
+          -365.140106,
+          16.219742
+        ],
+        "SouthWorkshop_Roof": [
+          -62.0,
+          -368.459991,
+          21.411741
+        ],
+        "SouthWarehouse_Facade": [
+          72.0,
+          -378.0,
+          15.504033
+        ],
+        "SouthWarehouse_Rear": [
+          72.0,
+          -368.171204,
+          15.504033
+        ],
+        "SouthWarehouse_Roof": [
+          72.0,
+          -373.049988,
+          22.764032
+        ],
+        "SouthStable": [
+          74.0,
+          -430.0,
+          15.207035
+        ],
+        "SouthOutpost_Tower": [
+          -53.0,
+          -384.0,
+          15.465821
+        ],
+        "SouthOutpost_Dock": [
+          105.0,
+          -167.0,
+          8.5
+        ],
+        "NorthHouse_01_Facade": [
+          3.0,
+          413.0,
+          57.806751
+        ],
+        "NorthHouse_01_Rear": [
+          3.0,
+          418.932617,
+          57.806751
+        ],
+        "NorthHouse_01_Roof": [
+          3.0,
+          416.0,
+          62.206753
+        ],
+        "NorthHouse_02_Facade": [
+          65.0,
+          425.0,
+          57.806751
+        ],
+        "NorthHouse_02_Rear": [
+          65.0,
+          430.880402,
+          57.806751
+        ],
+        "NorthHouse_02_Roof": [
+          65.0,
+          428.0,
+          62.206753
+        ],
+        "NorthHouse_03_Facade": [
+          25.0,
+          459.0,
+          57.806751
+        ],
+        "NorthHouse_03_Rear": [
+          25.0,
+          464.402679,
+          57.806751
+        ],
+        "NorthHouse_03_Roof": [
+          25.0,
+          462.0,
+          62.206753
+        ],
+        "NorthOutpost_Tower": [
+          93.0,
+          415.0,
+          57.806751
+        ],
+        "Bridge_Main": [
+          0.0,
+          -145.0,
+          8.4
+        ],
+        "Bridge_Minor": [
+          275.0,
+          -118.0,
+          8.9
+        ],
+        "POI_Mine_Entrance": [
+          -345.0,
+          -72.0,
+          63.509716
+        ],
+        "Mine_Rock_00": [
+          -360.0,
+          -64.0,
+          62.994053
+        ],
+        "Mine_Rock_01": [
+          -355.0,
+          -60.0,
+          63.693581
+        ],
+        "Mine_Rock_02": [
+          -350.0,
+          -64.0,
+          63.991959
+        ],
+        "Mine_Rock_03": [
+          -345.0,
+          -60.0,
+          64.389427
+        ],
+        "Mine_Rock_04": [
+          -340.0,
+          -64.0,
+          64.221054
+        ],
+        "Mine_Rock_05": [
+          -335.0,
+          -60.0,
+          64.646538
+        ],
+        "Mine_Rock_06": [
+          -330.0,
+          -64.0,
+          64.521767
+        ],
+        "POI_CaveWest_Entrance": [
+          -410.0,
+          -5.0,
+          56.848934
+        ],
+        "POI_ReactiveCamp": [
+          300.0,
+          72.0,
+          72.796097
+        ],
+        "POI_RegionalObservatory": [
+          -260.0,
+          205.0,
+          108.523689
+        ],
+        "Wastes_Ruin_01": [
+          -350.0,
+          365.0,
+          97.480003
+        ],
+        "Wastes_Ruin_02": [
+          -326.0,
+          383.0,
+          96.135361
+        ],
+        "Wastes_Ruin_03": [
+          -378.0,
+          391.0,
+          89.343719
+        ],
+        "POI_TurbulentPortal_Surface": [
+          315.0,
+          320.0,
+          97.4217
+        ],
+        "POI_TurbulentPortal_Arch": [
+          315.0,
+          320.399994,
+          97.4217
+        ],
+        "REGION_IrrigationCanal_01": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REGION_IrrigationCanal_02": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/nature.glb",
+      "bytes": 174107964,
+      "objects": 4,
+      "meshes": 4,
+      "vertices": 1694,
+      "triangles": 706,
+      "materials": [
+        "MAT_Bark_PBR_CC0",
+        "MAT_FoliageEmerald",
+        "MAT_Grass_PBR_CC0",
+        "MAT_PineBark_PBR_CC0",
+        "MAT_PineFoliageTeal",
+        "MAT_Rock_PBR_CC0"
+      ],
+      "bounds": {
+        "min": [
+          -25.42630958557129,
+          11.600000381469727,
+          -0.10207995772361755
+        ],
+        "max": [
+          19.925891876220703,
+          18.399999618530273,
+          11.149999618530273
+        ]
+      },
+      "origins": {
+        "ASSET_BroadleafTree": [
+          -22.0,
+          15.0,
+          0.0
+        ],
+        "ASSET_PineTree": [
+          -14.0,
+          15.0,
+          0.0
+        ],
+        "ASSET_GrassClump": [
+          10.0,
+          15.0,
+          0.0
+        ],
+        "ASSET_Rock": [
+          18.0,
+          15.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/routes.glb",
+      "bytes": 50476696,
+      "objects": 4,
+      "meshes": 4,
+      "vertices": 704,
+      "triangles": 352,
+      "materials": [
+        "MAT_Road_PBR_CC0"
+      ],
+      "bounds": {
+        "min": [
+          -410.8669128417969,
+          -411.6211853027344,
+          10.31765365600586
+        ],
+        "max": [
+          317.28338623046875,
+          427.32220458984375,
+          113.41654968261719
+        ]
+      },
+      "origins": {
+        "ROUTE_short_gorge": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ROUTE_safe_east": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ROUTE_mine_spur": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ROUTE_observatory_trail": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "region/waterworks.glb",
+      "bytes": 3080,
+      "objects": 2,
+      "meshes": 2,
+      "vertices": 24,
+      "triangles": 12,
+      "materials": [
+        "MAT_WaterTeal"
+      ],
+      "bounds": {
+        "min": [
+          -83.70830535888672,
+          -370.56756591796875,
+          10.740839958190918
+        ],
+        "max": [
+          93.75,
+          -142.04273986816406,
+          22.109764099121094
+        ]
+      },
+      "origins": {
+        "REGION_IrrigationCanal_01": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "REGION_IrrigationCanal_02": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "file": "turbulent/turbulenta_01.glb",
+      "bytes": 148447700,
+      "objects": 22,
+      "meshes": 21,
+      "vertices": 29512,
+      "triangles": 51802,
+      "materials": [
+        "MAT_AnomalyCyan",
+        "MAT_AnomalyCyanSurface",
+        "MAT_Bark_PBR_CC0",
+        "MAT_Road_PBR_CC0",
+        "MAT_Rock_PBR_CC0",
+        "MAT_Stone_PBR_CC0",
+        "MAT_TurbulentGround"
+      ],
+      "bounds": {
+        "min": [
+          -128.0,
+          -128.0,
+          -0.18612045049667358
+        ],
+        "max": [
+          128.0,
+          128.0,
+          46.814884185791016
+        ]
+      },
+      "origins": {
+        "TURBULENT_Terrain": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "TURBULENT_ROUTE_anomalous_crossing": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "TURBULENT_ROUTE_alternate_exit": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "TURBULENT_PortalRing": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "TURBULENT_PortalSurface": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "TURBULENT_PortalArch": [
+          0.0,
+          1.2,
+          26.14216
+        ],
+        "TURBULENT_FloatingFragment_00": [
+          -42.0,
+          20.0,
+          35.0
+        ],
+        "TURBULENT_FloatingFragment_01": [
+          38.0,
+          -15.0,
+          29.0
+        ],
+        "TURBULENT_FloatingFragment_02": [
+          60.0,
+          55.0,
+          42.0
+        ],
+        "TURBULENT_FloatingFragment_03": [
+          -66.0,
+          72.0,
+          31.0
+        ],
+        "TURBULENT_FloatingFragment_04": [
+          15.0,
+          78.0,
+          37.0
+        ],
+        "TURBULENT_Ruin_00": [
+          -58.0,
+          38.0,
+          10.457005
+        ],
+        "TURBULENT_Ruin_01": [
+          -82.0,
+          63.0,
+          28.067823
+        ],
+        "TURBULENT_Ruin_02": [
+          57.0,
+          50.0,
+          22.752945
+        ],
+        "TURBULENT_DeadTree_00": [
+          -70.0,
+          -10.0,
+          5.279181
+        ],
+        "TURBULENT_DeadTree_01": [
+          -45.0,
+          68.0,
+          24.318529
+        ],
+        "TURBULENT_DeadTree_02": [
+          74.0,
+          18.0,
+          30.390347
+        ],
+        "TURBULENT_DeadTree_03": [
+          82.0,
+          82.0,
+          23.321859
+        ],
+        "TURBULENT_Root_00": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "TURBULENT_Root_01": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "TURBULENT_Root_02": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    }
+  ],
+  "failures": []
+}
