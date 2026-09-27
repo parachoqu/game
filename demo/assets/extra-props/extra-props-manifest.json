@@ -6,9 +6,9 @@
     {
       "id": "ponte_pedra",
       "glb": "ponte_pedra.glb",
-      "bytes": 1831756,
-      "sha256": "3c283baa4612b08b620850c51fe52bcd7b21c3ae4cd92646c870ba9e6b4a3874",
-      "triangles": 22088,
+      "bytes": 2048912,
+      "sha256": "8188c47640d4f1dc0c28694ee93b12be3436ecd9fe57ae529abc28b3267775ad",
+      "triangles": 22090,
       "source": {
         "file": "stone-bridge.zip",
         "entry": "source/StoneBridge.fbx",
@@ -18,7 +18,7 @@
         "title": "Stone Bridge"
       },
       "author": null,
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         2.913,
@@ -26,16 +26,62 @@
         1.188
       ],
       "extra": {
+        "support": "bridge",
+        "contactY": 0,
+        "footprint": [
+          [
+            -1.398,
+            -0.569
+          ],
+          [
+            -1.252,
+            -0.573
+          ],
+          [
+            1.214,
+            -0.573
+          ],
+          [
+            1.27,
+            -0.573
+          ],
+          [
+            1.409,
+            -0.569
+          ],
+          [
+            1.409,
+            0.55
+          ],
+          [
+            1.27,
+            0.579
+          ],
+          [
+            1.214,
+            0.579
+          ],
+          [
+            -1.264,
+            0.567
+          ],
+          [
+            -1.398,
+            0.55
+          ]
+        ],
+        "stone": true,
         "deckY": 0.485,
+        "roadHalf": 0.5,
         "longAxis": "x"
       }
     },
     {
       "id": "ponte_quebrada",
       "glb": "ponte_quebrada.glb",
-      "bytes": 481220,
-      "sha256": "438047698c3bcc8c5eba9014615e1ac045836bcd30d94647852e68d348f8667c",
-      "triangles": 14048,
+      "bytes": 466756,
+      "sha256": "d242f124cdde17739f3149143846a011857c0deeaaaa374e47f6ae4cda41f0ce",
+      "triangles": 13976,
       "source": {
         "file": "ruined_stone_bridge_broken_arch.glb",
         "entry": null,
@@ -49,17 +95,88 @@
       "url": "https://sketchfab.com/3d-models/ruined-stone-bridge-broken-arch-57fa861b90ff4793bccf7930a43c8bd0",
       "size": [
         13.889,
-        9,
+        8.795,
         6.138
       ],
-      "extra": {}
+      "extra": {
+        "baseFacesRemoved": 72,
+        "support": "flat",
+        "contactY": 0,
+        "footprint": [
+          [
+            -6.312,
+            1.182
+          ],
+          [
+            -6.089,
+            -1.898
+          ],
+          [
+            -6.063,
+            -2.211
+          ],
+          [
+            -5.344,
+            -2.631
+          ],
+          [
+            -5.138,
+            -2.642
+          ],
+          [
+            5.398,
+            -2.639
+          ],
+          [
+            5.597,
+            -2.63
+          ],
+          [
+            6.313,
+            -2.214
+          ],
+          [
+            6.743,
+            2.037
+          ],
+          [
+            6.106,
+            2.917
+          ],
+          [
+            5.553,
+            2.991
+          ],
+          [
+            -4.928,
+            3.018
+          ],
+          [
+            -5.092,
+            2.992
+          ],
+          [
+            -5.575,
+            2.871
+          ],
+          [
+            -6.183,
+            2.16
+          ],
+          [
+            -6.222,
+            2.09
+          ]
+        ],
+        "stone": true
+      }
     },
     {
       "id": "poco",
       "glb": "poco.glb",
-      "bytes": 367184,
-      "sha256": "9926da2b2ae504eaa0b579f3d471d9b5da1c5cc41596f6f3a80ed1ddd3008a68",
-      "triangles": 5856,
+      "bytes": 350188,
+      "sha256": "d4f5b9b91f36fcdb1f2b112c600ffd60678caf81ff59b1e3ff7cf98035fa3f65",
+      "triangles": 5756,
       "source": {
         "file": "medieval_stone_well_-_game_prop.glb",
         "entry": null,
@@ -73,17 +190,88 @@
       "url": "https://sketchfab.com/3d-models/medieval-stone-well-game-prop-a0ca279889b84afb9f24b88bff9c6860",
       "size": [
         2.975,
-        2.6,
+        2.591,
         2.976
       ],
-      "extra": {}
+      "extra": {
+        "baseFacesRemoved": 100,
+        "support": "flat",
+        "contactY": 0,
+        "footprint": [
+          [
+            -1.487,
+            0.188
+          ],
+          [
+            -1.477,
+            -0.148
+          ],
+          [
+            -1.271,
+            -0.786
+          ],
+          [
+            -0.731,
+            -1.248
+          ],
+          [
+            -0.122,
+            -1.488
+          ],
+          [
+            0.349,
+            -1.381
+          ],
+          [
+            1,
+            -1.061
+          ],
+          [
+            1.38,
+            -0.562
+          ],
+          [
+            1.484,
+            0.203
+          ],
+          [
+            1.161,
+            0.818
+          ],
+          [
+            0.829,
+            1.219
+          ],
+          [
+            0.3,
+            1.433
+          ],
+          [
+            -0.009,
+            1.488
+          ],
+          [
+            -0.365,
+            1.427
+          ],
+          [
+            -1.022,
+            1.124
+          ],
+          [
+            -1.296,
+            0.733
+          ]
+        ],
+        "stone": true
+      }
     },
     {
       "id": "casa_palha",
       "glb": "casa_palha.glb",
-      "bytes": 553568,
-      "sha256": "4f3150edd5dc26c510ea8a9d7d1edb1fdd3981a7d840ebe4278966de9c0eb91f",
-      "triangles": 12064,
+      "bytes": 586776,
+      "sha256": "3d5aae5c7da13109648239b62903d257fa4c2b41feaf80966df47335227d16f9",
+      "triangles": 11912,
       "source": {
         "file": "medieval-straw-house.zip",
         "entry": "source/haus.usdz",
@@ -93,21 +281,71 @@
         "title": "Medieval Straw House"
       },
       "author": null,
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         1.136,
-        1.327,
+        1.216,
         1.657
       ],
-      "extra": {}
+      "extra": {
+        "baseFacesRemoved": 152,
+        "support": "flat",
+        "contactY": 0,
+        "footprint": [
+          [
+            -0.509,
+            -0.687
+          ],
+          [
+            -0.495,
+            -0.722
+          ],
+          [
+            -0.159,
+            -0.821
+          ],
+          [
+            0.172,
+            -0.828
+          ],
+          [
+            0.467,
+            -0.689
+          ],
+          [
+            0.518,
+            0.719
+          ],
+          [
+            0.511,
+            0.744
+          ],
+          [
+            0.475,
+            0.757
+          ],
+          [
+            -0.468,
+            0.769
+          ],
+          [
+            -0.503,
+            0.755
+          ],
+          [
+            -0.507,
+            0.727
+          ]
+        ]
+      }
     },
     {
       "id": "ferraria",
       "glb": "ferraria.glb",
-      "bytes": 1899808,
-      "sha256": "fa66e3d0d7c7fc3e230f8d46667144c01a50b0c67fb80fb686f997a5bfcc763d",
-      "triangles": 16993,
+      "bytes": 1896604,
+      "sha256": "d368da19249e381fac766d151bbed70bffa48838e7a2bdfbb8485088c1f3aa3b",
+      "triangles": 16648,
       "source": {
         "file": "the-blacksmiths.zip",
         "entry": "source/Blacksmith.fbx",
@@ -117,21 +355,59 @@
         "title": "The Blacksmiths"
       },
       "author": null,
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         8.453,
-        4.841,
+        4.659,
         10.112
       ],
-      "extra": {}
+      "extra": {
+        "baseFacesRemoved": 345,
+        "support": "flat",
+        "contactY": 0,
+        "footprint": [
+          [
+            -4.227,
+            -4.197
+          ],
+          [
+            -1.627,
+            -5.034
+          ],
+          [
+            3.469,
+            -5.056
+          ],
+          [
+            4.194,
+            -1.991
+          ],
+          [
+            4.227,
+            3.936
+          ],
+          [
+            -0.128,
+            5.051
+          ],
+          [
+            -2.119,
+            5.056
+          ],
+          [
+            -4.195,
+            1.22
+          ]
+        ]
+      }
     },
     {
       "id": "torre_a",
       "glb": "torre_a.glb",
-      "bytes": 425876,
-      "sha256": "fbfa38048271adc1673ddce7884eb1f2b969196e249555eabcb24d6b2efcecef",
-      "triangles": 8998,
+      "bytes": 391568,
+      "sha256": "dbbf897431efe6d25c2dfef1cfca7ac0ad5e7070e61f1cfd24a8e2e3f29a0b9c",
+      "triangles": 8239,
       "source": {
         "file": "free_fantasy_castle_towers.zip",
         "entry": "Free Fantasy Castle Towers.blend",
@@ -141,21 +417,92 @@
         "title": "Free Fantasy Castle Towers (torre redonda de pedra)"
       },
       "author": null,
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         0.695,
-        0.992,
+        0.925,
         0.696
       ],
-      "extra": {}
+      "extra": {
+        "baseFacesRemoved": 759,
+        "support": "flat",
+        "contactY": 0,
+        "footprint": [
+          [
+            -0.346,
+            -0.009
+          ],
+          [
+            -0.296,
+            -0.165
+          ],
+          [
+            -0.231,
+            -0.249
+          ],
+          [
+            -0.105,
+            -0.316
+          ],
+          [
+            -0.044,
+            -0.331
+          ],
+          [
+            0.075,
+            -0.329
+          ],
+          [
+            0.187,
+            -0.284
+          ],
+          [
+            0.25,
+            -0.206
+          ],
+          [
+            0.276,
+            -0.133
+          ],
+          [
+            0.31,
+            0.095
+          ],
+          [
+            0.286,
+            0.186
+          ],
+          [
+            0.202,
+            0.277
+          ],
+          [
+            0.075,
+            0.331
+          ],
+          [
+            -0.075,
+            0.325
+          ],
+          [
+            -0.263,
+            0.218
+          ],
+          [
+            -0.319,
+            0.133
+          ]
+        ],
+        "stone": true
+      }
     },
     {
       "id": "torre_b",
       "glb": "torre_b.glb",
-      "bytes": 471712,
-      "sha256": "2200f94a95a4dbdc1083d8ef3b33af105d108d9f54854612022321c366b510d1",
-      "triangles": 9000,
+      "bytes": 437448,
+      "sha256": "243d91911e68d99549e333c0517ab9435f6a228a4268095e5fea56ee43dba714",
+      "triangles": 8731,
       "source": {
         "file": "free_fantasy_castle_towers.zip",
         "entry": "Free Fantasy Castle Towers.blend",
@@ -165,21 +512,92 @@
         "title": "Free Fantasy Castle Towers (torre redonda azulada)"
       },
       "author": null,
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         0.621,
-        1.031,
+        0.958,
         0.633
       ],
-      "extra": {}
+      "extra": {
+        "baseFacesRemoved": 269,
+        "support": "flat",
+        "contactY": 0,
+        "footprint": [
+          [
+            -0.304,
+            -0.006
+          ],
+          [
+            -0.286,
+            -0.101
+          ],
+          [
+            -0.212,
+            -0.224
+          ],
+          [
+            -0.126,
+            -0.273
+          ],
+          [
+            -0.008,
+            -0.301
+          ],
+          [
+            0.127,
+            -0.273
+          ],
+          [
+            0.212,
+            -0.223
+          ],
+          [
+            0.287,
+            -0.1
+          ],
+          [
+            0.303,
+            0.011
+          ],
+          [
+            0.287,
+            0.101
+          ],
+          [
+            0.213,
+            0.225
+          ],
+          [
+            0.126,
+            0.275
+          ],
+          [
+            -0.009,
+            0.304
+          ],
+          [
+            -0.127,
+            0.275
+          ],
+          [
+            -0.213,
+            0.225
+          ],
+          [
+            -0.287,
+            0.101
+          ]
+        ],
+        "stone": true
+      }
     },
     {
       "id": "moinho",
       "glb": "moinho.glb",
-      "bytes": 447300,
-      "sha256": "534c64484a55e49429dbfc442df8ca9f81646fdecea8a15d979bb49f0024342d",
-      "triangles": 9997,
+      "bytes": 435916,
+      "sha256": "49bb33ad943a30d77eae35cc3ce157a99a70482e1a3d1c20adcb72997ba4b41f",
+      "triangles": 9969,
       "source": {
         "file": "free_windmills_set.blend",
         "entry": "mesh.003",
@@ -189,14 +607,85 @@
         "title": "Free Windmills Set (moinho com pás)"
       },
       "author": null,
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         8.332,
-        9,
+        8.892,
         11.645
       ],
-      "extra": {}
+      "extra": {
+        "baseFacesRemoved": 28,
+        "support": "flat",
+        "contactY": 0,
+        "footprint": [
+          [
+            -4.166,
+            -5.074
+          ],
+          [
+            -4.116,
+            -5.286
+          ],
+          [
+            -3.923,
+            -5.741
+          ],
+          [
+            -3.667,
+            -5.822
+          ],
+          [
+            -3.178,
+            -5.786
+          ],
+          [
+            2.133,
+            -3.027
+          ],
+          [
+            2.417,
+            -2.874
+          ],
+          [
+            2.611,
+            -2.655
+          ],
+          [
+            4.097,
+            1.024
+          ],
+          [
+            4,
+            1.34
+          ],
+          [
+            2.352,
+            3.846
+          ],
+          [
+            2.253,
+            3.928
+          ],
+          [
+            -1.728,
+            3.911
+          ],
+          [
+            -2.822,
+            3.637
+          ],
+          [
+            -3.064,
+            3.535
+          ],
+          [
+            -3.182,
+            3.33
+          ]
+        ],
+        "stone": true
+      }
     },
     {
       "id": "arvore_marco",
@@ -213,7 +702,7 @@
         "title": "HighPoly Tree Model"
       },
       "author": "Next Spring (https://www.fab.com/sellers/Next%20Spring)",
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         10.885,
@@ -224,6 +713,46 @@
         "lodTriangles": [
           27797,
           6086
+        ],
+        "support": "point",
+        "contactY": 0.325,
+        "footprint": [
+          [
+            -0.846,
+            0.176
+          ],
+          [
+            -0.751,
+            -0.018
+          ],
+          [
+            -0.176,
+            -0.361
+          ],
+          [
+            0.119,
+            -0.432
+          ],
+          [
+            0.24,
+            -0.14
+          ],
+          [
+            0.208,
+            0.615
+          ],
+          [
+            0.03,
+            0.774
+          ],
+          [
+            -0.18,
+            0.692
+          ],
+          [
+            -0.762,
+            0.351
+          ]
         ]
       }
     },
@@ -242,7 +771,7 @@
         "title": "Void Hound"
       },
       "author": null,
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         1.05,
@@ -254,9 +783,9 @@
     {
       "id": "casa_s32_a",
       "glb": "casa_s32_a.glb",
-      "bytes": 417384,
-      "sha256": "d97e190749d9d9f7f9d0374bac83ba770c151bb56273e3f90292b3df20093683",
-      "triangles": 9000,
+      "bytes": 414108,
+      "sha256": "e159291ac614cbf45b4a2f786f58a0fa2fb16633c47192db811af88e6ffeefac",
+      "triangles": 8993,
       "source": {
         "file": "fantasy_architecture_set_32.zip",
         "entry": "fantasy architecture set 32.blend",
@@ -266,21 +795,92 @@
         "title": "Fantasy Architecture Set 32 (casa de telhado vermelho)"
       },
       "author": null,
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         0.922,
-        0.742,
+        0.737,
         0.923
       ],
-      "extra": {}
+      "extra": {
+        "baseFacesRemoved": 7,
+        "support": "flat",
+        "contactY": 0,
+        "footprint": [
+          [
+            -0.461,
+            0.005
+          ],
+          [
+            -0.404,
+            -0.162
+          ],
+          [
+            -0.129,
+            -0.421
+          ],
+          [
+            0.024,
+            -0.461
+          ],
+          [
+            0.162,
+            -0.423
+          ],
+          [
+            0.187,
+            -0.413
+          ],
+          [
+            0.393,
+            -0.135
+          ],
+          [
+            0.442,
+            -0.022
+          ],
+          [
+            0.287,
+            0.313
+          ],
+          [
+            0.218,
+            0.423
+          ],
+          [
+            0.164,
+            0.446
+          ],
+          [
+            0.099,
+            0.46
+          ],
+          [
+            -0.058,
+            0.461
+          ],
+          [
+            -0.378,
+            0.28
+          ],
+          [
+            -0.406,
+            0.223
+          ],
+          [
+            -0.442,
+            0.098
+          ]
+        ],
+        "stone": true
+      }
     },
     {
       "id": "casa_s32_b",
       "glb": "casa_s32_b.glb",
-      "bytes": 378712,
-      "sha256": "ee5d3bc9a6915be640e1fc42144a854e14140929b35da86b41d9d65082f0ad15",
-      "triangles": 9000,
+      "bytes": 372644,
+      "sha256": "3a5e61dfa01c1029b10e6c63db52aeaf8f228d5476aa414eacf139acfe32b4d5",
+      "triangles": 8999,
       "source": {
         "file": "fantasy_architecture_set_32.zip",
         "entry": "fantasy architecture set 32.blend",
@@ -290,21 +890,92 @@
         "title": "Fantasy Architecture Set 32 (casa alta de telhado azul)"
       },
       "author": null,
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         0.837,
-        0.695,
+        0.694,
         0.837
       ],
-      "extra": {}
+      "extra": {
+        "baseFacesRemoved": 1,
+        "support": "flat",
+        "contactY": 0,
+        "footprint": [
+          [
+            -0.418,
+            0.083
+          ],
+          [
+            -0.377,
+            -0.181
+          ],
+          [
+            -0.349,
+            -0.298
+          ],
+          [
+            -0.316,
+            -0.326
+          ],
+          [
+            -0.087,
+            -0.418
+          ],
+          [
+            -0.064,
+            -0.419
+          ],
+          [
+            0.215,
+            -0.287
+          ],
+          [
+            0.263,
+            -0.248
+          ],
+          [
+            0.372,
+            -0.064
+          ],
+          [
+            0.411,
+            0.013
+          ],
+          [
+            0.417,
+            0.17
+          ],
+          [
+            0.397,
+            0.191
+          ],
+          [
+            0.293,
+            0.267
+          ],
+          [
+            -0.016,
+            0.419
+          ],
+          [
+            -0.356,
+            0.351
+          ],
+          [
+            -0.379,
+            0.288
+          ]
+        ],
+        "stone": true
+      }
     },
     {
       "id": "casa_s32_c",
       "glb": "casa_s32_c.glb",
-      "bytes": 424608,
-      "sha256": "3a5b1453b98d7ef5d62286a15a834326a33851a15a0bd9bf123f6f2d8dca3338",
-      "triangles": 8976,
+      "bytes": 422380,
+      "sha256": "748c7d91b4b4e515ef9965bdaa21632a93e1158c0ea15fe655195cf2e49e7d44",
+      "triangles": 8973,
       "source": {
         "file": "fantasy_architecture_set_32.zip",
         "entry": "fantasy architecture set 32.blend",
@@ -314,21 +985,72 @@
         "title": "Fantasy Architecture Set 32 (casa-galpão azul)"
       },
       "author": null,
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         0.684,
-        0.708,
+        0.707,
         0.705
       ],
-      "extra": {}
+      "extra": {
+        "baseFacesRemoved": 3,
+        "support": "flat",
+        "contactY": 0,
+        "footprint": [
+          [
+            -0.342,
+            0.03
+          ],
+          [
+            -0.22,
+            -0.326
+          ],
+          [
+            0.059,
+            -0.352
+          ],
+          [
+            0.31,
+            -0.33
+          ],
+          [
+            0.342,
+            0.254
+          ],
+          [
+            0.334,
+            0.294
+          ],
+          [
+            0.268,
+            0.316
+          ],
+          [
+            -0.085,
+            0.339
+          ],
+          [
+            -0.122,
+            0.331
+          ],
+          [
+            -0.132,
+            0.328
+          ],
+          [
+            -0.33,
+            0.162
+          ]
+        ],
+        "stone": true
+      }
     },
     {
       "id": "casa_pedra",
       "glb": "casa_pedra.glb",
-      "bytes": 500784,
-      "sha256": "7b181e1e8d019e735d1066fe9756c57e0c692a7fa856c9d2a9243583d539896f",
-      "triangles": 9000,
+      "bytes": 461408,
+      "sha256": "f40ca6af367e1027a00219db59b925a247dfbbadb7899fd9e55210e4fac929b4",
+      "triangles": 8976,
       "source": {
         "file": "free_windmills_set.blend",
         "entry": "mesh.002",
@@ -338,21 +1060,92 @@
         "title": "Free Windmills Set (casa de pedra, telhado vermelho)"
       },
       "author": null,
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         1.058,
-        1.042,
+        1.027,
         0.804
       ],
-      "extra": {}
+      "extra": {
+        "baseFacesRemoved": 24,
+        "support": "flat",
+        "contactY": 0,
+        "footprint": [
+          [
+            -0.529,
+            0.193
+          ],
+          [
+            -0.526,
+            -0.085
+          ],
+          [
+            -0.492,
+            -0.157
+          ],
+          [
+            -0.489,
+            -0.16
+          ],
+          [
+            -0.108,
+            -0.361
+          ],
+          [
+            0.399,
+            -0.38
+          ],
+          [
+            0.427,
+            -0.381
+          ],
+          [
+            0.498,
+            -0.344
+          ],
+          [
+            0.528,
+            -0.325
+          ],
+          [
+            0.529,
+            -0.298
+          ],
+          [
+            0.502,
+            0.279
+          ],
+          [
+            0.438,
+            0.329
+          ],
+          [
+            0.392,
+            0.357
+          ],
+          [
+            0.328,
+            0.387
+          ],
+          [
+            -0.527,
+            0.333
+          ],
+          [
+            -0.528,
+            0.333
+          ]
+        ],
+        "stone": true
+      }
     },
     {
       "id": "armazem",
       "glb": "armazem.glb",
-      "bytes": 432328,
-      "sha256": "7321109ca2f95d261bc13873a81d7a8cd33fa65f39d45b0e41f4d801a8ac49e8",
-      "triangles": 9000,
+      "bytes": 421020,
+      "sha256": "e883c3328c032a38ad93b67249efdf4c3e990570b414ebb53ab284cac6fb9573",
+      "triangles": 8650,
       "source": {
         "file": "free_windmills_set.blend",
         "entry": "mesh",
@@ -362,21 +1155,92 @@
         "title": "Free Windmills Set (prédio de pedra e madeira)"
       },
       "author": null,
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         0.885,
-        1.013,
+        0.926,
         0.976
       ],
-      "extra": {}
+      "extra": {
+        "baseFacesRemoved": 350,
+        "support": "flat",
+        "contactY": 0,
+        "footprint": [
+          [
+            -0.39,
+            -0.38
+          ],
+          [
+            -0.381,
+            -0.409
+          ],
+          [
+            -0.35,
+            -0.426
+          ],
+          [
+            -0.131,
+            -0.453
+          ],
+          [
+            0.245,
+            -0.481
+          ],
+          [
+            0.34,
+            -0.473
+          ],
+          [
+            0.414,
+            -0.304
+          ],
+          [
+            0.43,
+            -0.166
+          ],
+          [
+            0.443,
+            0.378
+          ],
+          [
+            0.429,
+            0.44
+          ],
+          [
+            0.4,
+            0.479
+          ],
+          [
+            0.306,
+            0.488
+          ],
+          [
+            0.253,
+            0.486
+          ],
+          [
+            -0.306,
+            0.413
+          ],
+          [
+            -0.342,
+            0.403
+          ],
+          [
+            -0.357,
+            0.382
+          ]
+        ],
+        "stone": true
+      }
     },
     {
       "id": "torre_escombros",
       "glb": "torre_escombros.glb",
-      "bytes": 481744,
-      "sha256": "15c38dafce6e8644b7d83c0d27c9a900a55c50b11e11155c589e4bcee159a728",
-      "triangles": 8973,
+      "bytes": 443628,
+      "sha256": "53b98eab0f6c3f5a1b1d59fcb03025a27ac52fd6c57769e03016de0fcf48a4d4",
+      "triangles": 8822,
       "source": {
         "file": "free_fantasy_castle_towers.zip",
         "entry": "Free Fantasy Castle Towers.blend",
@@ -386,14 +1250,85 @@
         "title": "Free Fantasy Castle Towers (torre com escombros)"
       },
       "author": null,
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         0.699,
-        0.97,
+        0.967,
         0.684
       ],
-      "extra": {}
+      "extra": {
+        "baseFacesRemoved": 151,
+        "support": "flat",
+        "contactY": 0,
+        "footprint": [
+          [
+            -0.346,
+            -0.051
+          ],
+          [
+            -0.211,
+            -0.276
+          ],
+          [
+            -0.113,
+            -0.325
+          ],
+          [
+            -0.052,
+            -0.342
+          ],
+          [
+            0.037,
+            -0.329
+          ],
+          [
+            0.117,
+            -0.297
+          ],
+          [
+            0.236,
+            -0.217
+          ],
+          [
+            0.318,
+            -0.122
+          ],
+          [
+            0.342,
+            -0.081
+          ],
+          [
+            0.35,
+            0.026
+          ],
+          [
+            0.207,
+            0.287
+          ],
+          [
+            0.128,
+            0.312
+          ],
+          [
+            -0.088,
+            0.342
+          ],
+          [
+            -0.13,
+            0.339
+          ],
+          [
+            -0.285,
+            0.196
+          ],
+          [
+            -0.343,
+            0.04
+          ]
+        ],
+        "stone": true
+      }
     },
     {
       "id": "banca",
@@ -417,7 +1352,28 @@
         2.4,
         2.2
       ],
-      "extra": {}
+      "extra": {
+        "support": "flat",
+        "contactY": 0.024,
+        "footprint": [
+          [
+            -1.53,
+            -1.03
+          ],
+          [
+            1.53,
+            -1.03
+          ],
+          [
+            1.53,
+            1.03
+          ],
+          [
+            -1.53,
+            1.03
+          ]
+        ]
+      }
     },
     {
       "id": "doca",
@@ -442,6 +1398,26 @@
         3.04
       ],
       "extra": {
+        "support": "deck",
+        "contactY": 0,
+        "footprint": [
+          [
+            -2.52,
+            -1.52
+          ],
+          [
+            2.52,
+            -1.52
+          ],
+          [
+            2.52,
+            1.52
+          ],
+          [
+            -2.52,
+            1.52
+          ]
+        ],
         "deckY": 2.4299999999999997
       }
     },
@@ -467,7 +1443,56 @@
         3.4,
         2.068
       ],
-      "extra": {}
+      "extra": {
+        "support": "flat",
+        "contactY": 0,
+        "footprint": [
+          [
+            -2.64,
+            -0.559
+          ],
+          [
+            -0.695,
+            -1.034
+          ],
+          [
+            1.839,
+            -0.922
+          ],
+          [
+            2.36,
+            -0.559
+          ],
+          [
+            2.64,
+            -0.069
+          ],
+          [
+            2.64,
+            0.251
+          ],
+          [
+            2.289,
+            0.753
+          ],
+          [
+            0.144,
+            1.034
+          ],
+          [
+            -1.627,
+            0.832
+          ],
+          [
+            -1.864,
+            0.781
+          ],
+          [
+            -2.64,
+            0.441
+          ]
+        ]
+      }
     },
     {
       "id": "muro_b",
@@ -491,7 +1516,36 @@
         3,
         2.457
       ],
-      "extra": {}
+      "extra": {
+        "support": "flat",
+        "contactY": 0,
+        "footprint": [
+          [
+            -2.059,
+            -1.228
+          ],
+          [
+            1.941,
+            -1.228
+          ],
+          [
+            2.059,
+            0.725
+          ],
+          [
+            1.825,
+            1.019
+          ],
+          [
+            -0.859,
+            1.228
+          ],
+          [
+            -2.059,
+            0.772
+          ]
+        ]
+      }
     },
     {
       "id": "arma_espada",
@@ -508,7 +1562,7 @@
         "title": "PP_Theme_11_Sword_One-Handed_003"
       },
       "author": "PurePoly",
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         0.054,
@@ -539,7 +1593,7 @@
         "title": "PP_Theme_11_Axe_One_Handed_002"
       },
       "author": "PurePoly",
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         0.08,
@@ -570,7 +1624,7 @@
         "title": "PP_Theme_03_Hammer_001"
       },
       "author": "PurePoly",
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         0.247,
@@ -599,7 +1653,7 @@
         "title": "PP_Theme_07_Spear_002"
       },
       "author": "PurePoly",
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         0.036,
@@ -629,7 +1683,7 @@
         "title": "PP_Theme_10_Dagger_002"
       },
       "author": "PurePoly",
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         0.041,
@@ -660,7 +1714,7 @@
         "title": "PP_Theme_04_Scythe_001"
       },
       "author": "PurePoly",
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         0.095,
@@ -690,7 +1744,7 @@
         "title": "PP_Theme_02_Bow_001"
       },
       "author": "PurePoly",
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         0.112,
@@ -720,7 +1774,7 @@
         "title": "PP_Theme_02_Fist_Weapon_001"
       },
       "author": "PurePoly",
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         0.063,
@@ -749,7 +1803,7 @@
         "title": "PP_Theme_04_Spellbook_003"
       },
       "author": "PurePoly",
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         0.122,
@@ -778,7 +1832,7 @@
         "title": "PP_Theme_07_Scepter_001"
       },
       "author": "PurePoly",
-      "license": "licença informada pelo usuário (26/09/2026)",
+      "license": "gratuito/licença pública conforme declaração do usuário em 26/09/2026",
       "url": null,
       "size": [
         0.095,

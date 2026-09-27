@@ -18,7 +18,7 @@ import { resolveWorldMaterial } from './world-materials.js';
 import { vnoise } from './noise.js';
 import { forestDensity } from './vegetation-fields.js';
 import { loadWorldGLB } from './runtime-loader.js';
-import { replacedVolume, loadExtraReplacements, EXTRA_STATUS } from './extra-props.js';
+import { replacedVolume, loadExtraReplacements, updateExtraDetail, EXTRA_STATUS } from './extra-props.js';
 import regionPropsBin from '../../assets/world-runtime/region-props.glb';
 import regionWaterBin from '../../assets/world-runtime/region-water.glb';
 import turbulentPropsBin from '../../assets/world-runtime/turbulent-props.glb';
@@ -337,20 +337,19 @@ const DROPPED_WATER = /^REGION_(MainRiver|IrrigationCanal_\d+)$/;
 const LIFTS = new Map(PLACEMENTS.filter((p) => p.lift).map((p) => [p.name, p.lift]));
 
 export async function loadRegionProps(scene) {
-  const replacedNodes = new Map();
   const { root } = await loadWorldGLB(regionPropsBin, {
     resolveMaterial: resolveWorldMaterial,
     onNode: (name, node) => {
       const lift = LIFTS.get(name); if (lift) node.position.y += lift;
       // troca só visual (`extra-props.js`): o nó some, a colisão do manifesto continua
-      if (replacedVolume(name)) { node.visible = false; replacedNodes.set(name, node); EXTRA_STATUS.hidden++; }
+      if (replacedVolume(name)) { node.visible = false; EXTRA_STATUS.hidden++; }
     },
   });
   root.name = 'region-props';
   root.updateMatrixWorld(true);
   scene.add(root);
   WORLD_SCENE.props = root;
-  await loadExtraReplacements(scene, replacedNodes);
+  await loadExtraReplacements(scene);
   const water = await loadWorldGLB(regionWaterBin, { resolveMaterial: resolveWorldMaterial, cast: false });
   // A lâmina plana de 1 km do rio (a 10,1 m, duplicada sob o rio refeito) e os dois canais retos de
   // irrigação, que flutuavam sobre o relevo e entravam numa casa do Vale, saem da cena. A exportação
@@ -391,6 +390,7 @@ const DEFAULT_DETAIL = { tileNear: 260, blockFar: 1400, shadowFar: 90 };
 export function updateWorldDetail(cam, detail = DEFAULT_DETAIL) {
   const near = detail.tileNear ?? DEFAULT_DETAIL.tileNear;
   const blockFar = detail.blockFar ?? DEFAULT_DETAIL.blockFar;
+  updateExtraDetail(cam, detail.extraFar ?? 900);
   for (const b of WORLD_SCENE.blocks) {
     const c = b.userData.center;
     b.visible = Math.hypot(c.x - cam.x, c.z - cam.z) - b.userData.radius < blockFar;

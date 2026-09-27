@@ -21,7 +21,7 @@ export const LEVELS = {
     grass: 1, grassFar: 80,
     vegetation: 1, secondary: 1, vegShadow: true,
     tileNear: 300, blockFar: 1600, shadowSpan: 70, shadowFar: 340, turbFx: 1,
-    natureFar: 360, canopyFar: 700, groundFar: 140,
+    natureFar: 360, canopyFar: 700, groundFar: 140, extraFar: 900,
     treeLod: [28, 65, 150, 700], shrubLod: [22, 50, 360], vegShadowFar: 55, coverRadius: 84, coverDensity: 1,
   },
   media: {
@@ -29,7 +29,7 @@ export const LEVELS = {
     grass: 0.45, grassFar: 64,
     vegetation: 0.72, secondary: 0.85, vegShadow: true,
     tileNear: 200, blockFar: 1100, shadowSpan: 58, shadowFar: 280, turbFx: 0.7,
-    natureFar: 260, canopyFar: 500, groundFar: 100,
+    natureFar: 260, canopyFar: 500, groundFar: 100, extraFar: 650,
     treeLod: [0, 45, 120, 520], shrubLod: [0, 40, 260], vegShadowFar: 45, coverRadius: 68, coverDensity: 0.6,
   },
   baixa: {
@@ -37,7 +37,7 @@ export const LEVELS = {
     grass: 0.20, grassFar: 45,
     vegetation: 0.45, secondary: 0.65, vegShadow: false,
     tileNear: 130, blockFar: 700, shadowSpan: 46, shadowFar: 220, turbFx: 0.4,
-    natureFar: 180, canopyFar: 350, groundFar: 70,
+    natureFar: 180, canopyFar: 350, groundFar: 70, extraFar: 450,
     treeLod: [0, 0, 70, 380], shrubLod: [0, 0, 180], vegShadowFar: 0, coverRadius: 48, coverDensity: 0.35,
   },
 };

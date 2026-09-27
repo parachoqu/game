@@ -112,7 +112,7 @@ function buildAlto() {
   stallCloths.forEach((c, i) => {
     const x = base.x + (i - 0.5) * 11, z = base.z + 7;
     // banca do kit Kenney com o telhado na cor do tecido; sem o modelo, a barraca procedural
-    const banca = extraModel('banca', { w: 3.3, d: 2.5, tint: c });
+    const banca = extraModel('banca', { w: 3.3, d: 2.5, tint: c, x, z, yaw: 0 });
     place(banca || PR.stall(c), x, z, 0, { hw: 1.6, hd: 1.3 }, !!banca);
     addNpc({ x, z: z - 1.6, yaw: 0, race: ['elfo', 'humano'][i % 2], cloth: c, role: 'merchant', face: true });
   });
@@ -144,7 +144,7 @@ function buildPassage() {
   const v = LOC.vigia;
   // torre com escombros no lugar da ruína procedural (mesmo colisor); os modelos texturizados ficam
   // fora da junção de malhas estáticas, que só guarda posição, normal e cor
-  const torre = extraModel('torre_escombros', { w: 4.4, d: 4.4, fit: 'redonda' });
+  const torre = extraModel('torre_escombros', { w: 4.4, d: 4.4, fit: 'redonda', x: v.x, z: v.z, yaw: Math.PI / 2 });
   place(torre || PR.watchtowerRuin(), v.x, v.z, Math.PI / 2, { hw: 2.2, hd: 2.2 }, !!torre);
   interactable('vigia', v.x + 3.4, v.z, 3.4, 'Registrar o movimento na Passagem');
 

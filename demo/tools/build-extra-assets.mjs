@@ -7,7 +7,9 @@
 // Os originais são lidos e nunca alterados. Cada um passa por: extração num temporário do sistema;
 // conversão (FBX2glTF para FBX; Blender em segundo plano para .blend; o leitor USD do three.js para
 // USDZ); transformação assada, metros, Y para cima, frente para +Z, base na origem; redução de malha
-// (meshoptimizer); texturas em WebP no tamanho do jogo; compressão meshopt. As armas perdem a paleta
+// (meshoptimizer); assentamento (plano de contato da base, base aplanada e normais refeitas, pegada
+// da base no manifesto); materiais opacos com uma face e pedra fosca sem metal; recortes ladrilháveis
+// para o tabuleiro das pontes; texturas em WebP no tamanho do jogo; compressão meshopt. As armas perdem a paleta
 // (que não veio no pacote) e ganham zonas nomeadas (lâmina, guarda, cabo…) que o jogo pinta com as
 // cores e superfícies das armas atuais.
 //
@@ -43,13 +45,16 @@ const round = (v, n = 3) => Math.round(v * 10 ** n) / 10 ** n;
 const KB = (n) => `${(n / 1024).toFixed(0)} KB`;
 
 // ---------------------------------------------------------------- catálogo
-const USER = { author: null, license: 'licença informada pelo usuário (26/09/2026)' };
+const USER = { author: null, license: 'gratuito/licença pública conforme declaração do usuário em 26/09/2026' };
 const PIGCRAFT = { author: 'Pigcraft (https://sketchfab.com/s8819296)', license: 'CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)' };
 
-const SET32 = { file: 'fantasy_architecture_set_32.zip', blend: 'fantasy architecture set 32.blend', tris: 9000, tex: 1024, ...USER };
+// `stone`: pedra fosca e sem metal; `cleanBase`: base aplanada no plano de contato; `support`: como o
+// jogo assenta o modelo ('flat' base plana, 'point' tronco, 'bridge' e 'deck' datum funcional)
+const BUILDING = { stone: true, cleanBase: true, support: 'flat' };
+const SET32 = { file: 'fantasy_architecture_set_32.zip', blend: 'fantasy architecture set 32.blend', tris: 9000, tex: 1024, ...BUILDING, ...USER };
 const KENNEY = {
   file: 'kenney_retro-fantasy-kit.zip', author: 'Kenney (https://kenney.nl)', license: 'CC0-1.0 (https://creativecommons.org/publicdomain/zero/1.0/)',
-  url: 'https://kenney.nl/assets', tex: 64,
+  url: 'https://kenney.nl/assets', tex: 64, support: 'flat',
 };
 const KENNEY_DIR = 'Models/GLB format/';
 
@@ -105,31 +110,35 @@ const CH = {
 // arquivo e o jogo encaixa o modelo na caixa do volume que ele substitui.
 const ASSETS = [
   { id: 'ponte_pedra', title: 'Stone Bridge', file: 'stone-bridge.zip', fbx: 'source/StoneBridge.fbx', texDir: 'textures/',
-    texFor: (mat, f) => f.startsWith(`StoneBridge_${mat}_`), tris: 22000, tex: 1024, deck: 'Stone_Road_Material', ...USER },
-  { id: 'ponte_quebrada', title: 'Ruined Stone Bridge, Broken Arch', file: 'ruined_stone_bridge_broken_arch.glb', blender: true, tris: 15000, tex: 1024, height: 9,
+    texFor: (mat, f) => f.startsWith(`StoneBridge_${mat}_`), tris: 22000, tex: 1024, deck: 'Stone_Road_Material', stone: true, support: 'bridge',
+    // fiadas de cantaria (faixa de cima do atlas das lajes) e o piso da própria pista (metade de cima
+    // do atlas da pista, sem as bordas escuras do recorte)
+    roadway: { cantaria: { from: 'Slab_Stone_Material', crop: [0.01, 0.01, 0.94, 0.2] }, calcamento: { from: 'Stone_Road_Material', crop: [0.06, 0.05, 0.94, 0.55] } },
+    ...USER },
+  { id: 'ponte_quebrada', title: 'Ruined Stone Bridge, Broken Arch', file: 'ruined_stone_bridge_broken_arch.glb', blender: true, tris: 15000, tex: 1024, height: 9, ...BUILDING,
     url: 'https://sketchfab.com/3d-models/ruined-stone-bridge-broken-arch-57fa861b90ff4793bccf7930a43c8bd0', ...PIGCRAFT },
-  { id: 'poco', title: 'Medieval Stone Well - Game Prop', file: 'medieval_stone_well_-_game_prop.glb', blender: true, tris: 6000, tex: 1024, height: 2.6,
+  { id: 'poco', title: 'Medieval Stone Well - Game Prop', file: 'medieval_stone_well_-_game_prop.glb', blender: true, tris: 6000, tex: 1024, height: 2.6, ...BUILDING,
     url: 'https://sketchfab.com/3d-models/medieval-stone-well-game-prop-a0ca279889b84afb9f24b88bff9c6860', ...PIGCRAFT },
-  { id: 'casa_palha', title: 'Medieval Straw House', file: 'medieval-straw-house.zip', usdz: 'source/haus.usdz', tris: 13000, tex: 1024, ...USER },
+  { id: 'casa_palha', title: 'Medieval Straw House', file: 'medieval-straw-house.zip', usdz: 'source/haus.usdz', tris: 13000, tex: 1024, cleanBase: true, support: 'flat', ...USER },
   { id: 'ferraria', title: 'The Blacksmiths', file: 'the-blacksmiths.zip', fbx: 'source/Blacksmith.fbx', texDir: 'textures/',
-    texFor: (mat, f) => f.startsWith(`${mat}_`) || (mat === 'GroundMat' && /^Ground_opacity/i.test(f)), tris: 17000, tex: 1024, ...USER },
-  { id: 'torre_a', title: 'Free Fantasy Castle Towers (torre redonda de pedra)', file: 'free_fantasy_castle_towers.zip', blend: 'Free Fantasy Castle Towers.blend', object: 'mesh_0', tris: 9000, tex: 1024, ...USER },
-  { id: 'torre_b', title: 'Free Fantasy Castle Towers (torre redonda azulada)', file: 'free_fantasy_castle_towers.zip', blend: 'Free Fantasy Castle Towers.blend', object: 'mesh_3', tris: 9000, tex: 1024, ...USER },
-  { id: 'moinho', title: 'Free Windmills Set (moinho com pás)', file: 'free_windmills_set.blend', object: 'mesh.003', tris: 10000, tex: 1024, height: 9, ...USER },
+    texFor: (mat, f) => f.startsWith(`${mat}_`) || (mat === 'GroundMat' && /^Ground_opacity/i.test(f)), tris: 17000, tex: 1024, cleanBase: true, support: 'flat', ...USER },
+  { id: 'torre_a', title: 'Free Fantasy Castle Towers (torre redonda de pedra)', file: 'free_fantasy_castle_towers.zip', blend: 'Free Fantasy Castle Towers.blend', object: 'mesh_0', tris: 9000, tex: 1024, ...BUILDING, ...USER },
+  { id: 'torre_b', title: 'Free Fantasy Castle Towers (torre redonda azulada)', file: 'free_fantasy_castle_towers.zip', blend: 'Free Fantasy Castle Towers.blend', object: 'mesh_3', tris: 9000, tex: 1024, ...BUILDING, ...USER },
+  { id: 'moinho', title: 'Free Windmills Set (moinho com pás)', file: 'free_windmills_set.blend', object: 'mesh.003', tris: 10000, tex: 1024, height: 9, ...BUILDING, ...USER },
   { id: 'arvore_marco', title: 'HighPoly Tree Model', file: 'highpoly_tree_model.zip', fbx: 'HighPoly Tree Model/Model/SM_HP_Tree.FBX', texDir: 'HighPoly Tree Model/Textures/',
-    texFor: (mat, f) => (/Trunk/i.test(mat) ? /Trunk/i.test(f) : /Leaf/i.test(f)), lods: [1, 0.22], tex: 1024, height: 16.5,
+    texFor: (mat, f) => (/Trunk/i.test(mat) ? /Trunk/i.test(f) : /Leaf/i.test(f)), lods: [1, 0.22], tex: 1024, height: 16.5, support: 'point',
     ...USER, author: 'Next Spring (https://www.fab.com/sellers/Next%20Spring)' },
-  { id: 'cao_vazio', title: 'Void Hound', file: 'void_hound.glb', blender: true, tris: 15000, tex: 1024, ...USER },
+  { id: 'cao_vazio', title: 'Void Hound', file: 'void_hound.glb', blender: true, tris: 15000, tex: 1024, keepSides: true, ...USER },
   // construções do Vale: as três casas do conjunto 32 e duas peças que sobraram do conjunto de moinhos
   { id: 'casa_s32_a', title: 'Fantasy Architecture Set 32 (casa de telhado vermelho)', object: 'mesh', ...SET32 },
   { id: 'casa_s32_b', title: 'Fantasy Architecture Set 32 (casa alta de telhado azul)', object: 'mesh.001', ...SET32 },
   { id: 'casa_s32_c', title: 'Fantasy Architecture Set 32 (casa-galpão azul)', object: 'mesh.002', ...SET32 },
-  { id: 'casa_pedra', title: 'Free Windmills Set (casa de pedra, telhado vermelho)', file: 'free_windmills_set.blend', object: 'mesh.002', tris: 9000, tex: 1024, ...USER },
-  { id: 'armazem', title: 'Free Windmills Set (prédio de pedra e madeira)', file: 'free_windmills_set.blend', object: 'mesh', tris: 9000, tex: 1024, ...USER },
-  { id: 'torre_escombros', title: 'Free Fantasy Castle Towers (torre com escombros)', file: 'free_fantasy_castle_towers.zip', blend: 'Free Fantasy Castle Towers.blend', object: 'mesh_1', tris: 9000, tex: 1024, ...USER },
+  { id: 'casa_pedra', title: 'Free Windmills Set (casa de pedra, telhado vermelho)', file: 'free_windmills_set.blend', object: 'mesh.002', tris: 9000, tex: 1024, ...BUILDING, ...USER },
+  { id: 'armazem', title: 'Free Windmills Set (prédio de pedra e madeira)', file: 'free_windmills_set.blend', object: 'mesh', tris: 9000, tex: 1024, ...BUILDING, ...USER },
+  { id: 'torre_escombros', title: 'Free Fantasy Castle Towers (torre com escombros)', file: 'free_fantasy_castle_towers.zip', blend: 'Free Fantasy Castle Towers.blend', object: 'mesh_1', tris: 9000, tex: 1024, ...BUILDING, ...USER },
   // montagens com peças do kit Kenney (1 unidade = 1 ladrilho do kit; o jogo encaixa na caixa do volume)
-  { id: 'banca', title: 'Retro Fantasy Kit: banca de mercado', kit: BANCA, tint: 'roof', ...KENNEY },
-  { id: 'doca', title: 'Retro Fantasy Kit: cais de madeira', kit: DOCA, deckTop: DOCA_PISO, ...KENNEY },
+  { id: 'banca', title: 'Retro Fantasy Kit: banca de mercado', kit: BANCA, tint: 'roof', doubleSided: ['telhado'], ...KENNEY },
+  { id: 'doca', title: 'Retro Fantasy Kit: cais de madeira', kit: DOCA, deckTop: DOCA_PISO, ...KENNEY, support: 'deck' },
   { id: 'muro_a', title: 'Retro Fantasy Kit: muro fortificado em ruína', kit: MURO_A, ...KENNEY },
   { id: 'muro_b', title: 'Retro Fantasy Kit: canto de muro em ruína', kit: MURO_B, ...KENNEY },
 ];
@@ -285,6 +294,196 @@ function normalize(doc, spec) {
   const s = spec.height ? spec.height / b.size[1] : 1;
   moveScale(doc, [(b.mn[0] + b.mx[0]) / 2, b.mn[1], (b.mn[2] + b.mx[2]) / 2], s);
   return bounds(doc);
+}
+
+// ---------------------------------------------------------------- assentamento
+// O menor vértice raramente é a base: pedras soltas, pontas de entulho e as faces serrilhadas que os
+// geradores deixam por baixo ficam abaixo da fundação visível. O plano de contato é a mediana (por
+// área) da altura das faces voltadas para baixo na faixa inferior do modelo; sem faces assim (fundo
+// aberto), o 20º percentil dos vértices da faixa. A pegada é o contorno convexo (XZ) do que fica até
+// um pouco acima desse plano — a base, sem beirais nem pás.
+function trianglesOf(prim) {
+  const pos = prim.getAttribute('POSITION'), idx = prim.getIndices()?.getArray();
+  const n = idx ? idx.length : pos.getCount();
+  return { pos, idx, n };
+}
+function contactPlane(doc) {
+  const b = bounds(doc), h = b.size[1], top = b.mn[1] + 0.12 * h;
+  const A = [0, 0, 0], B = [0, 0, 0], C = [0, 0, 0];
+  const down = [], ys = [];
+  for (const mesh of doc.getRoot().listMeshes()) for (const p of mesh.listPrimitives()) {
+    if (/_L1$/.test(mesh.getName())) continue;
+    const { pos, idx, n } = trianglesOf(p);
+    for (let i = 0; i < n; i += 3) {
+      pos.getElement(idx ? idx[i] : i, A); pos.getElement(idx ? idx[i + 1] : i + 1, B); pos.getElement(idx ? idx[i + 2] : i + 2, C);
+      const cy = (A[1] + B[1] + C[1]) / 3;
+      if (cy > top) continue;
+      const ux = B[0] - A[0], uz = B[2] - A[2], wx = C[0] - A[0], wz = C[2] - A[2];
+      const ny = (uz * wx - ux * wz) / 2;   // área projetada com sinal (negativa = face para baixo)
+      if (ny < 0) down.push([cy, -ny]);
+      ys.push(A[1], B[1], C[1]);
+    }
+  }
+  const total = down.reduce((s, [, a]) => s + a, 0);
+  if (total > 1e-6 * b.size[0] * b.size[2]) {
+    down.sort((p, q) => p[0] - q[0]);
+    let acc = 0;
+    for (const [y, a] of down) { acc += a; if (acc >= total / 2) return y; }
+  }
+  ys.sort((p, q) => p - q);
+  return ys.length ? ys[Math.floor(0.2 * (ys.length - 1))] : b.mn[1];
+}
+
+// Aplana a base: o que desce abaixo do plano sobe até ele (some o serrilhado); as faces que ficam
+// deitadas no plano e viradas para baixo (nunca vistas com o modelo assentado) e os triângulos que
+// ficaram sem área saem. As normais são refeitas depois.
+function flattenBase(doc, y0) {
+  for (const a of positions(doc)) for (let i = 0; i < a.getCount(); i++) {
+    const v = a.getElement(i, [0, 0, 0]);
+    if (v[1] < y0) { v[1] = y0; a.setElement(i, v); }
+  }
+  const A = [0, 0, 0], B = [0, 0, 0], C = [0, 0, 0], eps = 1e-5;
+  let removed = 0;
+  for (const mesh of doc.getRoot().listMeshes()) for (const p of mesh.listPrimitives()) {
+    const { pos, idx } = trianglesOf(p);
+    if (!idx) continue;
+    const keep = [];
+    for (let i = 0; i < idx.length; i += 3) {
+      pos.getElement(idx[i], A); pos.getElement(idx[i + 1], B); pos.getElement(idx[i + 2], C);
+      const ux = B[0] - A[0], uy = B[1] - A[1], uz = B[2] - A[2], wx = C[0] - A[0], wy = C[1] - A[1], wz = C[2] - A[2];
+      const nx = uy * wz - uz * wy, ny = uz * wx - ux * wz, nz = ux * wy - uy * wx;
+      const area2 = Math.hypot(nx, ny, nz);
+      const flat = A[1] < y0 + eps && B[1] < y0 + eps && C[1] < y0 + eps;
+      if (area2 < 1e-10 || (flat && ny <= 0)) { removed++; continue; }
+      keep.push(idx[i], idx[i + 1], idx[i + 2]);
+    }
+    if (keep.length !== idx.length) p.setIndices(p.getIndices().clone().setArray(new Uint32Array(keep)));
+  }
+  return removed;
+}
+
+// Normais refeitas depois de aplanar a base, sem desfazer os índices: cada vértice soma as faces
+// (por área) que tocam a mesma posição e cuja normal não se afasta mais de ~60° da normal que ele já
+// tinha — costuras de UV continuam lisas e as arestas vivas continuam vivas.
+function smoothNormals(doc) {
+  const COS = 0.5, A = [0, 0, 0], B = [0, 0, 0], C = [0, 0, 0];
+  const done = new Set();
+  for (const mesh of doc.getRoot().listMeshes()) for (const p of mesh.listPrimitives()) {
+    const pos = p.getAttribute('POSITION'), nor = p.getAttribute('NORMAL'), idx = p.getIndices()?.getArray();
+    if (!pos || !idx || !nor || done.has(nor)) continue;
+    done.add(nor);
+    const n = pos.getCount(), key = new Array(n), faces = new Map(), v = [0, 0, 0];
+    for (let i = 0; i < n; i++) { pos.getElement(i, v); key[i] = `${Math.round(v[0] * 1e5)},${Math.round(v[1] * 1e5)},${Math.round(v[2] * 1e5)}`; }
+    for (let i = 0; i < idx.length; i += 3) {
+      pos.getElement(idx[i], A); pos.getElement(idx[i + 1], B); pos.getElement(idx[i + 2], C);
+      const ux = B[0] - A[0], uy = B[1] - A[1], uz = B[2] - A[2], wx = C[0] - A[0], wy = C[1] - A[1], wz = C[2] - A[2];
+      const nx = uy * wz - uz * wy, ny = uz * wx - ux * wz, nz = ux * wy - uy * wx;
+      for (let k = 0; k < 3; k++) {
+        const kk = key[idx[i + k]];
+        if (!faces.has(kk)) faces.set(kk, []);
+        faces.get(kk).push([nx, ny, nz]);
+      }
+    }
+    const out = nor.clone(), o = [0, 0, 0];
+    for (let i = 0; i < n; i++) {
+      nor.getElement(i, o);
+      let sx = 0, sy = 0, sz = 0;
+      for (const [nx, ny, nz] of faces.get(key[i]) || []) {
+        const l = Math.hypot(nx, ny, nz) || 1;
+        if ((nx * o[0] + ny * o[1] + nz * o[2]) / l < COS) continue;
+        sx += nx; sy += ny; sz += nz;
+      }
+      const l = Math.hypot(sx, sy, sz);
+      if (l > 1e-12) out.setElement(i, [sx / l, sy / l, sz / l]);
+    }
+    for (const q of mesh.listPrimitives()) if (q.getAttribute('NORMAL') === nor) q.setAttribute('NORMAL', out);
+  }
+}
+
+// contorno convexo (cadeia monótona) e simplificação até `max` pontos, tirando o ponto que menos área perde
+function convexHull(pts) {
+  const P = [...pts].sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const lo = [], hi = [];
+  for (const p of P) { while (lo.length >= 2 && cross(lo.at(-2), lo.at(-1), p) <= 0) lo.pop(); lo.push(p); }
+  for (const p of P.reverse()) { while (hi.length >= 2 && cross(hi.at(-2), hi.at(-1), p) <= 0) hi.pop(); hi.push(p); }
+  return lo.slice(0, -1).concat(hi.slice(0, -1));
+}
+function simplifyHull(h, max) {
+  const H = [...h];
+  while (H.length > max) {
+    let best = -1, bestA = Infinity;
+    for (let i = 0; i < H.length; i++) {
+      const a = H[(i + H.length - 1) % H.length], b = H[i], c = H[(i + 1) % H.length];
+      const area = Math.abs((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]));
+      if (area < bestA) { bestA = area; best = i; }
+    }
+    H.splice(best, 1);
+  }
+  return H;
+}
+function footprintAt(doc, y0, band) {
+  const pts = [], v = [0, 0, 0];
+  for (const mesh of doc.getRoot().listMeshes()) {
+    if (/_L1$/.test(mesh.getName())) continue;
+    for (const p of mesh.listPrimitives()) {
+      const a = p.getAttribute('POSITION');
+      for (let i = 0; i < a.getCount(); i++) { a.getElement(i, v); if (v[1] <= y0 + band) pts.push([v[0], v[2]]); }
+    }
+  }
+  return simplifyHull(convexHull(pts), 16).map(([x, z]) => [round(x), round(z)]);
+}
+
+// Pedra não é metal: o canal azul (metal) do mapa zera e o verde (aspereza) ganha um piso. Cada
+// textura é tratada uma vez, mesmo quando dois materiais a usam.
+async function stoneMaterials(doc, floor = 0.62) {
+  const done = new Set();
+  for (const m of doc.getRoot().listMaterials()) {
+    if (m.getAlphaMode() !== 'OPAQUE') continue;
+    m.setMetallicFactor(0);
+    const t = m.getMetallicRoughnessTexture();
+    if (!t) { m.setRoughnessFactor(Math.max(0.85, m.getRoughnessFactor())); continue; }
+    m.setRoughnessFactor(1);
+    if (done.has(t)) continue;
+    done.add(t);
+    const { data, info } = await sharp(t.getImage()).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    const g0 = Math.round(floor * 255);
+    for (let i = 0; i < data.length; i += 4) { data[i + 1] = g0 + Math.round(data[i + 1] * (1 - floor)); data[i + 2] = 0; }
+    t.setImage(await sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } }).removeAlpha().png().toBuffer()).setMimeType('image/png');
+  }
+}
+
+// Recortes ladrilháveis das texturas da própria ponte, para o tabuleiro plano que o jogo monta por
+// cima do arco (`extra-props.js`). Viram dois materiais presos a uma amostra mínima, que o jogo tira
+// da cena ao carregar.
+async function roadwayMaterials(doc, spec) {
+  const mats = new Map(doc.getRoot().listMaterials().map((m) => [m.getName(), m]));
+  const holder = doc.getRoot().getDefaultScene().listChildren()[0];
+  const mesh = doc.createMesh('_amostras');
+  const buffer = doc.getRoot().listBuffers()[0];
+  for (const [name, { from, crop }] of Object.entries(spec.roadway)) {
+    const src = mats.get(from);
+    if (!src) throw new Error(`${spec.id}: material ${from} ausente para o recorte ${name}`);
+    const cut = async (tex) => {
+      const img = sharp(tex.getImage()), meta = await img.metadata();
+      const [x0, y0, x1, y1] = crop;
+      const left = Math.round(x0 * meta.width), top = Math.round(y0 * meta.height);
+      return img.extract({ left, top, width: Math.round((x1 - x0) * meta.width), height: Math.round((y1 - y0) * meta.height) }).png().toBuffer();
+    };
+    const mat = doc.createMaterial(name).setMetallicFactor(0).setRoughnessFactor(0.92).setDoubleSided(false);
+    mat.setBaseColorTexture(doc.createTexture(`${name}_cor`).setImage(await cut(src.getBaseColorTexture())).setMimeType('image/png'));
+    if (src.getNormalTexture()) mat.setNormalTexture(doc.createTexture(`${name}_normal`).setImage(await cut(src.getNormalTexture())).setMimeType('image/png'));
+    for (const info of [mat.getBaseColorTextureInfo(), mat.getNormalTextureInfo()]) {
+      info?.setWrapS(TextureInfo.WrapMode.MIRRORED_REPEAT).setWrapT(TextureInfo.WrapMode.MIRRORED_REPEAT);
+    }
+    const tri = (arr, type) => doc.createAccessor().setType(type).setArray(arr).setBuffer(buffer);
+    mesh.addPrimitive(doc.createPrimitive().setMaterial(mat)
+      .setAttribute('POSITION', tri(new Float32Array([0, 0.01, 0, 0.001, 0.01, 0, 0, 0.01, 0.001]), 'VEC3'))
+      .setAttribute('NORMAL', tri(new Float32Array([0, 1, 0, 0, 1, 0, 0, 1, 0]), 'VEC3'))
+      .setAttribute('TEXCOORD_0', tri(new Float32Array([0, 0, 1, 0, 0, 1]), 'VEC2'))
+      .setIndices(tri(new Uint32Array([0, 2, 1]), 'SCALAR')));
+  }
+  holder.addChild(doc.createNode('_amostras').setMesh(mesh));
 }
 
 async function reduce(doc, target, error = 0.01) {
@@ -589,17 +788,45 @@ async function buildAsset(spec) {
     normalize(doc, spec);
     dbg('normalizado');
   }
+  // assentamento: plano de contato, base aplanada e pegada da base (unidades do modelo, base em y = 0)
+  if (spec.support) {
+    let contactY = contactPlane(doc);
+    if (spec.cleanBase) {
+      extra.baseFacesRemoved = flattenBase(doc, contactY);
+      smoothNormals(doc);
+      normalize(doc, { height: 0 });   // a base aplanada vira y = 0, sem mudar a escala
+      contactY = 0;
+    }
+    const h = bounds(doc).size[1];
+    extra.support = spec.support;
+    extra.contactY = round(contactY);
+    extra.footprint = footprintAt(doc, contactY, Math.max(0.06 * h, spec.support === 'point' ? 0.04 * h : 0));
+  }
+  // materiais opacos com uma face só: a segunda face mostrava o avesso serrilhado das bases
+  if (!spec.keepSides) {
+    for (const m of doc.getRoot().listMaterials()) {
+      if (m.getAlphaMode() === 'OPAQUE' && !(spec.doubleSided || []).includes(m.getName())) m.setDoubleSided(false);
+    }
+  }
+  if (spec.stone) { await stoneMaterials(doc); extra.stone = true; }
+  if (spec.roadway) await roadwayMaterials(doc, spec);
   if (spec.deckTop) extra.deckY = spec.deckTop;   // piso da doca: a montagem já nasce com a base em y = 0
   if (spec.deck) {
     // altura do piso da ponte: topo do material da pista no terço central do comprimento
     const b = bounds(doc), long = b.size[0] >= b.size[2] ? 0 : 2, v = [0, 0, 0];
-    let top = -Infinity;
+    let top = -Infinity, c0 = Infinity, c1 = -Infinity;
+    const cross = long === 0 ? 2 : 0;
     for (const mesh of doc.getRoot().listMeshes()) for (const p of mesh.listPrimitives()) {
       if (p.getMaterial()?.getName() !== spec.deck) continue;
       const a = p.getAttribute('POSITION');
-      for (let i = 0; i < a.getCount(); i++) { a.getElement(i, v); if (Math.abs(v[long]) < b.size[long] / 6 && v[1] > top) top = v[1]; }
+      for (let i = 0; i < a.getCount(); i++) {
+        a.getElement(i, v);
+        if (Math.abs(v[long]) < b.size[long] / 6 && v[1] > top) top = v[1];
+        c0 = Math.min(c0, v[cross]); c1 = Math.max(c1, v[cross]);
+      }
     }
     extra.deckY = round(top);
+    extra.roadHalf = round((c1 - c0) / 2);   // meia-largura da pista (unidades do modelo)
     extra.longAxis = long === 0 ? 'x' : 'z';
   }
   const info = { srcSha, srcTris, tris: triCount(doc), bounds: bounds(doc), extra };
@@ -642,7 +869,8 @@ async function main() {
       const t0 = Date.now();
       const entry = spec.src ? await buildWeapon(spec) : await buildAsset(spec);
       byId.set(entry.id, entry);
-      console.log(`✓ ${entry.id.padEnd(15)} ${String(entry.source.triangles).padStart(8)} → ${String(entry.triangles).padStart(6)} tri  ${entry.size.join(' × ')} m  ${KB(entry.bytes)}  ${((Date.now() - t0) / 1000).toFixed(0)} s`);
+      const seat = entry.extra.support ? `  ${entry.extra.support}${entry.extra.baseFacesRemoved ? `, base −${entry.extra.baseFacesRemoved} faces` : ''}, pegada ${entry.extra.footprint.length} pts` : '';
+      console.log(`✓ ${entry.id.padEnd(15)} ${String(entry.source.triangles).padStart(8)} → ${String(entry.triangles).padStart(6)} tri  ${entry.size.join(' × ')} m  ${KB(entry.bytes)}  ${((Date.now() - t0) / 1000).toFixed(0)} s${seat}`);
     } catch (err) {
       failures.push(`${spec.id}: ${err.message}`);
       console.error(`✗ ${spec.id}: ${err.message}`);

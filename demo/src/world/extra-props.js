@@ -2,47 +2,23 @@
 //
 // Troca visual: o nó do `region-props.glb` fica invisível e o modelo novo entra na mesma caixa medida
 // no manifesto. Colisão, tabuleiro das pontes, rampas e parapeitos continuam vindo do manifesto
-// (`world-colliders.js`) — nada aqui muda por onde o jogador anda.
-//   'caixa'   casas, oficina, bancas e ruínas: escala uniforme para caber na pegada (sem passar de 1,6×
-//             a altura antiga), frente virada para o lado em que a fachada original estava (posição do
-//             nó _Facade em relação ao _Rear) ou para `yaw`, nos volumes de nó único
-//   'redonda' torres: o diâmetro do modelo vira o diâmetro do colisor redondo
-//   'ponte'   comprimento e largura casados com a caixa; o piso da pista na altura do tabuleiro
-//   'doca'    escala da pegada; o piso de tábuas na altura do piso do cais antigo (`deck`)
-// `tint` pinta o telhado das bancas com o tecido que o mercado já usava.
+// (`world-colliders.js`) — nada aqui muda por onde o jogador anda. Escala, giro e pegada vêm de
+// `extra-seat.js` (a mesma conta usada pelas clareiras da vegetação).
+//
+// Assentamento: cada modelo traz no manifesto o plano de contato da base e a pegada. A altura sai do
+// chão amostrado sob a pegada (não do vértice mais baixo nem de nove pontos num raio arbitrário), com
+// um embutimento pequeno; onde o chão cai abaixo desse datum, a base desce até ele (fundação), e nada
+// flutua. Pontes e doca mantêm o datum funcional (tabuleiro, piso do cais).
 import * as THREE from 'three';
 import { EXTRA_BINS, EXTRA_META } from '../engine/extra-assets.js';
 import { parseSceneGLB } from './runtime-loader.js';
 import { patchOcclusion } from './world-materials.js';
-import { PLACEMENTS } from './runtime-manifest.js';
-import { PLAN_Z_SIGN } from './coordinates.js';
 import { EXTRA_SPOTS } from './extra-spots.js';
 import { regionHeightAt } from './heightfield.js';
+import { REPLACEMENTS, replacementFit, additionFit, seatOf, EMBED, bridgeFrame } from './extra-seat.js';
+import { buildRoadway } from './bridge-roadway.js';
 
-export const REPLACEMENTS = [
-  { asset: 'ponte_pedra', volume: 'Bridge_Main', fit: 'ponte' },
-  { asset: 'ferraria', volume: 'SouthWorkshop', fit: 'caixa' },
-  { asset: 'casa_palha', volume: 'NorthHouse_01', fit: 'caixa' },
-  { asset: 'casa_palha', volume: 'NorthHouse_02', fit: 'caixa' },
-  { asset: 'casa_palha', volume: 'NorthHouse_03', fit: 'caixa' },
-  { asset: 'torre_a', volume: 'SouthOutpost_Tower', fit: 'redonda' },
-  { asset: 'torre_b', volume: 'NorthOutpost_Tower', fit: 'redonda' },
-  // Vale: casas, armazém, estábulo, mercado e doca
-  { asset: 'casa_s32_b', volume: 'SouthHouse_01', fit: 'caixa' },
-  { asset: 'casa_s32_c', volume: 'SouthHouse_02', fit: 'caixa' },
-  { asset: 'casa_pedra', volume: 'SouthHouse_03', fit: 'caixa' },
-  { asset: 'casa_s32_a', volume: 'SouthHouse_04', fit: 'caixa' },
-  { asset: 'armazem', volume: 'SouthWarehouse', fit: 'caixa' },
-  { asset: 'casa_palha', volume: 'SouthStable', fit: 'caixa', yaw: -Math.PI / 2 },   // porta para oeste, onde fica o cuidador
-  { asset: 'banca', volume: 'SouthMarket_01', fit: 'caixa', yaw: 0, tint: '#b24a3a' },   // PR.COL.tecido1
-  { asset: 'banca', volume: 'SouthMarket_02', fit: 'caixa', yaw: 0, tint: '#3e7a9a' },   // PR.COL.tecido3
-  { asset: 'doca', volume: 'SouthOutpost_Dock', fit: 'doca', yaw: 0, deck: 11 },   // topo das tábuas do cais antigo
-  { asset: 'ponte_pedra', volume: 'Bridge_Minor', fit: 'ponte' },
-  // Ermos: muros do kit Kenney e a torre com escombros
-  { asset: 'muro_a', volume: 'Wastes_Ruin_01', fit: 'caixa', yaw: 0 },
-  { asset: 'muro_b', volume: 'Wastes_Ruin_02', fit: 'caixa', yaw: 0 },
-  { asset: 'torre_escombros', volume: 'Wastes_Ruin_03', fit: 'redonda' },
-];
+export { REPLACEMENTS };
 // modelos que `game/world.js` pede já carregados (barracas do Alto, torre da Passagem)
 const GAME_MODELS = ['banca', 'torre_escombros'];
 const REPLACED = new Map(REPLACEMENTS.map((r) => [r.volume, r]));
@@ -52,22 +28,60 @@ export function replacedVolume(nodeName) {
   return REPLACED.has(v) ? v : null;
 }
 
-export const EXTRA_STATUS = { replaced: [], added: [], game: [], hidden: 0, ms: 0 };
+export const EXTRA_STATUS = { replaced: [], added: [], game: [], hidden: 0, ms: 0, parse: 0, drape: 0, bridge: 0, seats: [] };
+
+// ---------------------------------------------------------------- modelos
 const templates = new Map();
+// Peças que não projetam sombra: interiores, móveis, chão decalcado e miudezas.
+const NO_SHADOW = /Interior|Furniture|WeaponsTools|Ground|details|barrel/i;
 
 async function template(id) {
   if (templates.has(id)) return templates.get(id);
+  const meta = EXTRA_META[id];
   const gltf = await parseSceneGLB(EXTRA_BINS[id]);
-  gltf.scene.traverse((o) => {
+  const scene = gltf.scene;
+  // recortes de textura para o tabuleiro das pontes: presos a uma amostra mínima, que sai da cena
+  const roadway = {};
+  const samples = scene.getObjectByName('_amostras');
+  if (samples) {
+    samples.traverse((o) => { if (o.isMesh) for (const m of [o.material].flat()) roadway[m.name] = m; });
+    samples.parent.remove(samples);
+  }
+  scene.traverse((o) => {
     if (!o.isMesh) return;
-    o.castShadow = true; o.receiveShadow = true;
-    const mats = Array.isArray(o.material) ? o.material : [o.material];
-    for (const m of mats) { m.envMapIntensity = 0.35; patchOcclusion(m); }
+    o.receiveShadow = true;
+    for (const m of [o.material].flat()) { m.envMapIntensity = meta?.extra?.stone ? 0.2 : 0.35; patchOcclusion(m); }
   });
-  templates.set(id, gltf.scene);
-  return gltf.scene;
+  for (const m of Object.values(roadway)) { m.envMapIntensity = 0.2; patchOcclusion(m); }
+  scene.userData.roadway = roadway;
+  templates.set(id, scene);
+  return scene;
+}
+
+// Carrega em paralelo (lotes de 4, na ordem da lista) — o posicionamento continua sequencial.
+async function preload(ids) {
+  const t0 = performance.now();
+  const todo = [...new Set(ids)].filter((id) => EXTRA_BINS[id] && !templates.has(id));
+  for (let i = 0; i < todo.length; i += 4) {
+    await Promise.all(todo.slice(i, i + 4).map((id) => template(id).catch((e) => console.warn(`extra ${id}: ${e.message}`))));
+  }
+  EXTRA_STATUS.parse += Math.round(performance.now() - t0);
 }
 const place = (tpl) => tpl.clone(true);
+
+// Sombra só do que tem volume: a casca do prédio projeta; interiores, peças pequenas e o chão
+// decalcado não.
+const _s = new THREE.Vector3(), _q = new THREE.Quaternion(), _t = new THREE.Vector3();
+function shadows(obj) {
+  obj.updateMatrixWorld(true);
+  obj.traverse((o) => {
+    if (!o.isMesh) return;
+    if (!o.geometry.boundingSphere) o.geometry.computeBoundingSphere();
+    o.matrixWorld.decompose(_t, _q, _s);
+    const r = o.geometry.boundingSphere.radius * Math.max(_s.x, _s.y, _s.z);
+    o.castShadow = r >= 0.9 && ![o.material].flat().some((m) => NO_SHADOW.test(m.name));
+  });
+}
 
 // telhado das bancas: material próprio por cópia, na cor do tecido
 function tintRoof(obj, color) {
@@ -78,138 +92,160 @@ function tintRoof(obj, color) {
   });
 }
 
-// modelo já normalizado pela ferramenta: base em y = 0, pegada centrada, frente para +Z
-function fitReplacement(obj, meta, p, fit, front, r) {
-  const x = p.plan[0], z = PLAN_Z_SIGN * p.plan[1], [hw, hd] = p.half;
-  const [sx, sy, sz] = meta.size;
-  if (fit === 'ponte') {
-    // o eixo longo do modelo vai para o eixo longo da caixa; o piso fica no tabuleiro
-    // (a escala age nos eixos do próprio modelo, antes da rotação)
-    const longX = meta.extra.longAxis === 'x';
-    const modelLong = longX ? sx : sz, modelWide = longX ? sz : sx;
-    const targetLongZ = hd >= hw;
-    obj.rotation.y = longX === targetLongZ ? Math.PI / 2 : 0;
-    // meio metro a mais em cada ponta: a pedra encosta no barranco sem cobrir o começo das rampas
-    const sLong = (2 * Math.max(hw, hd) + 1) / modelLong, sWide = (2 * Math.min(hw, hd)) / modelWide;
-    const sy2 = (sLong + sWide) / 2;
-    if (longX) obj.scale.set(sLong, sy2, sWide); else obj.scale.set(sWide, sy2, sLong);
-    const deck = p.deck_final ?? p.deck ?? p.base;
-    obj.position.set(x, deck - meta.extra.deckY * sy2, z);
-    flattenDeck(obj, deck, targetLongZ ? 'z' : 'x', targetLongZ ? x : z);
-    return;
-  }
-  obj.rotation.y = front;
-  const turned = Math.abs(Math.sin(front)) > Math.SQRT1_2;
-  const w = turned ? sz : sx, d = turned ? sx : sz;
-  let s = fit === 'redonda' ? (2 * Math.min(hw, hd)) / Math.max(sx, sz) : Math.min((2 * hw) / w, (2 * hd) / d);
-  if (fit === 'caixa') s = Math.min(s, (1.6 * (p.top - p.base)) / sy);
-  obj.scale.setScalar(s);
-  obj.position.set(x, fit === 'doca' ? r.deck - meta.extra.deckY * s : p.base + (p.lift || 0), z);
-  if (r.tint) tintRoof(obj, r.tint);
+// ---------------------------------------------------------------- assentamento
+// Fundação: os vértices da base (até `band` acima do plano de contato, em unidades do modelo) descem
+// até o chão onde ele fica abaixo deles. A geometria é copiada só quando algo muda.
+const _w = new THREE.Vector3(), _m = new THREE.Vector3(), _inv = new THREE.Matrix4(), _toModel = new THREE.Matrix4(), _rel = new THREE.Matrix4();
+function drapeBase(obj, band) {
+  const t0 = performance.now();
+  obj.updateMatrixWorld(true);
+  _toModel.copy(obj.matrixWorld).invert();
+  let moved = 0;
+  obj.traverse((o) => {
+    if (!o.isMesh) return;
+    const src = o.geometry.attributes.position;
+    let arr = null;
+    _inv.copy(o.matrixWorld).invert();
+    // pré-filtro: com a malha só escalada/deslocada em relação ao modelo (a quantização do GLB), a
+    // altura no modelo sai de uma conta por vértice
+    _rel.multiplyMatrices(_toModel, o.matrixWorld);
+    const e = _rel.elements, axis = Math.abs(e[1]) + Math.abs(e[9]) < 1e-6 && e[5] > 0;
+    for (let i = 0; i < src.count; i++) {
+      if (axis && src.getY(i) * e[5] + e[13] > band) continue;
+      _w.fromBufferAttribute(src, i).applyMatrix4(o.matrixWorld);
+      _m.copy(_w).applyMatrix4(_toModel);
+      if (_m.y > band) continue;
+      const h = regionHeightAt(_w.x, _w.z) - EMBED;
+      if (h >= _w.y) continue;
+      if (!arr) {
+        arr = new Float32Array(src.count * 3);
+        for (let k = 0; k < src.count; k++) { arr[k * 3] = src.getX(k); arr[k * 3 + 1] = src.getY(k); arr[k * 3 + 2] = src.getZ(k); }
+      }
+      _w.y = h;
+      _w.applyMatrix4(_inv);
+      arr[i * 3] = _w.x; arr[i * 3 + 1] = _w.y; arr[i * 3 + 2] = _w.z;
+      moved++;
+    }
+    if (arr) {
+      // geometria nova só com a posição própria; normais, UV e índices continuam compartilhados
+      const src0 = o.geometry, g = new THREE.BufferGeometry();
+      for (const [k, a] of Object.entries(src0.attributes)) g.setAttribute(k, k === 'position' ? new THREE.BufferAttribute(arr, 3) : a);
+      g.setIndex(src0.index);
+      for (const gr of src0.groups) g.addGroup(gr.start, gr.count, gr.materialIndex);
+      g.computeBoundingSphere();
+      o.geometry = g;
+    }
+  });
+  EXTRA_STATUS.drape += performance.now() - t0;
+  return moved;
+}
+const drapeBand = (meta) => (meta.extra.contactY || 0) + (meta.extra.support === 'point' ? 0.03 : 0.004) * meta.size[1];
+
+// Põe o modelo no chão pela pegada (flat/point) e registra o que foi feito.
+function seat(obj, f, name) {
+  obj.rotation.y = f.yaw;
+  obj.scale.set(...f.s);
+  const st = seatOf(f);
+  obj.position.set(f.x, st.y, f.z);
+  const moved = st.drape ? drapeBase(obj, drapeBand(f.meta)) : 0;
+  EXTRA_STATUS.seats.push({ name, datum: +st.datum.toFixed(2), lo: +st.lo.toFixed(2), hi: +st.hi.toFixed(2), drape: moved });
+  return st;
 }
 
-// O tabuleiro de colisão das pontes é plano (e as rampas ficam fora dele); a ponte de pedra tem a
-// pista abaulada, até 2,5 m mais baixa nas pontas do vão. Para o jogador não andar no ar, a pista e
-// os parapeitos sobem até o tabuleiro; o que está mais de 2,5 m abaixo da pista (arco, pilares) fica
-// onde está, e a faixa entre os dois se estica. A colisão não muda.
-const _v = new THREE.Vector3(), _inv = new THREE.Matrix4();
-function flattenDeck(obj, deck, along, cross0) {
+const OLD_RAILS = /gaurd_rail|Slab_Stone/;
+// Pontes: o vão de pedra sem deformar, com a pista antiga logo abaixo do piso de colisão, e o
+// tabuleiro plano por cima (`bridge-roadway.js`).
+function placeBridge(obj, f, tpl) {
+  const t0 = performance.now();
+  const deck = f.p.deck_final ?? f.p.deck ?? f.p.base;
+  obj.rotation.y = f.yaw;
+  obj.scale.set(...f.s);
+  obj.position.set(f.x, deck - 0.12 - f.meta.extra.deckY * f.s[1], f.z);
+  // parapeitos e tampas antigos (em corcova) saem: as paredes do tabuleiro ocupam o lugar deles
+  obj.traverse((o) => { if (o.isMesh && OLD_RAILS.test(o.material.name)) o.visible = false; });
   obj.updateMatrixWorld(true);
-  const BAND = 2.5, STRIP = 1.2, BIN = 0.5;
-  const meshes = [];
-  obj.traverse((o) => { if (o.isMesh) meshes.push(o); });
-  // perfil do topo da pista: maior altura na faixa central, a cada meio metro ao longo da ponte
-  const prof = new Map();
-  for (const o of meshes) {
+  // topo da pista antiga ao longo do eixo (faixa central), para as paredes novas descerem até ela
+  const fr = bridgeFrame(f.r.volume);
+  if (!fr) return null;
+  const bins = new Map(), BIN = 0.5;
+  obj.traverse((o) => {
+    if (!o.isMesh || !o.visible) return;
     const p = o.geometry.attributes.position;
     for (let i = 0; i < p.count; i++) {
-      _v.fromBufferAttribute(p, i).applyMatrix4(o.matrixWorld);
-      const c = along === 'z' ? _v.x : _v.z, a = along === 'z' ? _v.z : _v.x;
-      if (Math.abs(c - cross0) > STRIP) continue;
-      const k = Math.round(a / BIN);
-      if (!prof.has(k) || prof.get(k) < _v.y) prof.set(k, _v.y);
+      _w.fromBufferAttribute(p, i).applyMatrix4(o.matrixWorld);
+      const t = fr.alongZ ? _w.z - fr.b.z : _w.x - fr.b.x, c = fr.alongZ ? _w.x - fr.b.x : _w.z - fr.b.z;
+      if (Math.abs(c) > fr.half * 0.8) continue;
+      const k = Math.round(t / BIN);
+      if (!bins.has(k) || bins.get(k) < _w.y) bins.set(k, _w.y);
     }
-  }
-  const keys = [...prof.keys()].sort((p, q) => p - q);
-  if (!keys.length) return;
-  const top = (a) => {
-    const k = Math.min(keys[keys.length - 1], Math.max(keys[0], Math.round(a / BIN)));
-    for (let d = 0; d < keys.length; d++) { if (prof.has(k - d)) return prof.get(k - d); if (prof.has(k + d)) return prof.get(k + d); }
-    return deck;
-  };
-  for (const o of meshes) {
-    const g = o.geometry.clone(), p = g.attributes.position;
-    const arr = new Float32Array(p.count * 3);
-    _inv.copy(o.matrixWorld).invert();
-    for (let i = 0; i < p.count; i++) {
-      _v.fromBufferAttribute(p, i).applyMatrix4(o.matrixWorld);
-      const road = top(along === 'z' ? _v.z : _v.x), lift = Math.max(0, deck - road);
-      const w = Math.min(1, Math.max(0, (_v.y - (road - BAND)) / BAND));
-      _v.y += lift * w;
-      _v.applyMatrix4(_inv);
-      arr[i * 3] = _v.x; arr[i * 3 + 1] = _v.y; arr[i * 3 + 2] = _v.z;
-    }
-    g.setAttribute('position', new THREE.BufferAttribute(arr, 3));
-    g.computeBoundingSphere();
-    o.geometry = g;
-  }
+  });
+  const oldTop = (t) => { const k = Math.round(t / BIN); return bins.get(k) ?? bins.get(k - 1) ?? bins.get(k + 1) ?? -Infinity; };
+  const roadway = buildRoadway(f.r.volume, tpl.userData.roadway || {}, oldTop);
+  EXTRA_STATUS.bridge += performance.now() - t0;
+  return roadway;
 }
 
-// frente de uma construção: da caixa dos fundos para a caixa da fachada
-function facadeYaw(nodes, volume) {
-  const box = (n) => n && new THREE.Box3().setFromObject(n).getCenter(new THREE.Vector3());
-  const f = box(nodes.get(`${volume}_Facade`)), r = box(nodes.get(`${volume}_Rear`));
-  if (!f || !r || f.distanceTo(r) < 1e-3) return 0;
-  const yaw = Math.atan2(f.x - r.x, f.z - r.z);
-  return Math.round(yaw / (Math.PI / 2)) * (Math.PI / 2);   // alinhado à caixa
-}
-
-// assenta no ponto mais baixo do chão sob a pegada (nenhuma borda flutua)
-function groundUnder(x, z, r) {
-  let h = regionHeightAt(x, z);
-  for (let a = 0; a < 8; a++) h = Math.min(h, regionHeightAt(x + Math.cos(a * Math.PI / 4) * r, z + Math.sin(a * Math.PI / 4) * r));
-  return h;
-}
-
+// ---------------------------------------------------------------- cena
 let group = null;
 function holder(scene) {
   if (!group) { group = new THREE.Group(); group.name = 'extra-props'; scene.add(group); }
   return group;
 }
 
-// Trocas visuais. Chamado por `loadRegionProps` depois de esconder os nós substituídos
-// (`nodes`: nome → objeto, para achar a fachada de cada construção).
-export async function loadExtraReplacements(scene, nodes) {
+// Trocas visuais. Chamado por `loadRegionProps` depois de esconder os nós substituídos.
+export async function loadExtraReplacements(scene) {
   const t0 = performance.now();
   const group = holder(scene);
+  await preload([...REPLACEMENTS.map((r) => r.asset), ...GAME_MODELS]);
   for (const r of REPLACEMENTS) {
-    const p = PLACEMENTS.find((q) => q.name === r.volume);
-    if (!p) continue;
-    const obj = place(await template(r.asset));
-    fitReplacement(obj, EXTRA_META[r.asset], p, r.fit, r.yaw ?? facadeYaw(nodes, r.volume), r);
+    const f = replacementFit(r);
+    const tpl = templates.get(r.asset);
+    if (!f || !tpl) continue;
+    const obj = place(tpl);
     obj.name = `extra:${r.volume}`;
+    if (r.fit === 'ponte') {
+      const roadway = placeBridge(obj, f, tpl);
+      if (roadway) group.add(roadway);
+    } else if (r.fit === 'doca') {
+      obj.rotation.y = f.yaw; obj.scale.set(...f.s);
+      obj.position.set(f.x, r.deck - f.meta.extra.deckY * f.s[1], f.z);
+    } else {
+      seat(obj, f, r.volume);
+    }
+    if (r.tint) tintRoof(obj, r.tint);
+    shadows(obj);
+    obj.userData.cull = cullRadius(f);
     group.add(obj);
     EXTRA_STATUS.replaced.push(r.volume);
   }
-  for (const id of GAME_MODELS) await template(id);
   group.updateMatrixWorld(true);
   EXTRA_STATUS.ms += Math.round(performance.now() - t0);
 }
 
-// Modelo para um objeto que o jogo monta (barraca do Alto, torre da Passagem): cópia já na escala da
-// pegada `w` × `d`, base no chão, frente para +Z. `null` se o modelo não carregou — o jogo fica com a
-// peça procedural de antes.
-export function extraModel(id, { w, d, fit = 'caixa', tint = null }) {
+// Modelo para um objeto que o jogo monta (barraca do Alto, torre da Passagem): cópia na escala da
+// pegada `w` × `d`, frente para +Z, assentada pelo chão sob a pegada no ponto (x, z) com giro `yaw`
+// (os mesmos que `game/world.js` passa para `place`, que põe o grupo na altura do chão no centro).
+// `null` se o modelo não carregou — o jogo fica com a peça procedural de antes.
+export function extraModel(id, { w, d, fit = 'caixa', tint = null, x = 0, z = 0, yaw = 0 }) {
   const tpl = templates.get(id), meta = EXTRA_META[id];
   if (!tpl || !meta) return null;
   const obj = place(tpl);
   const [sx, , sz] = meta.size;
-  obj.scale.setScalar(fit === 'redonda' ? Math.min(w, d) / Math.max(sx, sz) : Math.min(w / sx, d / sz));
-  obj.position.y = -0.1;   // assenta a borda no chão em terreno pouco inclinado
-  if (tint) tintRoof(obj, tint);
+  const s = fit === 'redonda' ? Math.min(w, d) / Math.max(sx, sz) : Math.min(w / sx, d / sz);
   const g = new THREE.Group();
   g.name = `extra:${id}`;
   g.add(obj);
+  // assenta com o grupo já no lugar e passa a altura para o referencial do grupo
+  const base = regionHeightAt(x, z);
+  g.position.set(x, base, z); g.rotation.y = yaw;
+  obj.scale.setScalar(s);
+  const st = seatOf({ meta, x, z, yaw, s: [s, s, s] });
+  obj.position.y = st.y - base;
+  g.updateMatrixWorld(true);
+  if (st.drape) drapeBase(obj, drapeBand(meta));
+  EXTRA_STATUS.seats.push({ name: `jogo:${id}`, datum: +st.datum.toFixed(2), lo: +st.lo.toFixed(2), hi: +st.hi.toFixed(2) });
+  if (tint) tintRoof(obj, tint);
+  shadows(g);
   EXTRA_STATUS.game.push(id);
   return g;
 }
@@ -218,11 +254,16 @@ export function extraModel(id, { w, d, fit = 'caixa', tint = null }) {
 export async function loadExtraAdditions(scene) {
   const t0 = performance.now();
   const group = holder(scene);
+  await preload(EXTRA_SPOTS.map((s) => s.asset));
   for (const s of EXTRA_SPOTS) {
-    const tpl = await template(s.asset);
+    const tpl = templates.get(s.asset), f = additionFit(s);
+    if (!tpl || !f) continue;
     const obj = place(tpl);
+    obj.name = `extra:${s.id}`;
+    seat(obj, f, s.id);
+    shadows(obj);
     if (s.asset === 'arvore_marco') {
-      // dois níveis: o modelo inteiro perto, a cópia reduzida longe
+      // dois níveis: o modelo inteiro perto, a cópia reduzida (sem sombra) longe
       const lod = new THREE.LOD();
       const l0 = obj.getObjectByName('L0'), l1 = obj.getObjectByName('L1');
       if (l0 && l1) {
@@ -232,12 +273,28 @@ export async function loadExtraAdditions(scene) {
         obj.add(lod);
       }
     }
-    obj.rotation.y = s.yaw;
-    obj.position.set(s.x, groundUnder(s.x, s.z, s.col.r || 2) - 0.08, s.z);
-    obj.name = `extra:${s.id}`;
+    obj.userData.cull = cullRadius(f);
     group.add(obj);
     EXTRA_STATUS.added.push(s.id);
   }
   group.updateMatrixWorld(true);
   EXTRA_STATUS.ms += Math.round(performance.now() - t0);
+}
+
+// ---------------------------------------------------------------- detalhe por distância
+// Raio que o modelo ocupa na cena: os pequenos saem de cena mais cedo que os grandes.
+function cullRadius(f) {
+  const [sx, sy, sz] = f.meta.size;
+  return 0.5 * Math.hypot(sx * f.s[0], sy * f.s[1], sz * f.s[2]);
+}
+// Esconde os extras além do alcance: prédios e torres até `far`; peças com menos de 4 m de raio,
+// até 45% disso. O tabuleiro das pontes fica sempre.
+export function updateExtraDetail(cam, far = 900) {
+  if (!group) return;
+  for (const o of group.children) {
+    const r = o.userData.cull;
+    if (!r) continue;
+    const lim = (r < 4 ? far * 0.45 : far) + r;
+    o.visible = (o.position.x - cam.x) ** 2 + (o.position.z - cam.z) ** 2 < lim * lim;
+  }
 }

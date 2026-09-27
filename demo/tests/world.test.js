@@ -27,6 +27,7 @@ import { ENCOUNTERS, CANTEIRO, PASSAGE_PROPS, GUARD_POSTS } from '../src/game/la
 import { SHELTER } from '../src/game/zones.js';
 import { EXTRA_SPOTS, EXTRA_DEFS } from '../src/world/extra-spots.js';
 import { REPLACEMENTS, replacedVolume } from '../src/world/extra-props.js';
+import { bridgeFrame, replacementFit, additionFit, footprintWorld, seatOf, roadwayFootprint } from '../src/world/extra-seat.js';
 import EXTRA_MANIFEST from '../assets/extra-props/extra-props-manifest.json';
 
 
@@ -784,7 +785,9 @@ test('cobertura: determinística, fora da água, da pista e das construções', 
         assert(!isWaterCell(it.x, it.z), `${k} na água em (${it.x.toFixed(1)}, ${it.z.toFixed(1)})`);
         assert(routeDistance(it.x, it.z) > 0.5 || k === 'pebble', `${k} sobre a pista em (${it.x.toFixed(1)}, ${it.z.toFixed(1)})`);
         for (const b of WORLD_BRIDGES) {
-          assert(!(Math.abs(it.x - b.x) < b.hw + 2 && Math.abs(it.z - b.z) < b.hd + b.apron + 2), `${k} na ponte ${b.name}`);
+          // nada no tabuleiro de colisão, nas paredes nem no tabuleiro visual até as cabeceiras
+          const f = bridgeFrame(b.name), t = it.z - b.z;
+          assert(!(Math.abs(it.x - b.x) < b.hw + f.wall + 0.2 && t > -f.tA - 0.2 && t < f.tB + 0.2), `${k} na ponte ${b.name}`);
         }
       }
     }
@@ -799,14 +802,106 @@ test('cobertura: determinística, fora da água, da pista e das construções', 
   }
   assert(grass > cells.length * 150, `grama rala demais: ${grass} tufos em ${cells.length} células`);
   assert(lonely / grass < 0.1, `${(lonely / grass * 100).toFixed(1)} % de tufos isolados`);
+  // nas construções trocadas vale a pegada do modelo novo; nas outras, a caixa do manifesto
   for (const p of PLACEMENTS) {
     if (p.bridge || p.kind === 'field') continue;
     const ci = Math.floor((p.plan[0] + 512) / CELL), cj = Math.floor((PLAN_Z_SIGN * p.plan[1] + 512) / CELL);
     const c = generateCell(ci, cj);
     const x = p.plan[0], z = PLAN_Z_SIGN * p.plan[1];
-    for (const it of c.grass) {
-      assert(!(Math.abs(it.x - x) < p.half[0] && Math.abs(it.z - z) < p.half[1]), `grama dentro de ${p.name}`);
+    const r = REPLACEMENTS.find((q) => q.volume === p.name);
+    const poly = r && footprintWorld(replacementFit(r));
+    for (const it of [...c.grass, ...c.meadow, ...c.meadowTall, ...c.flower]) {
+      if (poly) assert(!insideConvex(poly, it.x, it.z), `cobertura dentro da pegada de ${p.name}`);
+      else assert(!(Math.abs(it.x - x) < p.half[0] && Math.abs(it.z - z) < p.half[1]), `grama dentro de ${p.name}`);
     }
+  }
+});
+
+function insideConvex(poly, x, z) {
+  let sign = 0;
+  for (let i = 0; i < poly.length; i++) {
+    const [ax, az] = poly[i], [bx, bz] = poly[(i + 1) % poly.length];
+    const c = (bx - ax) * (z - az) - (bz - az) * (x - ax);
+    if (Math.abs(c) < 1e-9) continue;
+    if (sign === 0) sign = Math.sign(c); else if (Math.sign(c) !== sign) return false;
+  }
+  return true;
+}
+
+test('cobertura: clareira das trocas segue a pegada nova, sem o retângulo da caixa antiga', () => {
+  let between = 0, inside = 0, boxes = 0, close = 0;
+  const distPoly = (poly, x, z) => {
+    let d = Infinity;
+    for (let i = 0; i < poly.length; i++) {
+      const [ax, az] = poly[i], [bx, bz] = poly[(i + 1) % poly.length], ex = bx - ax, ez = bz - az;
+      const t = Math.max(0, Math.min(1, ((x - ax) * ex + (z - az) * ez) / (ex * ex + ez * ez || 1)));
+      d = Math.min(d, Math.hypot(ax + ex * t - x, az + ez * t - z));
+    }
+    return d;
+  };
+  for (const r of REPLACEMENTS) {
+    if (r.fit === 'ponte' || r.fit === 'doca') continue;
+    const p = PLACEMENTS.find((q) => q.name === r.volume), f = replacementFit(r), poly = footprintWorld(f);
+    assert(poly && poly.length >= 3, `${r.volume}: sem pegada`);
+    const x = p.plan[0], z = PLAN_Z_SIGN * p.plan[1];
+    const ci = Math.floor((x + 512) / CELL), cj = Math.floor((z + 512) / CELL);
+    const items = [];
+    for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) { const c = generateCell(ci + di, cj + dj); items.push(...c.grass, ...c.meadow); }
+    let n = 0, near = 0;
+    for (const it of items) {
+      const inBox = Math.abs(it.x - x) < p.half[0] && Math.abs(it.z - z) < p.half[1];
+      if (insideConvex(poly, it.x, it.z)) { inside++; continue; }
+      if (inBox) n++;
+      if (distPoly(poly, it.x, it.z) < 1.8) near++;
+    }
+    between += n; boxes++;
+    if (near > 0) close++;
+  }
+  assert(inside === 0, `${inside} tufos dentro das pegadas`);
+  // a grama volta logo depois da fundação (a menos de 1,8 m da pegada) na maioria das trocas, e
+  // aparece dentro da caixa antiga onde ela era maior que o modelo novo
+  assert(close >= boxes * 0.6, `grama perto da pegada em só ${close} de ${boxes} trocas`);
+  assert(between > 0, 'nenhum tufo entre pegada e caixa antiga');
+});
+
+test('extras: assentamento pela pegada — plano de contato, pegada e fundação', () => {
+  for (const a of EXTRA_MANIFEST.assets) {
+    if (!a.extra.support) continue;
+    assert(a.extra.contactY >= 0 && a.extra.contactY < 0.1 * a.size[1], `${a.id}: plano de contato ${a.extra.contactY}`);
+    assert(a.extra.footprint.length >= 3, `${a.id}: pegada vazia`);
+  }
+  for (const r of REPLACEMENTS) {
+    if (r.fit === 'ponte' || r.fit === 'doca') continue;
+    const f = replacementFit(r), st = seatOf(f);
+    // a base encosta no chão: nem acima do ponto mais baixo sem fundação, nem enterrada além do limite
+    assert(st.y + (f.meta.extra.contactY || 0) * f.s[1] <= st.hi, `${r.volume}: base acima do chão mais alto`);
+    assert(st.hi - (st.y + (f.meta.extra.contactY || 0) * f.s[1]) < 0.6, `${r.volume}: base enterrada demais (${(st.hi - st.y).toFixed(2)} m)`);
+  }
+  for (const s of EXTRA_SPOTS) {
+    const f = additionFit(s), st = seatOf(f);
+    assert(st.hi - st.y < 0.8, `${s.id}: base enterrada demais`);
+    if (s.col.box) {
+      // ponte em ruína: a base cabe no colisor do ponto
+      const poly = footprintWorld(f);
+      const turned = Math.abs(Math.sin(s.yaw)) > Math.SQRT1_2;
+      const [hw, hd] = turned ? [s.col.box[1], s.col.box[0]] : s.col.box;
+      for (const [x, z] of poly) assert(Math.abs(x - s.x) <= hw + 0.05 && Math.abs(z - s.z) <= hd + 0.05, `${s.id}: base fora do colisor`);
+    }
+  }
+});
+
+test('extras: tabuleiro das pontes segue a caminhada e alcança o terreno nas cabeceiras', () => {
+  for (const b of WORLD_BRIDGES) {
+    const f = bridgeFrame(b.name);
+    assert(f.tA > f.len && f.tB > f.len, `${b.name}: tabuleiro menor que o vão`);
+    for (const [t, dir] of [[-f.tA, -1], [f.tB, 1]]) {
+      const [x, z] = f.toWorld(t, 0);
+      assert(Math.abs(regionHeightAt(x, z) - f.walkY(t, 0)) < 0.35 || Math.abs(t) >= f.len + b.apron - 0.01, `${b.name}: cabeceira ${dir} solta do terreno`);
+    }
+    for (let t = -f.len; t <= f.len; t += 0.5) assert(Math.abs(f.walkY(t, 0) - b.y) < 1e-6, `${b.name}: piso fora do tabuleiro em ${t}`);
+    assert(f.rails.length > 0 && f.rails.every((r) => Math.abs(r.c1 - r.c0 - 0.6) < 1e-6), `${b.name}: parapeitos`);
+    const poly = roadwayFootprint(b.name);
+    assert(poly.length === 4, `${b.name}: pegada do tabuleiro`);
   }
 });
 

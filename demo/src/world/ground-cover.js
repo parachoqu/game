@@ -6,7 +6,7 @@
 // ao pool quando a câmera se afasta. Isso permite densidade de verdade onde o jogador está.
 //
 //   grama     manchas de tamanhos e densidades diferentes (campo distorcido em ~7, ~23 e ~61 m),
-//             sempre em touceiras de 3–5 tufos, nunca um tufo solto; mais rala sob a mata fechada,
+//             sempre em touceiras de 3–4 tufos, nunca um tufo solto; mais rala sob a mata fechada,
 //             viçosa e alta na margem do rio, seca no planalto, faixa própria na beira da estrada
 //   flores    colônias nos campos, na orla da mata e em volta das áreas funcionais
 //   cogumelos colônias no chão da mata
@@ -15,7 +15,8 @@
 //   campo     grama de campo (Poly Haven) no chão verde entre as manchas, onde antes só havia a
 //             textura do terreno; touceiras altas com pendão em colônias
 // Nada nasce na água, na pista, no tabuleiro e na rampa das pontes, na pegada das construções, no
-// calçamento das praças nem nos pontos de interação e coleta.
+// calçamento das praças nem nos pontos de interação e coleta. Em volta dessas áreas a cobertura volta
+// aos poucos, numa faixa de 0,8–1,5 m de largura irregular (sem círculo nem retângulo à vista).
 import * as THREE from 'three';
 import * as PR from '../engine/props.js';
 import { U } from '../engine/materials.js';
@@ -28,11 +29,12 @@ import { rng, hash2, vnoise, fbm2, smoothstep, lerp } from './noise.js';
 export const CELL = 32;
 const NC = 1024 / CELL;
 const KINDS = ['grass', 'flower', 'mushroom', 'pebble', 'branch', 'meadow', 'meadowTall'];
-const CAP = { grass: 1500, flower: 260, mushroom: 110, pebble: 240, branch: 80, meadow: 1300, meadowTall: 220 };
+const CAP = { grass: 1500, flower: 260, mushroom: 110, pebble: 240, branch: 80, meadow: 900, meadowTall: 160 };
 // tipos com uma variante sorteada por célula (a vizinha usa outra)
 const VARIANTS = { pebble: 5, meadow: 8, meadowTall: 3 };
 
-export const COVER = { radius: 84, density: 1, scene: null, seeds: null, cells: new Map(), pool: [], generated: 0, ms: 0 };
+// `meadowStep`: espaçamento da grama de campo (m), maior nos níveis de qualidade mais baixos
+export const COVER = { radius: 84, density: 1, meadowStep: 1.15, scene: null, seeds: null, cells: new Map(), pool: [], generated: 0, ms: 0 };
 
 // ---------------------------------------------------------------- sementes autorais
 // Os 900 tufos do Blender viram reforço das manchas: onde a fonte pôs grama, a mancha engrossa.
@@ -68,8 +70,34 @@ export function generateCell(ci, cj) {
     const a = Fg[j * M + i], b = Fg[j * M + i + 1], c = Fg[(j + 1) * M + i], d = Fg[(j + 1) * M + i + 1];
     return (a + (b - a) * tx) * (1 - tz) + (c + (d - c) * tx) * tz;
   };
+  // chão verde (camada de grama viva do terreno) na mesma grade de 4 m, calculado só nos nós que
+  // algum candidato de grama de campo pede: a consulta refaz os pesos do terreno e a normal
+  const Gg = new Float32Array(M * M).fill(-1);
+  const gnode = (i, j) => {
+    const k = j * M + i;
+    if (Gg[k] < 0) Gg[k] = greenGroundAt(Math.min(511, x0 + i * S), Math.min(511, z0 + j * S));
+    return Gg[k];
+  };
+  const green = (x, z) => {
+    const fx = (x - x0) / S, fz = (z - z0) / S;
+    const i = Math.min(M - 2, Math.max(0, Math.floor(fx))), j = Math.min(M - 2, Math.max(0, Math.floor(fz)));
+    const tx = fx - i, tz = fz - j;
+    const a = gnode(i, j), b = gnode(i + 1, j), c = gnode(i, j + 1), d = gnode(i + 1, j + 1);
+    return (a + (b - a) * tx) * (1 - tz) + (c + (d - c) * tx) * tz;
+  };
   const inRegion = (x, z) => x > -511 && x < 511 && z > -511 && z < 511;
-  const free = (x, z, road = 0.25, low = 0.3) => inRegion(x, z) && !isWaterCell(x, z) && routeEdgeAt(x, z) > road && lowGapExact(x, z) > low;
+  // borda das áreas funcionais: a cobertura rareia numa faixa de largura irregular (0,8–1,5 m),
+  // sorteada pela posição (a mesma célula dá sempre o mesmo chão)
+  const edge = (x, z, gap) => {
+    if (gap >= 1.5) return true;
+    const w = 0.8 + 0.7 * vnoise(x / 2.3, z / 2.3, 57);
+    return gap >= w || hash2(Math.floor(x * 9), Math.floor(z * 9), 131) < smoothstep(0, w, gap);
+  };
+  const free = (x, z, road = 0.25, low = 0.3) => {
+    if (!inRegion(x, z) || isWaterCell(x, z) || routeEdgeAt(x, z) <= road) return false;
+    const gap = lowGapExact(x, z) - low;
+    return gap > 0 && edge(x, z, gap);
+  };
   const tone = (base, j) => base.map((v) => v * (1 + (R() - 0.5) * j));
 
   // limiar das manchas de grama: abaixo dele o campo de manchas não chega a formar touceira
@@ -92,8 +120,11 @@ export function generateCell(ci, cj) {
     if (roll > dens * GS * GS / 4) continue;
     if (slopeHere(x, z) > 1.15) continue;
     const lush = wet > 0.25 ? wet : 0;
-    const base = dry ? [0.98, 0.9, 0.64] : lush ? [0.76, 0.94, 0.74] : [0.84 + 0.08 * vnoise(x / 30, z / 30, 97), 0.92, 0.8];
-    const n = 3 + Math.floor(R() * 3);
+    // tom de campo: manchas largas entre verde frio e verde-palha, mais escuro que antes (o claro
+    // chapado destacava a cobertura do chão)
+    const hue = vnoise(x / 18, z / 18, 71);
+    const base = dry ? [0.9, 0.84, 0.6] : lush ? [0.7, 0.86, 0.68] : [0.72 + 0.1 * hue + 0.06 * vnoise(x / 30, z / 30, 97), 0.84 - 0.04 * hue, 0.7 - 0.08 * hue];
+    const n = 3 + Math.floor(R() * 2);   // touceiras de 3–4 tufos: menos sobreposição
     for (let k = 0; k < n; k++) {
       const a = R() * Math.PI * 2, r = 0.12 + R() * 0.42;
       const px = x + Math.cos(a) * r, pz = z + Math.sin(a) * r;
@@ -101,14 +132,14 @@ export function generateCell(ci, cj) {
       const s = (0.6 + R() * 0.55) * (1 + 0.25 * lush);
       out.grass.push({
         x: px, y: regionHeightAt(px, pz) - 0.04, z: pz, s,
-        sy: s * (lush > 0.5 ? 1.5 + R() * 0.4 : 0.85 + R() * 0.35), rot: R() * Math.PI * 2, c: tone(base, 0.16),
+        sy: s * (lush > 0.5 ? 1.5 + R() * 0.4 : 0.8 + R() * 0.4), rot: R() * Math.PI * 2, c: tone(base, 0.2),
       });
     }
   }
 
   // grama de campo: preenche o chão verde entre as manchas (e rareia dentro delas, onde a grama do
   // kit já cobre). Nada no chão batido, no calçamento, na rocha, na margem nem sob a mata fechada.
-  const MG = 0.9;
+  const MG = COVER.meadowStep;
   for (let gz = 0; gz < CELL / MG; gz++) for (let gx = 0; gx < CELL / MG; gx++) {
     const x = x0 + (gx + R()) * MG, z = z0 + (gz + R()) * MG;
     const roll = R(), pick = R();
@@ -121,13 +152,15 @@ export function generateCell(ci, cj) {
     const gap = 1 - smoothstep(t - 0.12, t + 0.01, g);
     const dens = 0.9 * gap * (1 - 0.85 * smoothstep(0.45, 0.85, f)) * (1 - smoothstep(0.3, 0.6, wet));
     if (roll > dens) continue;
-    const green = greenGroundAt(x, z);
-    if (green < 0.55 || roll > dens * smoothstep(0.55, 0.8, green) || slopeHere(x, z) > 1.1) continue;
+    const gr = green(x, z);
+    if (gr < 0.55 || roll > dens * smoothstep(0.55, 0.8, gr) || slopeHere(x, z) > 1.1) continue;
     const tall = pick < 0.4 && vnoise(x / 9, z / 9, 89) > 0.6;
-    const s = tall ? 0.8 + R() * 0.4 : 0.75 + R() * 0.55;
-    const base = [0.9 + 0.1 * vnoise(x / 30, z / 30, 97), 0.95, 0.84];
+    const s = tall ? 0.75 + R() * 0.45 : 0.62 + R() * 0.66;
+    // mais perto do verde do chão: menos brilho e manchas largas de tom
+    const hue = vnoise(x / 18, z / 18, 71);
+    const base = [0.7 + 0.12 * hue + 0.06 * vnoise(x / 30, z / 30, 97), 0.8 - 0.05 * hue, 0.62 - 0.08 * hue];
     (tall ? out.meadowTall : out.meadow).push({
-      x, y: regionHeightAt(x, z) - 0.03, z, s, sy: s * (0.85 + R() * 0.3), rot: R() * Math.PI * 2, c: tone(base, 0.14),
+      x, y: regionHeightAt(x, z) - 0.03, z, s, sy: s * (0.78 + R() * 0.4), rot: R() * Math.PI * 2, c: tone(base, 0.2),
     });
   }
 
@@ -290,7 +323,16 @@ export function initGroundCover(scene, { seeds = [] } = {}) {
 
 export function setGroundCoverQuality({ radius, density } = {}) {
   if (radius != null) COVER.radius = radius;
-  if (density != null) COVER.density = density;
+  if (density != null) {
+    COVER.density = density;
+    // grama de campo mais espaçada nos níveis baixos: menos instâncias, menos sobreposição; as
+    // células já geradas voltam ao pool e são refeitas com o novo espaçamento
+    const step = Math.round(1.15 / Math.sqrt(Math.max(0.2, density)) * 100) / 100;
+    if (step !== COVER.meadowStep) {
+      COVER.meadowStep = step;
+      for (const [key, cell] of COVER.cells) { COVER.scene?.remove(cell.group); COVER.cells.delete(key); COVER.pool.push(cell); }
+    }
+  }
   U.uGrassFar.value = COVER.radius * 0.94;
   lastX = Infinity;
 }
