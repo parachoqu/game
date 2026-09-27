@@ -26,7 +26,7 @@
 namespace rpg::sim {
 
 // ---------------------------------------------------------------- estados de mundo
-enum class CampPhase : std::uint8_t { Estabelecido, Pressionado, Deslocado, Recuperacao };
+using protocol::CampPhase;
 
 struct CampState {  // camp.js CAMP
   int pop = 9;
@@ -154,6 +154,7 @@ struct Sim {
   Enemy* enemy(EntityId id);
   const Enemy* enemy(EntityId id) const;
   LootBag* lootBag(EntityId id);
+  const Npc* npc(EntityId id) const;
   Player* nearestPlayer(MapKind map, InstanceId inst, double x, double z, double* dist = nullptr);
 
   int day() const;

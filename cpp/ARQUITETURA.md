@@ -486,3 +486,39 @@ A regra é reproduzir a demo, inclusive o que parece estranho. As exceções:
 
 Mantidos de propósito: o clique de ataque com magia nunca entra em alcance (a conta da demo dá NaN);
 o `reparoCampo` e a queimadura que dão crédito a quem causou; a ordem dos arrays e dos sorteios.
+
+## 9. O cliente (fase 3)
+
+### Duas bibliotecas
+
+- `rpg_client_core`: tudo o que não precisa de plataforma — `ClientSession` (Hello/Welcome, comandos,
+  pedidos, eventos), `SnapshotInterpolator` (atraso de 1,5 passo, ângulos pelo lado curto, teleporte
+  sem deslizar), `ClientWorld`, `ThirdPersonCamera` (porte linha a linha de `updateCamera`: órbita,
+  ombro, spring arm, recuo, tremor, volta ao norte), mira (`updateAim`), alvos e clique
+  (`targetsNear`, `pick`), `CommandBuilder`, `FxState` (eventos → textos flutuantes, telegrafias,
+  partículas, avisos, relatório de derrota), `Localization` (`data/text/pt-BR`), atlas FreeType,
+  HUD e telas em desenho imediato, malhas do relevo e do cenário, PNG. Testado sem janela.
+- `rpg_client`: `Platform` (SDL3: janela, teclas por scancode, mouse relativo na mira, texto),
+  `Renderer` (SDL_GPU) e `ClientApp`. Só estes diretórios podem incluir a SDL (`check_layering.py`).
+
+### Render (SDL_GPU, Vulkan, SPIR-V)
+
+Shaders em GLSL (`shaders/src`), compilados para SPIR-V no build (glslangValidator) e embutidos no
+executável; os `.spv` também ficam versionados em `shaders/spv`. Por quadro: cena em HDR (céu →
+relevo em blocos de 64 m com duas resoluções e recorte por frustum → cenário e entidades
+instanciados → água → efeitos sem luz) e saída RGBA8 (ACES filmic como o three.js + sRGB, depois a
+interface). A saída é copiada para a janela e, sob `--screenshot`, baixada para PNG. Sem janela
+(`--headless`), o SDL usa o driver de vídeo `offscreen` e tudo roda igual: é o que o CI faz com o
+Vulkan por software do mesa (lavapipe).
+
+A luz segue `applyDaylight` (cores lineares, sol/lua, hemisfério, névoa exponencial, intensidade do
+ambiente). As cores do chão aproximam as camadas de solo de `scene-world.js`; os modelos, texturas e
+a vegetação de verdade entram na fase 4.
+
+### Desvios da demo no cliente
+
+| Demo | Cliente C++ | Por quê |
+|---|---|---|
+| a UI pausa a simulação (`G.uiOpen`) | o painel manda `kHeldUiOpen` no comando; só o jogo local pausa (`ReqPause`) | servidor autoritativo |
+| o cursor sai da mira pelo Pointer Lock do navegador (e o Esc solta) | modo relativo da SDL enquanto o botão direito está apertado | mesmo efeito, sem o navegador |
+| Ctrl+W fecha a aba (keyguard.js) | não existe | app nativo |

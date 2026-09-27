@@ -142,10 +142,9 @@ std::vector<Target> targetsNear(Sim& s, const Player& p, double maxDist) {
     if (b.map != p.map || b.instance != p.instance) continue;
     if (!b.items.empty() && near(b.x, b.z)) list.push_back({{InteractKind::LootBag, b.id}, b.x, b.z, 2.6, 0.5, true});
   }
-  for (std::size_t i = 0; i < s.npcs.size(); ++i) {
-    const Npc& n = s.npcs[i];
+  for (const Npc& n : s.npcs) {
     if (n.role == NpcRole::Traveler && near(n.pos.x, n.pos.z))
-      list.push_back({{InteractKind::Traveler, static_cast<std::uint32_t>(i)}, n.pos.x, n.pos.z, 3, 0, true});
+      list.push_back({{InteractKind::Traveler, n.id}, n.pos.x, n.pos.z, 3, 0, true});
   }
   if (const auto& portal = s.turb.portal; portal && near(portal->x, portal->z))
     list.push_back({{InteractKind::Portal, portal->id}, portal->x, portal->z, 4.5, 1, true});
@@ -181,9 +180,9 @@ std::optional<Target> resolveTarget(Sim& s, const Player& p, const InteractRef& 
       return Target{ref, b->x, b->z, 2.6, 0.5, true};
     }
     case InteractKind::Traveler: {
-      if (ref.id >= s.npcs.size()) return std::nullopt;
-      const Npc& n = s.npcs[ref.id];
-      return Target{ref, n.pos.x, n.pos.z, 3, 0, true};
+      const Npc* n = s.npc(ref.id);
+      if (!n || n->role != NpcRole::Traveler) return std::nullopt;
+      return Target{ref, n->pos.x, n->pos.z, 3, 0, true};
     }
     case InteractKind::Portal:
       if (!s.turb.portal || s.turb.portal->id != ref.id) return std::nullopt;
@@ -227,8 +226,7 @@ void runTarget(Sim& s, Player& p, const InteractRef& ref) {
     }
     case InteractKind::LootBag: openService(s, p, Service::Loot, ref.id); break;
     case InteractKind::Traveler: {
-      const Npc& n = s.npcs[ref.id];
-      openService(s, p, Service::Traveler, static_cast<std::uint32_t>(n.traveler));
+      if (const Npc* n = s.npc(ref.id)) openService(s, p, Service::Traveler, static_cast<std::uint32_t>(n->traveler));
       break;
     }
     case InteractKind::Portal: openService(s, p, Service::Portal, ref.id); break;

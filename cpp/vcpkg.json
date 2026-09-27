@@ -11,7 +11,14 @@
     "tests": {
       "description": "Testes (Catch2)",
       "dependencies": ["catch2"]
+    },
+    "client": {
+      "description": "Cliente: janela, GPU e texto (SDL3 + SDL_GPU, FreeType)",
+      "dependencies": [
+        "sdl3",
+        { "name": "freetype", "default-features": false }
+      ]
     }
   },
-  "default-features": ["tests"]
+  "default-features": ["tests", "client"]
 }

@@ -33,6 +33,31 @@ else()
   catch_discover_tests(rpg_tests)
 endif()
 
+# Cliente sem janela (lógica, sessão contra o servidor, textos, geometria): roda em qualquer CI.
+if(RPG_BUILD_CLIENT)
+  add_executable(rpg_client_tests client/ClientTests.cpp)
+  target_link_libraries(rpg_client_tests PRIVATE rpg_client_core rpg_server Catch2::Catch2WithMain)
+  target_include_directories(rpg_client_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+  target_compile_definitions(rpg_client_tests PRIVATE
+    RPG_TEST_DATA_DIR="${RPG_DATA_DIR}"
+    RPG_TEST_SIM_DIR="${RPG_SIM_DIR}"
+  )
+  rpg_set_warnings(rpg_client_tests)
+  if(WIN32)
+    add_test(NAME rpg_client_tests COMMAND rpg_client_tests)
+  else()
+    catch_discover_tests(rpg_client_tests)
+  endif()
+  # Jogo inteiro sem janela (Vulkan; em CI, mesa lavapipe): entra no mundo, joga 2 s e grava uma captura.
+  option(RPG_TEST_GPU "Registra os testes que precisam de GPU/Vulkan (rpg_local sem janela)" OFF)
+  if(RPG_TEST_GPU)
+    add_test(NAME smoke.client_headless
+      COMMAND rpg_local --headless --auto --size 640x360 --frames 60 --screenshot "${CMAKE_BINARY_DIR}/smoke_client.png")
+    add_test(NAME smoke.client_view_title
+      COMMAND rpg_local --headless --size 640x360 --view 01_title_screen --frames 10 --screenshot "${CMAKE_BINARY_DIR}/smoke_title.png")
+  endif()
+endif()
+
 # Separação de camadas (ARQUITETURA.md, seção 3).
 find_package(Python3 COMPONENTS Interpreter)
 if(Python3_Interpreter_FOUND)

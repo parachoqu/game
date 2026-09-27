@@ -38,6 +38,12 @@ LootBag* Sim::lootBag(EntityId id) {
   return nullptr;
 }
 
+const Npc* Sim::npc(EntityId id) const {
+  for (const Npc& n : npcs)
+    if (n.id == id) return &n;
+  return nullptr;
+}
+
 Player* Sim::nearestPlayer(MapKind map, InstanceId inst, double x, double z, double* dist) {
   Player* best = nullptr;
   double bd = 0;

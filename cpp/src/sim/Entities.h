@@ -19,7 +19,9 @@
 #include "core/anim/AnimRules.h"
 #include "core/data/Ids.h"
 #include "core/movement/CharacterMotor.h"
+#include "core/protocol/Interact.h"
 #include "core/protocol/Messages.h"
+#include "core/protocol/Replicated.h"
 #include "core/world/MapId.h"
 #include "core/world/ZoneMap.h"
 #include "sim/Book.h"
@@ -48,7 +50,7 @@ struct DamageSource {
 };
 
 // ---------------------------------------------------------------- jogador
-enum class PlayerState : std::uint8_t { Free, Attack, Skill, Dodge, Stagger, Channel, Down, Dead };
+using protocol::PlayerState;
 
 using anim::ActionKind;
 
@@ -83,10 +85,7 @@ struct Channel {
 };
 
 // Comando de clique (pointer.js): atacar um inimigo ou ir até um alvo e usá-lo.
-enum class InteractKind : std::uint8_t {
-  Node, Market, Forge, Trainer, Storage, Stable, Board, Canteiro, Astronomer, Vigia, Observatory,
-  LootBag, Traveler, Portal, Mount, Shrine, Exit,
-};
+using protocol::InteractKind;
 
 struct InteractRef {
   InteractKind kind = InteractKind::Market;
@@ -231,7 +230,7 @@ struct Player {
 };
 
 // ---------------------------------------------------------------- inimigos
-enum class EnemyState : std::uint8_t { Idle, Loot, Chase, Windup, Recover, Stun, Return, Dead };
+using protocol::EnemyState;
 
 struct Telegraph {
   std::uint32_t id = 0;  // 0 = nenhum
@@ -288,8 +287,8 @@ struct Enemy {
 };
 
 // ---------------------------------------------------------------- projéteis
-enum class ProjectileOwner : std::uint8_t { Player, Enemy, Shadow };
-enum class ProjectileKind : std::uint8_t { Arrow, Bolt, Spell };
+using protocol::ProjectileKind;
+using protocol::ProjectileOwner;
 
 struct Projectile {
   EntityId id = kNoEntity;
@@ -309,7 +308,7 @@ struct Projectile {
 };
 
 // ---------------------------------------------------------------- cargas no chão
-enum class LootLabel : std::uint8_t { Cargo, Spoils, Recoverable, YourCargo, Dropped };
+using protocol::LootLabel;
 
 struct LootBag {
   EntityId id = kNoEntity;

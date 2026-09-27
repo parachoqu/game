@@ -6,7 +6,8 @@ plano de fases estão em [ARQUITETURA.md](ARQUITETURA.md).
 
 ## Estado
 
-**Fases 0, 1 e 2 concluídas:** o jogo inteiro da demo roda no servidor, sem janela.
+**Fases 0 a 3 concluídas:** o jogo inteiro da demo roda no servidor, e o cliente grey-box (SDL3 +
+SDL_GPU/Vulkan) joga contra ele: andar, correr, pular, mirar, lutar, coletar, morrer e reaparecer.
 
 - `rpg_core` (compartilhado por servidor e cliente):
   - dados de design de `config.js`, validados na carga;
@@ -22,11 +23,15 @@ plano de fases estão em [ARQUITETURA.md](ARQUITETURA.md).
   acampamento reativo, evento regional, estrelas, Região Turbulenta, NPCs, descobertas e o Livro.
 - `rpg_server`: sessões, pedidos validados, snapshots com raio de interesse, eventos por
   destinatário e bots.
-- **Testes: 81.** Os de paridade repetem 19 roteiros jogados pela própria demo (do boot completo a
+- `rpg_client_core` + `rpg_client` (nunca linkam a simulação): sessão pelo protocolo, interpolação
+  de snapshots, câmera em terceira pessoa (porte de `updateCamera`), mira, clique para atacar e usar,
+  tecla F, HUD (vitais, zona, avisos, ações, carga, mira, derrubado, relatório de derrota), telas de
+  título e criação, textos em pt-BR, relevo e cenário grey-box, telegrafias e partículas.
+- `rpg_local`: servidor numa thread + cliente, ligados por `LocalTransport`.
+- **Testes: 92.** Os de paridade repetem 19 roteiros jogados pela própria demo (do boot completo a
   cada técnica das 18 armas) e exigem o mesmo resultado **bit a bit**, quadro a quadro. Os desvios
-  intencionais estão em [ARQUITETURA.md](ARQUITETURA.md), seção 8.
-
-O cliente (janela SDL3 + SDL_GPU) entra na fase 3.
+  intencionais estão em [ARQUITETURA.md](ARQUITETURA.md), seção 8. Os do cliente rodam sem janela; os
+  que precisam de GPU (`-DRPG_TEST_GPU=ON`) sobem o jogo inteiro fora da tela.
 
 ## Compilar
 
@@ -35,6 +40,11 @@ Pré-requisitos:
 - CMake ≥ 3.28 (o 4.x também serve), Ninja e um compilador C++20 (GCC 13 ou mais novo, Clang 17 ou
   MSVC 2022).
 - Python 3, para a checagem de camadas.
+- Cliente: FreeType e, para compilar shaders, `glslangValidator` (opcional: os SPIR-V vêm prontos em
+  `shaders/spv`). A **SDL3** é usada do sistema se houver (Kali, Arch, Fedora 42+); senão o CMake a
+  baixa por git (`release-3.4.16`) e compila junto — no Ubuntu 24.04 é esse o caminho. Para rodar, um
+  driver Vulkan (qualquer GPU atual; sem GPU, `mesa-vulkan-drivers` dá o lavapipe por software).
+  `-DRPG_BUILD_CLIENT=OFF` compila só servidor e testes.
 - Node ≥ 18, opcional: sem ele, o teste que confere `cpp/data` com a demo não é registrado.
 
 O C++ não precisa dos arquivos do Git LFS: o pacote de mundo da simulação (`assets/sim`, ~4 MB) já vem
@@ -46,8 +56,11 @@ Vale para Ubuntu 24.04+, Debian 13+, Kali rolling e Fedora 39+, que trazem CMake
 pacotes. O caminho do projeto pode ter espaço e acento (por exemplo `~/Área de trabalho/…`):
 
 ```bash
-sudo apt install cmake ninja-build g++ python3 nodejs libglm-dev nlohmann-json3-dev catch2
-# Fedora: os pacotes equivalentes de glm, nlohmann-json e Catch2 3 via dnf
+sudo apt install cmake ninja-build g++ python3 nodejs libglm-dev nlohmann-json3-dev catch2 \
+  libfreetype-dev glslang-tools libvulkan1 mesa-vulkan-drivers \
+  libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxss-dev libxkbcommon-dev libwayland-dev
+# Kali/Debian testing: acrescente libsdl3-dev (a SDL3 do sistema evita o download)
+# Fedora: os pacotes equivalentes de glm, nlohmann-json, Catch2 3, freetype, SDL3 e vulkan via dnf
 cd cpp
 cmake --preset dev
 cmake --build --preset dev
@@ -77,6 +90,29 @@ Outros presets:
 - `release-vcpkg`: Release com as dependências do vcpkg.
 
 ## Rodar
+
+### O jogo
+
+```bash
+./build/dev/apps/local/rpg_local                 # título → criação → Vale
+./build/dev/apps/local/rpg_local --auto          # entra direto com um personagem padrão
+./build/dev/apps/local/rpg_local --net-sim latency:120,jitter:30,loss:2   # rede simulada
+./build/dev/apps/local/rpg_local --size 1600x900 --fullscreen --no-vsync --dev
+```
+
+Controles da demo: WASD anda (Shift corre, Ctrl agacha), Espaço pula (Shift+Espaço: salto
+impulsionado), botão direito mira (o clique dispara), clique esquerdo ataca ou usa o que está sob o
+cursor e arrastar o chão gira a câmera, Q/E técnicas, C esquiva, 1 poção, F interage, R montaria,
+V troca o ombro, Tab+1/2/3 a distância da câmera, Esc pausa.
+
+Capturas sem monitor, nos enquadramentos de `demo/captures/after`:
+
+```bash
+./build/dev/apps/local/rpg_local --headless --size 1100x700 --view 02_mercado --screenshot mercado.png
+# vistas: 01_title_screen 02_mercado 03_ponte_principal … 12b_turbulenta_interior 13_vista_elevada_horizonte
+```
+
+### O servidor dedicado
 
 ```bash
 ./build/dev/apps/server/rpg_server               # tempo real, Ctrl+C encerra
@@ -132,4 +168,6 @@ a paridade fica bit a bit. Como cada entidade carrega o próprio mapa, nenhuma r
 
 - `core` ou `sim` incluírem rede, servidor ou cliente;
 - o cliente incluir a simulação;
-- qualquer camada fora do cliente incluir biblioteca de janela, GPU ou UI.
+- qualquer camada fora do cliente incluir biblioteca de janela, GPU ou UI;
+- dentro do cliente, algo fora de `client/platform`, `client/render`, `client/audio` e `client/app`
+  incluir a SDL (o `rpg_client_core` é testável sem janela).

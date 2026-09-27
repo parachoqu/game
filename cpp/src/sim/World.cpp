@@ -559,6 +559,7 @@ protocol::Snapshot World::snapshot(EntityId viewerId, double radius) const {
   W.instrumentGiven = s.skyState.instrumentGiven;
   if (s.turb.portal) {
     W.portal = true;
+    W.portalId = s.turb.portal->id;
     W.portalX = s.turb.portal->x;
     W.portalZ = s.turb.portal->z;
     W.portalExpires = s.turb.portal->expires;

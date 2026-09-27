@@ -1,0 +1,74 @@
+#pragma once
+// Renderizador SDL_GPU (backend Vulkan com SPIR-V). Passes por quadro:
+//   1. cena em HDR (RGBA16F + profundidade): céu → relevo → cenário e entidades instanciados →
+//      água → efeitos sem luz;
+//   2. saída (RGBA8): composição (ACES + sRGB) e interface 2D;
+//   3. cópia da saída para a janela e, quando pedida, para a memória (captura de tela).
+// A cena é descrita pelo app a cada quadro (listas de instâncias, vértices sem luz, vértices da UI);
+// o relevo e o cenário estático de cada mapa sobem para a GPU uma vez.
+#include <array>
+#include <cstdint>
+#include <filesystem>
+#include <memory>
+#include <optional>
+#include <vector>
+
+#include <glm/glm.hpp>
+
+#include "client/geom/SceneBatch.h"
+#include "client/geom/TerrainMesh.h"
+#include "client/render/FrameUniforms.h"
+#include "client/ui/UiBatch.h"
+
+struct SDL_Window;
+
+namespace rpg::client {
+
+struct RendererOptions {
+  int width = 1280, height = 720;  // tamanho da saída sem janela
+  bool debug = false;
+  bool vsync = true;
+};
+
+struct FrameStats {
+  std::uint32_t drawCalls = 0;
+  std::uint64_t triangles = 0;
+  std::uint32_t chunksDrawn = 0;
+};
+
+class Renderer {
+ public:
+  Renderer(SDL_Window* window, const RendererOptions& o);
+  ~Renderer();
+  Renderer(const Renderer&) = delete;
+  Renderer& operator=(const Renderer&) = delete;
+
+  // Relevo, água, pontes e cenário estático de um mapa (índice = MapKind).
+  void uploadMap(int map, const TerrainBuild& terrain, const InstanceLists& props);
+
+  struct Frame {
+    FrameUniforms uniforms;
+    int map = 0;
+    glm::vec3 cameraPos{0.0f};
+    const InstanceLists* dynamic = nullptr;
+    const std::vector<ColorVertex>* unlit = nullptr;
+    const UiBatch* ui = nullptr;
+    FontAtlas* atlas = nullptr;
+    float exposure = 1.0f;
+  };
+  // Desenha um quadro. `capture`: grava a saída em PNG (espera a GPU terminar).
+  bool render(const Frame& f, const std::optional<std::filesystem::path>& capture = std::nullopt);
+
+  int width() const { return outW_; }
+  int height() const { return outH_; }
+  const FrameStats& stats() const { return stats_; }
+  const char* driver() const;
+
+ private:
+  struct Impl;
+  std::unique_ptr<Impl> impl_;
+  int outW_ = 0, outH_ = 0;
+  FrameStats stats_;
+};
+
+}  // namespace rpg::client

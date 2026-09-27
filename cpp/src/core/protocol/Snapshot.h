@@ -187,6 +187,7 @@ struct WorldState {
   bool instrumentGiven = false;
   // portal (turbulent.js TS.portal)
   bool portal = false;
+  std::uint32_t portalId = 0;  // id do alvo de uso (ReqClickUse{Portal, portalId})
   double portalX = 0, portalZ = 0, portalExpires = 0;
   std::uint8_t portalPlace = 0;
   std::vector<MarketState> markets;
@@ -197,7 +198,7 @@ struct WorldState {
     a(tick); a(time); a(paused);
     a(evtProgress); a(evtDone); a(evtContrib); a(evtPlayerPts); a(evtOthersPts); a(evtTotalPts);
     a(campState); a(vanished); a(observed); a(instrumentGiven);
-    a(portal); a(portalX); a(portalZ); a(portalExpires); a(portalPlace);
+    a(portal); a(portalId); a(portalX); a(portalZ); a(portalExpires); a(portalPlace);
     a(markets); a(nodes);
   }
 };

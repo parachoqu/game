@@ -30,8 +30,9 @@ jobs:
         working-directory: cpp
     steps:
       - uses: actions/checkout@v4
+      # SDL3 não é empacotada no Ubuntu 24.04: o CMake a baixa por git (release-3.4.16) e compila
       - name: Dependências
-        run: sudo apt-get update && sudo apt-get install -y libglm-dev nlohmann-json3-dev catch2 ninja-build
+        run: sudo apt-get update && sudo apt-get install -y libglm-dev nlohmann-json3-dev catch2 ninja-build libfreetype-dev glslang-tools
       - run: cmake --preset ${{ matrix.preset }}
       - run: cmake --build --preset ${{ matrix.preset }}
       - run: ctest --preset ${{ matrix.preset }}
@@ -48,7 +49,7 @@ jobs:
       - name: Dependências
         run: |
           sudo apt-get update
-          sudo apt-get install -y g++-14 libglm-dev nlohmann-json3-dev catch2 ninja-build
+          sudo apt-get install -y g++-14 libglm-dev nlohmann-json3-dev catch2 ninja-build libfreetype-dev
           pip install --user 'cmake>=4,<5'
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: Build e testes
@@ -60,6 +61,42 @@ jobs:
           cmake --preset ci
           cmake --build --preset ci
           ctest --preset ci
+
+  # O jogo de verdade, sem monitor: Vulkan por software (mesa lavapipe) e X11 virtual (Xvfb).
+  # Roda os testes que precisam de GPU, abre a janela uma vez e grava as capturas dos enquadramentos
+  # da demo (demo/captures/after) como artefato do CI.
+  linux-client:
+    name: Linux (cliente com Xvfb + lavapipe)
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: cpp
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dependências
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libglm-dev nlohmann-json3-dev catch2 ninja-build libfreetype-dev glslang-tools \
+            mesa-vulkan-drivers libvulkan1 vulkan-tools xvfb xauth \
+            libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxss-dev libxtst-dev libxkbcommon-dev \
+            libwayland-dev libegl-dev libdrm-dev libgbm-dev
+      - run: cmake --preset ci -DRPG_TEST_GPU=ON
+      - run: cmake --build --preset ci
+      - run: ctest --preset ci
+      - name: Janela de verdade (X11 no Xvfb)
+        run: xvfb-run -a -s "-screen 0 1280x800x24" ./build/ci/apps/local/rpg_local --size 1100x700 --auto --frames 90 --screenshot shots/janela_jogo.png
+      - name: Capturas dos enquadramentos da demo
+        run: |
+          mkdir -p shots
+          for v in 01_title_screen 02_mercado 03_ponte_principal 04_passagem_garganta 05_bosque_forjas 06_mina \
+                   07_observatorio 08_entreposto_norte 09_campos 10_margens_rio 11_ermos 12_portal_turbulenta \
+                   12b_turbulenta_interior 13_vista_elevada_horizonte; do
+            ./build/ci/apps/local/rpg_local --headless --size 1100x700 --view "$v" --screenshot "shots/$v.png"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: capturas-cliente
+          path: cpp/shots/*.png
 
   windows:
     name: Windows (MSVC + vcpkg)
