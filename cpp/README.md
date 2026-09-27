@@ -41,7 +41,8 @@ O cliente (janela SDL3 + SDL_GPU) entra na fase 3.
 
 Pré-requisitos:
 
-- CMake ≥ 3.28, Ninja e um compilador C++20 (GCC 13, Clang 17 ou MSVC 2022).
+- CMake ≥ 3.28 (o 4.x também serve), Ninja e um compilador C++20 (GCC 13 ou mais novo, Clang 17 ou
+  MSVC 2022).
 - Python 3, para a checagem de camadas.
 - Node ≥ 18, opcional: sem ele, o teste que confere `cpp/data` com a demo não é registrado.
 
@@ -50,7 +51,8 @@ pronto no repositório.
 
 ### Linux, com as bibliotecas do sistema
 
-Vale para Ubuntu 24.04+, Debian 13+ e Fedora 39+, que trazem CMake ≥ 3.28 e Catch2 v3 nos pacotes:
+Vale para Ubuntu 24.04+, Debian 13+, Kali rolling e Fedora 39+, que trazem CMake ≥ 3.28 e Catch2 v3 nos
+pacotes. O caminho do projeto pode ter espaço e acento (por exemplo `~/Área de trabalho/…`):
 
 ```bash
 sudo apt install cmake ninja-build g++ python3 nodejs libglm-dev nlohmann-json3-dev catch2

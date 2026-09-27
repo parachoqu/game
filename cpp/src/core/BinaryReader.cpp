@@ -4,13 +4,14 @@
 #include <fstream>
 #include <iterator>
 
+#include "core/Paths.h"
 #include "core/data/DataError.h"
 
 namespace rpg {
 
 std::vector<std::uint8_t> readFileBytes(const std::filesystem::path& path) {
   std::ifstream in(path, std::ios::binary);
-  if (!in) throw DataError("não foi possível abrir " + path.string());
+  if (!in) throw DataError("não foi possível abrir " + pathToUtf8(path));
   return {std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>()};
 }
 
@@ -61,10 +62,10 @@ template <class T, class Read>
 std::vector<T> readArray(const std::filesystem::path& path, std::size_t count, std::size_t elemSize, Read read) {
   const auto bytes = readFileBytes(path);
   if (bytes.size() != count * elemSize) {
-    throw DataError(path.filename().string() + ": " + std::to_string(bytes.size()) + " bytes, esperado " +
+    throw DataError(pathToUtf8(path.filename()) + ": " + std::to_string(bytes.size()) + " bytes, esperado " +
                     std::to_string(count * elemSize));
   }
-  ByteCursor c(bytes, path.filename().string());
+  ByteCursor c(bytes, pathToUtf8(path.filename()));
   std::vector<T> out;
   out.reserve(count);
   for (std::size_t i = 0; i < count; ++i) out.push_back(read(c));
@@ -84,7 +85,7 @@ std::vector<float> readF32File(const std::filesystem::path& path, std::size_t ex
 std::vector<std::uint8_t> readU8File(const std::filesystem::path& path, std::size_t expectedCount) {
   auto bytes = readFileBytes(path);
   if (bytes.size() != expectedCount) {
-    throw DataError(path.filename().string() + ": " + std::to_string(bytes.size()) + " bytes, esperado " +
+    throw DataError(pathToUtf8(path.filename()) + ": " + std::to_string(bytes.size()) + " bytes, esperado " +
                     std::to_string(expectedCount));
   }
   return bytes;

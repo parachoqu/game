@@ -36,6 +36,31 @@ jobs:
       - run: cmake --build --preset ${{ matrix.preset }}
       - run: ctest --preset ${{ matrix.preset }}
 
+  # Reproduz o ambiente em que o build já quebrou (Kali rolling): CMake 4 + GCC ≥ 14, que fazem o
+  # escaneamento de módulos C++20, com o projeto num caminho com espaço e acento.
+  linux-accented-path:
+    name: Linux (GCC 14 + CMake 4, caminho com espaço e acento)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: 'Área de trabalho/rpg'
+      - name: Dependências
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++-14 libglm-dev nlohmann-json3-dev catch2 ninja-build
+          pip install --user 'cmake>=4,<5'
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Build e testes
+        working-directory: 'Área de trabalho/rpg/cpp'
+        env:
+          CXX: g++-14
+        run: |
+          cmake --version
+          cmake --preset ci
+          cmake --build --preset ci
+          ctest --preset ci
+
   windows:
     name: Windows (MSVC + vcpkg)
     runs-on: windows-latest

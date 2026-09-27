@@ -24,7 +24,7 @@ namespace {
 
 const json& fixtures() {
   static const json j = [] {
-    std::ifstream in(std::string(RPG_TEST_FIXTURES_DIR) + "/world-parity.json");
+    std::ifstream in(rpg::pathFromUtf8(RPG_TEST_FIXTURES_DIR) / "world-parity.json");
     REQUIRE(in.good());
     return json::parse(in);
   }();
@@ -33,7 +33,7 @@ const json& fixtures() {
 
 const json& placeNames() {
   static const json j = [] {
-    std::ifstream in(std::string(RPG_TEST_DATA_DIR) + "/text/pt-BR/places.json");
+    std::ifstream in(rpg::pathFromUtf8(RPG_TEST_DATA_DIR) / "text" / "pt-BR" / "places.json");
     REQUIRE(in.good());
     return json::parse(in);
   }();

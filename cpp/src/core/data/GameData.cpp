@@ -5,6 +5,8 @@
 
 #include <nlohmann/json.hpp>
 
+#include "core/Paths.h"
+
 namespace rpg {
 namespace {
 
@@ -14,11 +16,11 @@ namespace fs = std::filesystem;
 
 Json readFile(const fs::path& path) {
   std::ifstream in(path, std::ios::binary);
-  if (!in) throw DataError("não foi possível abrir " + path.string());
+  if (!in) throw DataError("não foi possível abrir " + pathToUtf8(path));
   try {
     return Json::parse(in);
   } catch (const Json::exception& e) {
-    throw DataError(path.filename().string() + ": JSON inválido: " + e.what());
+    throw DataError(pathToUtf8(path.filename()) + ": JSON inválido: " + e.what());
   }
 }
 

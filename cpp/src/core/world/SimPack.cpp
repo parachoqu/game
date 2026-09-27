@@ -6,6 +6,7 @@
 #include <nlohmann/json.hpp>
 
 #include "core/BinaryReader.h"
+#include "core/Paths.h"
 #include "core/data/DataError.h"
 
 namespace rpg {
@@ -69,11 +70,11 @@ std::vector<Circle> circles(const Json& list) {
 
 std::vector<Collider> readColliders(const fs::path& path, std::size_t expected) {
   const auto bytes = readFileBytes(path);
-  ByteCursor c(bytes, path.filename().string());
-  if (c.ascii(4) != "RPGC") throw DataError(path.filename().string() + ": assinatura inválida");
-  if (const auto v = c.u32(); v != 1) throw DataError(path.filename().string() + ": versão " + std::to_string(v) + " desconhecida");
+  ByteCursor c(bytes, pathToUtf8(path.filename()));
+  if (c.ascii(4) != "RPGC") throw DataError(pathToUtf8(path.filename()) + ": assinatura inválida");
+  if (const auto v = c.u32(); v != 1) throw DataError(pathToUtf8(path.filename()) + ": versão " + std::to_string(v) + " desconhecida");
   const std::uint32_t count = c.u32();
-  if (count != expected) throw DataError(path.filename().string() + ": quantidade diferente da declarada em simpack.json");
+  if (count != expected) throw DataError(pathToUtf8(path.filename()) + ": quantidade diferente da declarada em simpack.json");
   std::vector<Collider> out;
   out.reserve(count);
   for (std::uint32_t i = 0; i < count; ++i) {
@@ -94,11 +95,11 @@ std::vector<Collider> readColliders(const fs::path& path, std::size_t expected) 
       o.s = c.f64();
       o.r = c.f64();
     } else {
-      throw DataError(path.filename().string() + ": tipo de colisor desconhecido");
+      throw DataError(pathToUtf8(path.filename()) + ": tipo de colisor desconhecido");
     }
     out.push_back(o);
   }
-  if (c.remaining() != 0) throw DataError(path.filename().string() + ": bytes sobrando no fim");
+  if (c.remaining() != 0) throw DataError(pathToUtf8(path.filename()) + ": bytes sobrando no fim");
   return out;
 }
 
@@ -108,7 +109,7 @@ SimPack SimPack::load(const fs::path& dir) {
   Json j;
   {
     std::ifstream in(dir / "simpack.json", std::ios::binary);
-    if (!in) throw DataError("não foi possível abrir " + (dir / "simpack.json").string());
+    if (!in) throw DataError("não foi possível abrir " + pathToUtf8(dir / "simpack.json"));
     try {
       j = Json::parse(in);
     } catch (const Json::exception& e) {

@@ -15,7 +15,7 @@ using Catch::Matchers::ContainsSubstring;
 
 namespace {
 
-const fs::path kData = RPG_TEST_DATA_DIR;
+const fs::path kData = rpg::pathFromUtf8(RPG_TEST_DATA_DIR);
 
 const rpg::GameData& data() { return rpg::test::gameData(); }
 

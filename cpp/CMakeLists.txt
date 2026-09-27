@@ -13,6 +13,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# O projeto não usa módulos C++20. Com C++20 + Ninja, a política CMP0155 faria o CMake pedir ao
+# compilador um escaneamento de módulos (`-fmodules-ts -fdeps-format=p1689r5` no GCC ≥ 14). O mapeador
+# de módulos do GCC quebra em caminhos com espaço e acento ("Área de trabalho"): "cannot determine
+# '#include' translation … unrecognized 'INCLUDE-TRANSLATE". Desligado, o build não depende do caminho.
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+
 option(RPG_BUILD_TESTS "Compila os testes (Catch2)" ON)
 option(RPG_WARNINGS_AS_ERRORS "Trata avisos como erros" OFF)
 option(RPG_SANITIZE "Compila com AddressSanitizer + UBSan" OFF)
@@ -20,7 +26,9 @@ option(RPG_SANITIZE "Compila com AddressSanitizer + UBSan" OFF)
 # Determinismo numérico: sem fusão de multiplicação+soma (FMA) nem matemática "rápida". Servidor e
 # cliente precisam chegar ao mesmo resultado em qualquer CPU, e os testes comparam com o JS bit a bit.
 if(MSVC)
-  add_compile_options(/fp:precise)
+  # /utf-8: fontes e literais em UTF-8 (textos em pt-BR e caminhos com acento), qualquer que seja a
+  # página de código do Windows.
+  add_compile_options(/fp:precise /utf-8)
 else()
   add_compile_options(-ffp-contract=off -fno-fast-math)
 endif()

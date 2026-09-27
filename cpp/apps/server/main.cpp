@@ -17,6 +17,7 @@
 #include <string_view>
 
 #include "core/Log.h"
+#include "core/Paths.h"
 #include "core/data/GameData.h"
 #include "core/world/StaticWorld.h"
 #include "server/ServerHost.h"
@@ -47,8 +48,8 @@ int usage() {
 }  // namespace
 
 int main(int argc, char** argv) {
-  std::filesystem::path dataDir = RPG_DEFAULT_DATA_DIR;
-  std::filesystem::path simDir = RPG_DEFAULT_SIM_DIR;
+  std::filesystem::path dataDir = rpg::pathFromUtf8(RPG_DEFAULT_DATA_DIR);
+  std::filesystem::path simDir = rpg::pathFromUtf8(RPG_DEFAULT_SIM_DIR);
   std::uint64_t ticks = 0;
   rpg::server::ServerConfig cfg;
 
@@ -71,7 +72,7 @@ int main(int argc, char** argv) {
     return 1;
   }
   rpg::log::info("dados carregados de {}: {} itens, {} armas, {} técnicas, {} inimigos, {} receitas",
-                 dataDir.string(), data.items.size(), data.weapons.size(), data.skills.size(),
+                 rpg::pathToUtf8(dataDir), data.items.size(), data.weapons.size(), data.skills.size(),
                  data.enemies.size(), data.recipes.size());
 
   std::optional<rpg::StaticWorld> statics;
@@ -84,7 +85,7 @@ int main(int argc, char** argv) {
   const auto& region = statics->map(rpg::MapKind::Region);
   const auto& turb = statics->map(rpg::MapKind::Turbulent);
   rpg::log::info("mundo (layout {}) de {}: {} colisores na região, {} na Turbulenta, {} pontes",
-                 statics->worldLayoutVersion(), simDir.string(), region.collision().size(), turb.collision().size(),
+                 statics->worldLayoutVersion(), rpg::pathToUtf8(simDir), region.collision().size(), turb.collision().size(),
                  region.terrain().bridges().size());
 
   rpg::server::ServerHost host(data, *statics, cfg, nullptr);
