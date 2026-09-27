@@ -17,6 +17,14 @@ option(RPG_BUILD_TESTS "Compila os testes (Catch2)" ON)
 option(RPG_WARNINGS_AS_ERRORS "Trata avisos como erros" OFF)
 option(RPG_SANITIZE "Compila com AddressSanitizer + UBSan" OFF)
 
+# Determinismo numérico: sem fusão de multiplicação+soma (FMA) nem matemática "rápida". Servidor e
+# cliente precisam chegar ao mesmo resultado em qualquer CPU, e os testes comparam com o JS bit a bit.
+if(MSVC)
+  add_compile_options(/fp:precise)
+else()
+  add_compile_options(-ffp-contract=off -fno-fast-math)
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(Warnings)
 include(Sanitizers)
@@ -26,6 +34,7 @@ find_package(nlohmann_json 3.11 CONFIG REQUIRED)
 
 # Diretório de dados padrão para rodar direto da árvore de fontes (os executáveis aceitam --data).
 set(RPG_DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data" CACHE PATH "Diretório de cpp/data")
+set(RPG_SIM_DIR "${CMAKE_CURRENT_SOURCE_DIR}/assets/sim" CACHE PATH "Diretório do pacote de mundo da simulação")
 
 add_subdirectory(src/core)
 add_subdirectory(src/net)

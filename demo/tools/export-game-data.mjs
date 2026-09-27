@@ -14,7 +14,7 @@
 // Ids são as chaves do JS, na mesma ordem de declaração: a ordem importa para reproduzir o jogo.
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 const TOOLS = dirname(fileURLToPath(import.meta.url));
 const DEMO = dirname(TOOLS);
@@ -22,7 +22,10 @@ const ROOT = dirname(DEMO);
 const OUT = join(ROOT, 'cpp', 'data');
 const check = process.argv.includes('--check');
 
-const C = await import(pathToFileURL(join(DEMO, 'src', 'config.js')).href);
+// Importado como `data:` URL, que é sempre ESM: funciona em qualquer Node ≥ 18, sem depender da
+// detecção automática de módulos (Node ≥ 22.7). O config.js não importa nada, então isso basta.
+const C = await import('data:text/javascript;charset=utf-8,' +
+  encodeURIComponent(readFileSync(join(DEMO, 'src', 'config.js'), 'utf8')));
 
 // ---------------------------------------------------------------- constantes nomeadas do código
 // Lê `NOME = <expressão>` de um módulo e avalia a expressão com as constantes já lidas no escopo.

@@ -172,7 +172,9 @@ cpp/
 - `core/data/GameData.h/.cpp`: carrega tudo e valida as referências cruzadas (receita → item, arma → técnica, …).
 
 **Mundo estático (somente leitura; o servidor usa para autoridade e o cliente para predição, câmera e mira)**
-- `core/world/MapId.h`: `MapKind { Region, Turbulent }` e `MapInstanceId`. Substitui `TURB_RUNTIME_OFFSET` e `isTurbulentSpace`.
+- `core/world/MapId.h`: `MapKind { Region, Turbulent }` e `MapInstanceId`. Substitui o teste `isTurbulentSpace(x)`: as regras usam o mapa da entidade.
+  - Cada mapa mantém o referencial da demo (a Turbulenta centrada em x = 1.400). Subtrair o deslocamento mudaria o arredondamento no último bit e quebraria a paridade exata.
+  - Várias incursões são instâncias do mesmo mapa estático.
 - `core/world/Coordinates.h`: `PLAN_Z_SIGN` e conversões plano ↔ cena.   [world/coordinates.js]
 - `core/world/WorldManifest.h/.cpp`: limites, âncoras, rotas, placements e checagem de `runtime_schema`.   [world/runtime-manifest.js]
 - `core/world/SimPack.h/.cpp`: lê o pacote pré-calculado (heightfield escavado, máscara, rio, colisores, pontes, campo de rotas).   [novo]
@@ -375,17 +377,21 @@ cpp/
 
 ## 5. Pipeline offline (reaproveita o JS existente)
 
-Três scripts Node novos em `demo/tools/`, empacotados com o esbuild que `build.mjs` já usa, para importar
-os módulos atuais sem reescrevê-los:
+Scripts Node em `demo/tools/`, empacotados com o esbuild que `build.mjs` já usa, para importar os módulos
+atuais sem reescrevê-los:
 
 - `demo/tools/export-game-data.mjs`: `config.js` → `cpp/data/*.json` (regras) e `cpp/data/text/pt-BR/*.json`
   (textos). A partir daí, o JSON é a fonte única.
-- `demo/tools/bake-sim-world.mjs`: roda `heightfield.js` + `river.js` (escavação), `world-colliders.js`, o
-  planejamento de `world-instances.js` (extrair `planRegionInstances` sem three.js), `extra-spots.js` e
-  `functional-areas.js`. Grava `cpp/assets/sim/` com o heightfield escavado, a máscara, o rio, os colisores
-  (cenário + árvores + extras), as pontes, o campo de rotas e a lista de instâncias de vegetação (o
-  cliente desenha a partir dela). Com isso o servidor não precisa de nenhum código de vegetação.
-- `demo/tools/export-parity-fixtures.mjs`: amostras de consultas do JS → `cpp/tests/parity/fixtures/*.json`.
+- `demo/tools/bake-sim-world.mjs` (feito na Fase 1a):
+  - **Carga:** roda no Node a sequência de boot da demo inteira (texturas → modelos → mundo com o kit de natureza → `buildWorld` → `initTurbulent`), com o ambiente mínimo de navegador de `tools/lib/node-env.mjs`.
+  - **Captura:** um plugin do esbuild acrescenta, só nesse pacote, exportações de estruturas internas (grade de colisores, máscara, campo de rotas, pontos de zona). `demo/src` não muda.
+  - **Saída em `cpp/assets/sim`:**
+    - relevo escavado, máscara, rio, campo de rotas e pontes;
+    - 24.753 colisores na ordem de inserção;
+    - lugares e zonas.
+  - **Fixtures:** na mesma carga, grava `cpp/tests/parity/fixtures/world-parity.json` com terreno, colisão, trajetos de `moveEntity` e ruído. Isso substitui o `export-parity-fixtures.mjs` previsto.
+  - O conjunto de colisores é determinístico e não depende da qualidade gráfica (conferido por hash).
+  - A lista de instâncias de vegetação para o cliente desenhar entra no mesmo script na Fase 4.
 
 Os assets visuais (GLB, WebP, `world-manifest.json`) são lidos como estão.
 

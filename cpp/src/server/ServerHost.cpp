@@ -8,10 +8,11 @@
 
 namespace rpg::server {
 
-ServerHost::ServerHost(const GameData& data, ServerConfig config, std::unique_ptr<net::ITransport> transport)
+ServerHost::ServerHost(const GameData& data, const StaticWorld& statics, ServerConfig config,
+                       std::unique_ptr<net::ITransport> transport)
     : config_(config),
       transport_(std::move(transport)),
-      world_(data, config.seed),
+      world_(data, statics, config.seed),
       timestep_(1.0 / config.tickRate) {}
 
 void ServerHost::runTicks(std::uint64_t n) {

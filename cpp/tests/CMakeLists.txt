@@ -9,11 +9,19 @@ add_executable(rpg_tests
   core/FixedTimestepTests.cpp
   core/GameDataTests.cpp
   net/LocalTransportTests.cpp
+  core/CollisionTests.cpp
+  core/TerrainTests.cpp
+  parity/WorldParityTests.cpp
   sim/WorldTests.cpp
   server/ServerHostTests.cpp
 )
 target_link_libraries(rpg_tests PRIVATE rpg_server Catch2::Catch2WithMain nlohmann_json::nlohmann_json)
-target_compile_definitions(rpg_tests PRIVATE RPG_TEST_DATA_DIR="${RPG_DATA_DIR}")
+target_include_directories(rpg_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_compile_definitions(rpg_tests PRIVATE
+  RPG_TEST_DATA_DIR="${RPG_DATA_DIR}"
+  RPG_TEST_SIM_DIR="${RPG_SIM_DIR}"
+  RPG_TEST_FIXTURES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/parity/fixtures"
+)
 rpg_set_warnings(rpg_tests)
 if(WIN32)
   # Os nomes dos casos têm acentos; no Windows a página de código do console atrapalha a descoberta.
@@ -36,4 +44,4 @@ if(NODE_EXECUTABLE AND EXISTS "${_export}")
 endif()
 
 # O servidor headless sobe, valida os dados e roda 10 s de simulação.
-add_test(NAME smoke.server_headless COMMAND rpg_server_app --data "${RPG_DATA_DIR}" --ticks 300)
+add_test(NAME smoke.server_headless COMMAND rpg_server_app --data "${RPG_DATA_DIR}" --sim "${RPG_SIM_DIR}" --ticks 300)

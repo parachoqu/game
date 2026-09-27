@@ -4,19 +4,15 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include "core/data/GameData.h"
+#include "TestData.h"
 #include "net/LocalTransport.h"
 #include "server/ServerHost.h"
 
-namespace {
-const rpg::GameData& data() {
-  static const rpg::GameData d = rpg::GameData::load(RPG_TEST_DATA_DIR);
-  return d;
-}
-}  // namespace
+using rpg::test::gameData;
+using rpg::test::staticWorld;
 
 TEST_CASE("ServerHost roda passos fixos conforme o tempo real informado", "[server]") {
-  rpg::server::ServerHost host(data(), {.tickRate = 30.0}, nullptr);
+  rpg::server::ServerHost host(gameData(), staticWorld(), {.tickRate = 30.0}, nullptr);
   CHECK(host.update(0.02) == 0);
   CHECK(host.update(0.02) == 1);  // 0,04 s acumulados → 1 passo de 1/30
   host.runTicks(59);
@@ -25,7 +21,7 @@ TEST_CASE("ServerHost roda passos fixos conforme o tempo real informado", "[serv
 
 TEST_CASE("ServerHost registra conexões e desconexões pelo transporte", "[server]") {
   rpg::net::LocalHub hub;
-  rpg::server::ServerHost host(data(), {}, hub.serverEndpoint());
+  rpg::server::ServerHost host(gameData(), staticWorld(), {}, hub.serverEndpoint());
   auto a = hub.connectClient();
   auto b = hub.connectClient();
   host.runTicks(1);
@@ -39,7 +35,7 @@ TEST_CASE("ServerHost registra conexões e desconexões pelo transporte", "[serv
 }
 
 TEST_CASE("ServerHost roda numa thread própria e para quando pedido", "[server]") {
-  rpg::server::ServerHost host(data(), {.tickRate = 200.0}, nullptr);
+  rpg::server::ServerHost host(gameData(), staticWorld(), {.tickRate = 200.0}, nullptr);
   std::atomic<bool> stop{false};
   std::thread t([&] { host.run(stop); });
   std::this_thread::sleep_for(std::chrono::milliseconds(100));  // ~20 passos a 200 Hz

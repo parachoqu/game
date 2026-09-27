@@ -7,6 +7,7 @@
 #include <catch2/matchers/catch_matchers_string.hpp>
 #include <nlohmann/json.hpp>
 
+#include "TestData.h"
 #include "core/data/GameData.h"
 
 namespace fs = std::filesystem;
@@ -16,10 +17,7 @@ namespace {
 
 const fs::path kData = RPG_TEST_DATA_DIR;
 
-const rpg::GameData& data() {
-  static const rpg::GameData d = rpg::GameData::load(kData);
-  return d;
-}
+const rpg::GameData& data() { return rpg::test::gameData(); }
 
 nlohmann::json readJson(const fs::path& p) {
   std::ifstream in(p);

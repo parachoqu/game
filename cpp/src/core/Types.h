@@ -15,6 +15,13 @@ using Real = double;
 using Vec2 = glm::dvec2;  // plano do chão: x, z
 using Vec3 = glm::dvec3;  // cena: x, y (altura), z — norte = -z, como no three.js da demo
 
+// Ponto no chão (x, z da cena). Mais legível que Vec2 nas regras portadas do JS, que usam x/z.
+struct XZ {
+  Real x = 0.0;
+  Real z = 0.0;
+  bool operator==(const XZ&) const = default;
+};
+
 using Tick = std::uint64_t;  // número do passo fixo da simulação
 using Seconds = double;
 

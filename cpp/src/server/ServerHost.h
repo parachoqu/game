@@ -27,7 +27,8 @@ struct Session {
 class ServerHost {
  public:
   // `transport` pode ser nulo (servidor sem clientes, para testes e bancadas).
-  ServerHost(const GameData& data, ServerConfig config, std::unique_ptr<net::ITransport> transport);
+  ServerHost(const GameData& data, const StaticWorld& statics, ServerConfig config,
+             std::unique_ptr<net::ITransport> transport);
 
   // Avança `n` passos já, sem esperar o relógio (testes e execução headless acelerada).
   void runTicks(std::uint64_t n);
