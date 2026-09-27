@@ -1,0 +1,70 @@
+{
+  "viajante1": {
+    "name": "Ilsa Varenne",
+    "role": "Artesã de ferramentas",
+    "gear": [
+      "Martelo de oficina (bom)",
+      "Gibão de couro (usado)",
+      "Bolsa de viagem"
+    ],
+    "public": [
+      [
+        "Legado",
+        "Participou do reparo da ponte do Rio Largo, fornecendo pregos e ferragens."
+      ],
+      [
+        "Feitos",
+        "Trabalho de bancada: 140 ferramentas fabricadas em três estações."
+      ],
+      [
+        "Título exibido",
+        "Ofício de forja"
+      ]
+    ]
+  },
+  "viajante2": {
+    "name": "Tomek Arrudal",
+    "role": "Caravaneiro",
+    "gear": [
+      "Espada de ferro (gasta)",
+      "Cota de malha (usada)",
+      "Cavalo de carga"
+    ],
+    "public": [
+      [
+        "História",
+        "Temporada de entregas: 32 cargas levadas ao Entreposto Alto pela Estrada Longa."
+      ],
+      [
+        "Feitos",
+        "Derrota na Passagem Estreita. A carga foi recuperada dois dias depois."
+      ],
+      [
+        "Título exibido",
+        "Pé na estrada"
+      ]
+    ]
+  },
+  "viajante3": {
+    "name": "Siv de Aldren",
+    "role": "Exploradora",
+    "gear": [
+      "Arco de freixo (bom)",
+      "Gibão de couro (bom)"
+    ],
+    "public": [
+      [
+        "Descobertas",
+        "Registrou a ravina a oeste da Passagem antes de ela aparecer nos mapas do Vale."
+      ],
+      [
+        "História",
+        "Voltou de duas Regiões Turbulentas. Adversários não identificados."
+      ],
+      [
+        "Título exibido",
+        "Olhar do Observatório"
+      ]
+    ]
+  }
+}

@@ -3,6 +3,7 @@
 add_library(rpg_core STATIC
   Log.cpp
   Rng.cpp
+  JsMath.cpp
   Noise.cpp
   BinaryReader.cpp
   FixedTimestep.cpp
@@ -16,7 +17,13 @@ add_library(rpg_core STATIC
   world/ZoneMap.cpp
   world/SimPack.cpp
   world/StaticWorld.cpp
+  world/GameplayLayout.cpp
+  world/SkyLayout.cpp
   movement/MoveEntity.cpp
+  movement/CharacterMotor.cpp
+  anim/AnimRules.cpp
+  protocol/Messages.cpp
+  protocol/BookData.cpp
 )
 target_include_directories(rpg_core PUBLIC "${PROJECT_SOURCE_DIR}/src")
 target_link_libraries(rpg_core

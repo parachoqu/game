@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
+#include "core/JsMath.h"
 #include "core/Math.h"
 
 namespace rpg {
@@ -24,8 +25,8 @@ void CollisionGrid::addBox(double x, double z, double hw, double hd, double rotY
   c.z = z;
   c.hw = hw;
   c.hd = hd;
-  c.c = std::cos(rot);
-  c.s = std::sin(rot);
+  c.c = js::cos(rot);
+  c.s = js::sin(rot);
   c.r = jsHypot(hw, hd);
   add(c);
 }

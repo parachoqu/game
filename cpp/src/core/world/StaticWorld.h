@@ -9,6 +9,7 @@
 #include "core/Types.h"
 #include "core/data/Defs.h"
 #include "core/world/CollisionGrid.h"
+#include "core/world/GameplayLayout.h"
 #include "core/world/MapId.h"
 #include "core/world/RouteField.h"
 #include "core/world/Terrain.h"
@@ -69,14 +70,19 @@ class StaticWorld {
 
   int worldLayoutVersion() const { return worldLayoutVersion_; }
 
+  // Camada de jogo (serviços, coleta, NPCs, grupos, portais…): gameplay-layout.json.
+  const GameplayLayout& layout() const { return layout_; }
+
  private:
-  StaticWorld(std::array<StaticMap, kMapCount> maps, ZoneMap zones, double gateX, int layoutVersion)
-      : maps_(std::move(maps)), zones_(std::move(zones)), gateX_(gateX), worldLayoutVersion_(layoutVersion) {}
+  StaticWorld(std::array<StaticMap, kMapCount> maps, ZoneMap zones, double gateX, int layoutVersion, GameplayLayout layout)
+      : maps_(std::move(maps)), zones_(std::move(zones)), gateX_(gateX), worldLayoutVersion_(layoutVersion),
+        layout_(std::move(layout)) {}
 
   std::array<StaticMap, kMapCount> maps_;
   ZoneMap zones_;
   double gateX_;
   int worldLayoutVersion_;
+  GameplayLayout layout_;
 };
 
 }  // namespace rpg

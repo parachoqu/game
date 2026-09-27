@@ -19,6 +19,7 @@ import { dirname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { build } from 'esbuild';
 import { installBrowserShim } from './lib/node-env.mjs';
+import { buildScenarios } from './bake/scenarios.mjs';
 
 const TOOLS = dirname(fileURLToPath(import.meta.url));
 const DEMO = dirname(TOOLS);
@@ -49,7 +50,45 @@ const PATCHES = [
     apply: (s) => append(s, ['const PROTECTED_POINTS =', 'const NEVER_PROTECTED ='],
       'export { PROTECTED_POINTS as __PROTECTED, NEVER_PROTECTED as __NEVER_PROTECTED };'),
   },
+  // camada de jogo: posições internas de turbulent.js e discovery.js
+  // turbulent.js usa ITEMS em `encounterFor` sem importá-lo: no navegador o tick lança ReferenceError
+  // assim que uma figura persegue o jogador na Turbulenta. O C++ faz o que o código pretendia; aqui o
+  // import entra só no pacote do bake, para o harness rodar (ver ARQUITETURA.md, desvios da demo).
+  {
+    file: /[\\/]src[\\/]game[\\/]turbulent\.js$/,
+    apply: (s) => append(replaceOnce(s, "import { TURB, PORTAL_SPOTS", "import { ITEMS } from '../config.js';\nimport { TURB, PORTAL_SPOTS"),
+      ['const SHRINE_POS =', 'const EXIT_POS =', 'const START_POS ='],
+      'export { SHRINE_POS as __SHRINE_POS, EXIT_POS as __EXIT_POS, START_POS as __START_POS };'),
+  },
+  {
+    file: /[\\/]src[\\/]game[\\/]discovery\.js$/,
+    apply: (s) => append(s, ['const DISC = [', 'let t = 0;'], 'export { DISC as __DISC };\nexport function __resetDiscovery() { t = 0; }'),
+  },
+  // harness de paridade: composição do acampamento sob demanda
+  {
+    file: /[\\/]src[\\/]game[\\/]camp\.js$/,
+    apply: (s) => append(s, ['function applyComposition() {'], 'export { applyComposition as __applyComposition };'),
+  },
+  // harness: a mira chega pronta (no C++ ela vem no comando do cliente) e a aleatoriedade só visual
+  // (recuo e tremor de câmera) sai do Math.random da simulação
+  {
+    file: /[\\/]src[\\/]game[\\/]player\.js$/,
+    apply: (s) => visualRandom(replaceOnce(s, 'function updateAim(P) {',
+      'function updateAim(P) { if (globalThis.__aimHook) return globalThis.__aimHook(P);'), 12),
+  },
+  { file: /[\\/]src[\\/]engine[\\/]characters\.js$/, apply: (s) => visualRandom(s, 10) },
+  { file: /[\\/]src[\\/]engine[\\/]fx\.js$/, apply: (s) => visualRandom(s, 4) },
+  { file: /[\\/]src[\\/]engine[\\/]audio\.js$/, apply: (s) => visualRandom(s, 2) },
+  // o three.js sorteia UUIDs (e vetores aleatórios) com Math.random a cada objeto criado: na demo isso
+  // intercala o fluxo da simulação com a criação de modelos. No harness vai para o gerador visual.
+  { file: /[\\/]vendor[\\/]three[\\/]three\.core\.js$/, apply: (s) => visualRandom(s, s.split('Math.random()').length - 1) },
 ];
+// Math.random() → gerador visual à parte (sem ele, o do próprio Math.random).
+function visualRandom(src, expected) {
+  const n = src.split('Math.random()').length - 1;
+  if (n !== expected) throw new Error(`bake: esperado ${expected} Math.random() visuais (achados: ${n}); a demo mudou`);
+  return src.split('Math.random()').join('(globalThis.__visRand ? globalThis.__visRand() : Math.random())');
+}
 function replaceOnce(src, needle, replacement) {
   const n = src.split(needle).length - 1;
   if (n !== 1) throw new Error(`bake: esperado exatamente um "${needle}" (achados: ${n}); a demo mudou`);
@@ -94,6 +133,35 @@ try {
 }
 const snap = world.snapshot();
 const fix = world.fixtures();
+const gameplay = world.gameplayLayout();
+
+// Roteiros de paridade da simulação: o `boot` primeiro (continua do estado logo após buildWorld).
+const enemyTypes = Object.keys(JSON.parse(readFileSync(join(ROOT, 'cpp', 'data', 'enemies.json'), 'utf8')));
+const scenarios = buildScenarios({ places: snap.places, layout: gameplay.layout, bridges: snap.bridges, riverZ: world.riverCenterAt });
+const t1 = Date.now();
+// Math.sin/cos/atan2/exp do V8: 1 milhão de argumentos de um mulberry com semente, resumidos num
+// hash por função. O C++ gera os mesmos argumentos e confere as suas funções (core/JsMath).
+function jsMathHashes(seed, n) {
+  const R = world.mulberry(seed);
+  const fns = { sin: [], cos: [], atan2: [], exp: [] };
+  const h = Object.fromEntries(Object.keys(fns).map((k) => [k, 0x811c9dc5]));
+  const buf = new Float64Array(1), bytes = new Uint8Array(buf.buffer);
+  const mix = (k, v) => { buf[0] = v; let x = h[k]; for (let i = 0; i < 8; i++) { x ^= bytes[i]; x = Math.imul(x, 0x01000193) >>> 0; } h[k] = x; };
+  for (let i = 0; i < n; i++) {
+    const k = i % 4;
+    const x = k === 0 ? (R() - 0.5) * 20 : k === 1 ? (R() - 0.5) * 2000 : k === 2 ? (R() - 0.5) * 1e-3 : (R() - 0.5) * 1e6;
+    const y = (R() - 0.5) * (k === 3 ? 1e4 : 20);
+    const e = (R() - 0.5) * 40;
+    mix('sin', Math.sin(x)); mix('cos', Math.cos(x)); mix('atan2', Math.atan2(x, y)); mix('exp', Math.exp(e));
+  }
+  return { seed, n, hashes: Object.fromEntries(Object.entries(h).map(([k, v]) => [k, v.toString(16).padStart(8, '0')])) };
+}
+
+const simParity = {
+  enemyTypes, bootSeed: world.BOOT_SEED, jsMath: jsMathHashes(20260927, 1000000),
+  scenarios: scenarios.map((sc) => ({ ...sc, trace: world.runScenario(sc, enemyTypes) })),
+};
+if (!quiet) console.log(`roteiros de paridade: ${scenarios.length} em ${Date.now() - t1} ms`);
 
 // ---------------------------------------------------------------- serialização
 const le = (TypedArray, arr) => Buffer.from(new TypedArray(arr).buffer);   // x86/ARM: little-endian
@@ -168,6 +236,11 @@ const outputs = {
   [join(OUT_SIM, 'simpack.json')]: Buffer.from(JSON.stringify(pack, null, 1) + '\n'),
   [join(OUT_FIXTURES, 'world-parity.json')]: Buffer.from(JSON.stringify(fix) + '\n'),
   [join(OUT_TEXT, 'places.json')]: Buffer.from(JSON.stringify(placeNames, null, 2) + '\n'),
+  [join(OUT_SIM, 'gameplay-layout.json')]: Buffer.from(JSON.stringify(gameplay.layout, null, 1) + '\n'),
+  [join(OUT_TEXT, 'interactables.json')]: Buffer.from(JSON.stringify(gameplay.texts.interactables, null, 2) + '\n'),
+  [join(OUT_TEXT, 'travelers.json')]: Buffer.from(JSON.stringify(gameplay.texts.travelers, null, 2) + '\n'),
+  [join(OUT_TEXT, 'discoveries.json')]: Buffer.from(JSON.stringify(gameplay.texts.discoveries, null, 2) + '\n'),
+  [join(OUT_FIXTURES, 'sim-parity.json')]: Buffer.from(JSON.stringify(simParity) + '\n'),
 };
 
 let changed = 0;

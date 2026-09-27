@@ -5,6 +5,7 @@
 #include <limits>
 #include <numbers>
 
+#include "core/JsMath.h"
 #include "core/Types.h"
 
 namespace rpg {
@@ -41,7 +42,7 @@ inline Real angleDiff(Real a, Real b) {
 inline Real lerpAngle(Real a, Real b, Real t) { return a + angleDiff(b, a) * (t < 1.0 ? t : 1.0); }
 
 // player.js `k(rate, dt)`: suavização por tempo, igual a 30, 60 ou 144 quadros por segundo.
-inline Real expSmooth(Real rate, Real dt) { return 1.0 - std::exp(-rate * dt); }
+inline Real expSmooth(Real rate, Real dt) { return 1.0 - js::exp(-rate * dt); }
 
 // ---------------------------------------------------------------- Math.* do JS, bit a bit
 // A simulação reproduz a demo exatamente (testes de paridade), então onde o JavaScript e a
@@ -64,6 +65,27 @@ inline Real jsHypot(Real a, Real b) {
   if (max == 0.0) return 0.0;
   Real sum = 0.0, compensation = 0.0;
   for (const Real v : {a, b}) {
+    const Real n = v / max;
+    const Real summand = n * n - compensation;
+    const Real preliminary = sum + summand;
+    compensation = (preliminary - sum) - summand;
+    sum = preliminary;
+  }
+  return std::sqrt(sum) * max;
+}
+
+// Math.hypot(a, b, c) do V8: o mesmo laço de Kahan com três termos.
+inline Real jsHypot3(Real a, Real b, Real c) {
+  a = std::fabs(a);
+  b = std::fabs(b);
+  c = std::fabs(c);
+  if (std::isinf(a) || std::isinf(b) || std::isinf(c)) return std::numeric_limits<Real>::infinity();
+  if (std::isnan(a) || std::isnan(b) || std::isnan(c)) return std::numeric_limits<Real>::quiet_NaN();
+  Real max = a > b ? a : b;
+  max = max > c ? max : c;
+  if (max == 0.0) return 0.0;
+  Real sum = 0.0, compensation = 0.0;
+  for (const Real v : {a, b, c}) {
     const Real n = v / max;
     const Real summand = n * n - compensation;
     const Real preliminary = sum + summand;

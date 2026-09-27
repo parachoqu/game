@@ -11,7 +11,10 @@ add_executable(rpg_tests
   net/LocalTransportTests.cpp
   core/CollisionTests.cpp
   core/TerrainTests.cpp
+  core/ProtocolTests.cpp
+  core/AnimRulesTests.cpp
   parity/WorldParityTests.cpp
+  parity/SimParityTests.cpp
   sim/WorldTests.cpp
   server/ServerHostTests.cpp
 )
@@ -45,3 +48,5 @@ endif()
 
 # O servidor headless sobe, valida os dados e roda 10 s de simulação.
 add_test(NAME smoke.server_headless COMMAND rpg_server_app --data "${RPG_DATA_DIR}" --sim "${RPG_SIM_DIR}" --ticks 300)
+# Dois minutos de jogo com oito bots: combate, mortes, reaparecimento, grupos, acampamento e evento.
+add_test(NAME smoke.server_bots COMMAND rpg_server_app --data "${RPG_DATA_DIR}" --sim "${RPG_SIM_DIR}" --ticks 3600 --bots 8)

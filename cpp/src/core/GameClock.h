@@ -24,4 +24,13 @@ ClockTime clockAt(Seconds gameTime, const ClockConfig& cfg);
 // Usado pelo comando de depuração `night` da demo: G.time += ((22 − hora + 24) % 24) / 24 · DAY_LENGTH.
 Seconds secondsUntilHour(Seconds gameTime, double hour, const ClockConfig& cfg);
 
+// Luz do dia (engine/sky.js `applyDaylight`, só os números): o sol nasce às 6h e se põe às 18h.
+struct Daylight {
+  double elev = 0;   // seno da altura do sol
+  double day = 0;    // 0 à noite, 1 de dia
+  double dusk = 0;   // crepúsculo
+  double night = 0;  // 0 de dia, 1 à noite (as estrelas sumidas só são notadas com night > 0,5)
+};
+Daylight daylightAt(double hour);
+
 }  // namespace rpg

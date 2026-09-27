@@ -9,7 +9,7 @@ using rpg::test::gameData;
 using rpg::test::staticWorld;
 
 TEST_CASE("World avança em passo fixo e o relógio segue o config.js", "[sim][world]") {
-  rpg::sim::World w(gameData(), staticWorld(), 1);
+  rpg::sim::World w(gameData(), staticWorld(), rpg::sim::WorldConfig{1, {}, false});
   CHECK(w.tick() == 0);
   CHECK(w.clock().day == 1);
   CHECK(w.clock().hour == Approx(9.0));
@@ -23,6 +23,7 @@ TEST_CASE("World avança em passo fixo e o relógio segue o config.js", "[sim][w
 }
 
 TEST_CASE("World: mesma semente, mesma sequência aleatória", "[sim][world]") {
-  rpg::sim::World a(gameData(), staticWorld(), 42), b(gameData(), staticWorld(), 42);
-  for (int i = 0; i < 10; ++i) CHECK(a.rng().nextU32() == b.rng().nextU32());
+  rpg::sim::World a(gameData(), staticWorld(), rpg::sim::WorldConfig{42, {}, false});
+  rpg::sim::World b(gameData(), staticWorld(), rpg::sim::WorldConfig{42, {}, false});
+  for (int i = 0; i < 10; ++i) CHECK(a.state().rng->next() == b.state().rng->next());
 }

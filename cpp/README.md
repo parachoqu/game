@@ -6,34 +6,25 @@ plano de fases estão em [ARQUITETURA.md](ARQUITETURA.md).
 
 ## Estado
 
-**Fase 0 e Fase 1a concluídas:**
+**Fases 0, 1 e 2 concluídas:** o jogo inteiro da demo roda no servidor, sem janela.
 
-- CMake com os alvos `rpg_core`, `rpg_net`, `rpg_sim` e `rpg_server`, e o executável `rpg_server`
-  (servidor headless).
 - `rpg_core` (compartilhado por servidor e cliente):
-  - `Math`: funções numéricas de `state.js`, mais o `Math.hypot` e o `Math.round` do V8 reproduzidos
-    bit a bit.
-  - `Rng`: `Mulberry32` bit a bit igual ao JS, e `Pcg32` para a simulação.
-  - `Noise`: o ruído de `world/noise.js`.
-  - `GameClock`, `FixedTimestep` e `SlotMap`, este com ordem estável como os arrays do JS.
-  - `GameData`: todos os dados de design de `config.js`, validados na carga.
-  - **Mundo estático** (`core/world`), com um relevo, colisores e regras próprios para cada mapa
-    (região e Turbulenta):
-    - relevo escavado pelo rio, com pontes e rampas;
-    - água e biomas;
-    - 24.753 colisores na ordem da demo;
-    - campo de rotas, zonas de risco e nomes de lugar.
-  - `moveEntity` (`core/movement`), o mesmo passo usado pelo servidor e, no futuro, pela predição do
-    cliente.
-- `rpg_net`: `LocalTransport` com latência, jitter e perda simulados.
-- `rpg_sim` / `rpg_server`: `World` em passo fixo sobre o mundo estático, e `ServerHost` (thread
-  própria, sessões).
-- **Testes: 46 casos.** A paridade com o JS é exata (`==`, sem tolerância):
-  - relevo, pontes, água, rotas, biomas, zonas e lugares em ~2.700 pontos;
-  - `testPoint`/`resolve` em 2.500 casos;
-  - `moveEntity` em 91 trajetos de 45 passos.
-
-  Também rodam a checagem de camadas e a conferência dos dados com a demo.
+  - dados de design de `config.js`, validados na carga;
+  - mundo estático com paridade exata com a demo: relevo escavado pelo rio, pontes, água, biomas,
+    24.753 colisores, rotas, zonas e lugares, e a camada de jogo (serviços, coleta, NPCs, grupos,
+    portais, Turbulenta, descobertas);
+  - motor do personagem, regras de animação, o céu (estrelas e constelações);
+  - `JsMath`: seno, cosseno, arco-tangente e exponencial iguais aos do navegador, bit a bit;
+  - o protocolo inteiro (comandos, pedidos, eventos, snapshots e sessão).
+- `rpg_sim`: toda a simulação da demo, para N jogadores — movimento, ataques, as 36 técnicas,
+  projéteis, IA de feras, saqueadores, sombras e guardas, grupos com reaparecimento, inventário,
+  mercados, fabricação, reparo, treinos, montaria, derrota por zona, cargas no chão, coleta,
+  acampamento reativo, evento regional, estrelas, Região Turbulenta, NPCs, descobertas e o Livro.
+- `rpg_server`: sessões, pedidos validados, snapshots com raio de interesse, eventos por
+  destinatário e bots.
+- **Testes: 81.** Os de paridade repetem 19 roteiros jogados pela própria demo (do boot completo a
+  cada técnica das 18 armas) e exigem o mesmo resultado **bit a bit**, quadro a quadro. Os desvios
+  intencionais estão em [ARQUITETURA.md](ARQUITETURA.md), seção 8.
 
 O cliente (janela SDL3 + SDL_GPU) entra na fase 3.
 
@@ -90,7 +81,8 @@ Outros presets:
 ```bash
 ./build/dev/apps/server/rpg_server               # tempo real, Ctrl+C encerra
 ./build/dev/apps/server/rpg_server --ticks 300   # 10 s de jogo o mais rápido possível
-# --data DIR e --sim DIR apontam para outros cpp/data e cpp/assets/sim
+./build/dev/apps/server/rpg_server --ticks 3600 --bots 8   # 2 min com 8 jogadores controlados pelo servidor
+# --data DIR e --sim DIR apontam para outros cpp/data e cpp/assets/sim; --dev aceita comandos de teste
 ```
 
 ## Dados de design
@@ -115,8 +107,10 @@ de boot da demo e grava o resultado:
 - colisores de construções, árvores, acréscimos e objetos de jogo, na ordem de inserção;
 - lugares e pontos de zona.
 
-Assim o servidor não precisa de nenhum código de vegetação ou de render. O mesmo script gera as
-amostras dos testes de paridade (`tests/parity/fixtures/world-parity.json`).
+Assim o servidor não precisa de nenhum código de vegetação ou de render. O mesmo script grava a
+camada de jogo (`assets/sim/gameplay-layout.json`) e as amostras dos testes de paridade:
+`tests/parity/fixtures/world-parity.json` (consultas do mundo) e `sim-parity.json` (19 roteiros
+jogados pelas funções da demo, com o rastro quadro a quadro).
 
 Rode de novo quando o mundo da demo mudar. Isso precisa do Git LFS, porque o kit de natureza e os
 modelos estão lá:

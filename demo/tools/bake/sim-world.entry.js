@@ -27,6 +27,21 @@ import { bridges, groundHeight, terrainHeight, waterAt } from '../../src/engine/
 import { __inserted, resolve, testPoint, moveEntity } from '../../src/game/collide.js';
 import { LOC, HALF, TURB, zoneAt, placeAt, __PROTECTED, __NEVER_PROTECTED } from '../../src/game/layout.js';
 import { hash2, vnoise, fbm2 } from '../../src/world/noise.js';
+import { G as GAME } from '../../src/state.js';
+import { NODES } from '../../src/game/world.js';
+import { NPCS, TRAVELERS } from '../../src/game/npcs.js';
+import { groups } from '../../src/game/enemies.js';
+import { SHELTER } from '../../src/game/zones.js';
+import { GUARD_POSTS, CAMP_DISPLACED, CAMP_PATROL, PORTAL_SPOTS, ROUTES } from '../../src/game/layout.js';
+import { PORTAL_CORE, __SHRINE_POS, __EXIT_POS, __START_POS } from '../../src/game/turbulent.js';
+import { __DISC } from '../../src/game/discovery.js';
+import { mulberry as harnessRng } from './sim-harness.js';
+
+export { runScenario, aimTarget, mulberry } from './sim-harness.js';
+
+// Semente do cenário `boot` do harness: vale para os sorteios de buildWorld (espera dos viajantes e
+// criação dos grupos) em diante. Nada do pacote de mundo depende dela.
+export const BOOT_SEED = 424242;
 
 export async function loadWorld(log = () => {}) {
   const scene = new THREE.Scene();
@@ -38,6 +53,8 @@ export async function loadWorld(log = () => {}) {
   await loadWorldScene(scene, (t) => log(`mundo: ${t}`), { density: 1, debug: false, tier: 'alta', renderer: null });
   // As variantes e os colisores das árvores vêm do kit; sem ele o conjunto de colisores seria outro.
   if (!KIT_STATUS.loaded) throw new Error(`o kit de natureza não carregou: ${KIT_STATUS.error}`);
+  globalThis.__visRand = harnessRng(99);
+  Math.random = harnessRng(BOOT_SEED);
   buildWorld();
   log('camada de jogo');
   initTurbulent();
@@ -82,6 +99,57 @@ export function snapshot() {
     zones: { protected: __PROTECTED.map(circle), neverProtected: __NEVER_PROTECTED.map(circle) },
   };
 }
+
+// ---------------------------------------------------------------- camada de jogo
+// Posições que world.js, layout.js, turbulent.js, npcs.js e discovery.js montam, na ordem de criação.
+// `texts` vai para data/text/pt-BR (só o cliente lê).
+export function gameplayLayout() {
+  const labelKey = (it) => it.kind + (typeof it.data === 'string' ? '.' + it.data : '');
+  const labels = {};
+  const interactables = GAME.interactables.map((it) => {
+    const o = { kind: it.kind, x: it.x, z: it.z, r: it.r };
+    if (typeof it.data === 'string') o.data = it.data;
+    if (it.kind === 'node') o.node = NODES.indexOf(it.data);
+    else { o.label = labelKey(it); labels[o.label] = it.label; }
+    return o;
+  });
+  const nodes = NODES.map((n) => ({ kind: n.kind, x: n.x, z: n.z, yieldBonus: n.yieldBonus, rot: n.mesh.rotation.y }));
+  const travelerKeys = TRAVELERS.map((t, i) => `viajante${i + 1}`);
+  const npcs = NPCS.map((n, i) => {
+    const o = { x: n.x, z: n.z, yaw: n.yaw || 0, role: n.kind === 'traveler' ? 'traveler' : n.role };
+    if (n.face) o.face = true;
+    if (n.work) o.work = true;
+    for (const k of ['race', 'cloth', 'trim', 'hood', 'weapon', 'name']) if (n[k]) o[k] = n[k];
+    o.model = n.race === 'elfo' ? 'eve' : i % 2 ? 'eve' : 'kachujin';
+    if (n.kind === 'traveler') o.traveler = TRAVELERS.indexOf(n.travel);
+    return o;
+  });
+  const travelers = TRAVELERS.map((t, i) => ({ key: travelerKeys[i], path: t.path }));
+  const travelerTexts = Object.fromEntries(TRAVELERS.map((t, i) => [travelerKeys[i], { name: t.name, role: t.role, gear: t.gear, public: t.public }]));
+  const groupList = groups.map((g) => ({
+    id: g.id, x: g.center.x, z: g.center.z, leash: g.leash ?? null, respawn: g.respawn,
+    gorge: g.active.toString().includes('EVT'), members: g.members,
+  }));
+  const discoveries = __DISC.map(([key, c, r]) => ({ key, x: c.x, z: c.z, r, ...(key === 'ermos' ? { byZone: true } : {}) }));
+  const discoveryTexts = Object.fromEntries(__DISC.map(([key, , , title, text]) => [key, { title, text }]));
+  return {
+    layout: {
+      schema: 1,
+      interactables, nodes, npcs, travelers, groups: groupList,
+      canteiroGuard: { x: LOC.canteiro.x - 7, z: LOC.canteiro.z - 6, yaw: Math.PI },
+      guardPosts: GUARD_POSTS,
+      camp: { center: { x: LOC.acampamento.x, z: LOC.acampamento.z }, displaced: CAMP_DISPLACED, patrol: CAMP_PATROL },
+      portalSpots: PORTAL_SPOTS,
+      shelter: { x: SHELTER.x, z: SHELTER.z },
+      turbulent: { shrines: __SHRINE_POS, exits: __EXIT_POS, starts: __START_POS, portalCore: PORTAL_CORE, center: { x: TURB.x, z: TURB.z } },
+      discoveries,
+      shortGorge: ROUTES.short_gorge.pts,
+    },
+    texts: { interactables: labels, travelers: travelerTexts, discoveries: discoveryTexts },
+  };
+}
+
+export { riverCenterAt };
 
 // ---------------------------------------------------------------- fixtures de paridade
 function mulberry(seed) {

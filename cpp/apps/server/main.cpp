@@ -41,7 +41,8 @@ bool parseNumber(std::string_view s, T& out) {
 }
 
 int usage() {
-  std::fprintf(stderr, "uso: rpg_server [--data DIR] [--sim DIR] [--ticks N] [--seed S] [--tick-rate HZ]\n");
+  std::fprintf(stderr,
+               "uso: rpg_server [--data DIR] [--sim DIR] [--ticks N] [--seed S] [--tick-rate HZ] [--bots N] [--dev]\n");
   return 2;
 }
 
@@ -61,6 +62,8 @@ int main(int argc, char** argv) {
     else if (arg == "--ticks" && hasValue && parseNumber(argv[++i], ticks)) {}
     else if (arg == "--seed" && hasValue && parseNumber(argv[++i], cfg.seed)) {}
     else if (arg == "--tick-rate" && hasValue && parseNumber(argv[++i], cfg.tickRate) && cfg.tickRate > 0) {}
+    else if (arg == "--bots" && hasValue && parseNumber(argv[++i], cfg.bots) && cfg.bots >= 0) {}
+    else if (arg == "--dev") cfg.devCommands = true;
     else return usage();
   }
 
@@ -88,7 +91,13 @@ int main(int argc, char** argv) {
                  statics->worldLayoutVersion(), rpg::pathToUtf8(simDir), region.collision().size(), turb.collision().size(),
                  region.terrain().bridges().size());
 
+  const auto& layout = statics->layout();
+  rpg::log::info("camada de jogo: {} interagíveis, {} pontos de coleta, {} NPCs, {} grupos de inimigos",
+                 layout.interactables.size(), layout.nodes.size(), layout.npcs.size(), layout.groups.size());
+
   rpg::server::ServerHost host(data, *statics, cfg, nullptr);
+  const auto& S = host.world().state();
+  rpg::log::info("mundo povoado: {} inimigos, {} NPCs, {} bots", S.enemies.size(), S.npcs.size(), host.botCount());
   if (ticks > 0) {
     host.runTicks(ticks);
   } else {
@@ -100,5 +109,9 @@ int main(int argc, char** argv) {
   const rpg::ClockTime c = host.world().clock();
   rpg::log::info("encerrado no tick {} (tempo de jogo {:.2f} s, dia {} às {:.2f} h)", host.world().tick(),
                  host.world().time(), c.day, c.hour);
+  int alive = 0;
+  for (const auto& e : S.enemies) alive += e->alive ? 1 : 0;
+  rpg::log::info("estado final: {} inimigos vivos, acampamento no estado {}, evento em {:.1f}%, {} estrelas sumidas",
+                 alive, static_cast<int>(S.camp.state), S.evt.progress, S.skyState.vanished.size());
   return 0;
 }

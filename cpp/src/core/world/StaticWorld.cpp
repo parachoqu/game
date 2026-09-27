@@ -89,8 +89,9 @@ StaticWorld StaticWorld::load(const std::filesystem::path& simDir, const Balance
   StaticMap turbulentMap(MapKind::Turbulent, std::move(turbulent), std::move(turbulentGrid), std::nullopt,
                          std::move(p.turbulent.routes), XZ{p.turbulentOffsetX, p.turbulentOffsetZ}, p.turbulent.half - 6, rules);
 
+  GameplayLayout layout = GameplayLayout::load(simDir / "gameplay-layout.json");
   return StaticWorld({std::move(regionMap), std::move(turbulentMap)}, ZoneMap(std::move(z)), p.turbulentGateX,
-                     p.worldLayoutVersion);
+                     p.worldLayoutVersion, std::move(layout));
 }
 
 }  // namespace rpg

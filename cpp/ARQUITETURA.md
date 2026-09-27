@@ -425,3 +425,64 @@ Os assets visuais (GLB, WebP, `world-manifest.json`) são lidos como estão.
 - **Fim a fim:** `apps/local` percorre o roteiro da demo (criar → mercado → coleta → bancada → Passagem →
   derrota na Fronteira → recuperar carga → portal → extração), no modo manual e em teste roteirizado
   pelos `DevCommands`.
+
+---
+
+## 8. Como a simulação foi implementada (fases 1b e 2)
+
+### Estrutura
+
+- **`rpg_core`** ganhou o que servidor e cliente compartilham:
+  - `JsMath`: `sin`, `cos`, `atan2` e `exp` do fdlibm, na forma do V8. A libm do sistema diverge do
+    V8 no último bit em 2–19% dos argumentos; com isso a simulação ficava igual à demo por poucos
+    segundos. Além da paridade, dá o mesmo resultado em Linux, Windows e macOS (predição do cliente).
+  - `Random`: `IRandom` injetável (`Pcg32Random` no jogo, `Mulberry32Random` nos testes de paridade).
+  - `movement/CharacterMotor`: velocidade do passo, pulo, controle aéreo, gravidade e altura no vau.
+  - `anim/AnimRules`: lado do golpe, lado da queda, clipe da esquiva, pesos de locomoção e pose das
+    técnicas.
+  - `world/GameplayLayout` (serviços, coleta, NPCs, grupos, portais, Turbulenta, descobertas) e
+    `world/SkyLayout` (as 1.740 estrelas e a ordem de desaparecimento).
+  - `protocol/`: `ByteStream` (um `io()` por mensagem serve para ler e escrever), `PlayerCommand`,
+    `Requests`, `GameEvents`, `Snapshot`, `Session` e o catálogo de mensagens e sons.
+- **`rpg_sim`**: o estado (`Sim`, o `G` da demo) e os sistemas como funções livres, um arquivo por
+  módulo da demo: `Player`, `Combat`, `Enemies`, `Zones`, `Mount`, `Economy`, `Interact` e
+  `WorldSystems` (acampamento, evento, céu, Turbulenta, NPCs, descobertas). `World` é a interface:
+  jogadores, comandos, pedidos, passo, snapshot e eventos.
+- **`rpg_server`**: `ServerHost` com sessões (Hello → Welcome), comandos, pedidos, snapshots por
+  sessão com raio de interesse, eventos por destinatário e bots (`rpg_server --bots N`).
+
+### Um jogador na demo, N aqui
+
+O que era do único `G.player` passou para o `Player`: montaria, Livro, estatísticas, marcas,
+contribuição ao evento, observações do céu e a incursão na Turbulenta, que é uma instância própria do
+mapa. A IA escolhe o jogador mais próximo que pode atacar, no mesmo mapa e instância. Com um
+jogador, tudo se comporta exatamente como na demo.
+
+### Paridade por roteiro
+
+`demo/tools/bake-sim-world.mjs` roda, no Node, as funções de jogo da própria demo (updatePlayer,
+updateEnemies, combate, economia, acampamento, evento, céu, Turbulenta) com teclas e mira
+roteirizadas e `Math.random` trocado por um mulberry com semente. São 19 roteiros
+(`demo/tools/bake/scenarios.mjs`), do boot completo (todos os inimigos, NPCs e sistemas) a cada
+técnica das 18 famílias de armas, derrotas por zona, saque, resgate, mercado e fabricação,
+acampamento, estrelas, coleta e Turbulenta. `tests/parity/SimParityTests.cpp` repete cada roteiro e
+compara, quadro a quadro, o hash dos bits de tudo o que se move (jogador, inimigos, projéteis) e, no
+fim, inventários, moedas, estatísticas, Livro, acampamento, evento, céu, cargas, demanda e pontos de
+coleta. **A igualdade é exata.**
+
+Para isso o harness separa a aleatoriedade visual da demo (partículas, tremor e recuo de câmera,
+olhares dos personagens e os UUIDs que o three.js sorteia a cada objeto): ela passa a usar outro
+gerador, porque no C++ é do cliente.
+
+### Desvios da demo
+
+A regra é reproduzir a demo, inclusive o que parece estranho. As exceções:
+
+| O que a demo faz | O que o C++ faz | Por quê |
+|---|---|---|
+| `turbulent.js` usa `ITEMS` sem importá-lo: o tick lança ReferenceError quando uma figura persegue o jogador na Turbulenta | registra a arma da figura, como o código pretendia | a demo trava nesse ponto; o bake injeta o import só no pacote dele |
+| no colapso da Turbulenta, repõe `stateT = 4,4` a cada passo: o jogador fica derrubado para sempre | derruba uma vez e a derrota acontece | a região não teria saída |
+| nenhuma validação nos painéis | o servidor confere distância do serviço, moedas, capacidade e combate | anti-trapaça |
+
+Mantidos de propósito: o clique de ataque com magia nunca entra em alcance (a conta da demo dá NaN);
+o `reparoCampo` e a queimadura que dão crédito a quem causou; a ordem dos arrays e dos sorteios.
