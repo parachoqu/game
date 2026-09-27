@@ -1,0 +1,172 @@
+{
+  "minerio": {
+    "kind": "material",
+    "weight": 2
+  },
+  "madeira": {
+    "kind": "material",
+    "weight": 1.5
+  },
+  "erva": {
+    "kind": "material",
+    "weight": 0.2
+  },
+  "pele": {
+    "kind": "material",
+    "weight": 1
+  },
+  "cristal": {
+    "kind": "material",
+    "weight": 1
+  },
+  "fragmento": {
+    "kind": "material",
+    "weight": 0.5
+  },
+  "lingote": {
+    "kind": "material",
+    "weight": 1.5
+  },
+  "ferramentas": {
+    "kind": "goods",
+    "weight": 3
+  },
+  "instrumento": {
+    "kind": "goods",
+    "weight": 2
+  },
+  "pocao": {
+    "kind": "consumable",
+    "weight": 0.3
+  },
+  "espada": {
+    "kind": "weapon",
+    "family": "espada",
+    "req": "espadachim",
+    "weight": 3
+  },
+  "arco": {
+    "kind": "weapon",
+    "family": "arco",
+    "req": "arqueiro",
+    "weight": 1.5
+  },
+  "martelo": {
+    "kind": "weapon",
+    "family": "martelo",
+    "req": null,
+    "weight": 2.5
+  },
+  "gibao": {
+    "kind": "armor",
+    "hp": 20,
+    "speed": 1,
+    "weight": 4
+  },
+  "cota": {
+    "kind": "armor",
+    "hp": 45,
+    "speed": 0.93,
+    "weight": 8
+  },
+  "bolsa": {
+    "kind": "bag",
+    "cap": 15,
+    "weight": 0.5
+  },
+  "montaria": {
+    "kind": "mount",
+    "cap": 60,
+    "weight": 0
+  },
+  "manoplas": {
+    "kind": "weapon",
+    "family": "manoplas",
+    "req": "lutador",
+    "weight": 2.2
+  },
+  "maca": {
+    "kind": "weapon",
+    "family": "maca",
+    "req": "concussao_corte",
+    "weight": 3.2
+  },
+  "machado": {
+    "kind": "weapon",
+    "family": "machado",
+    "req": "concussao_corte",
+    "weight": 3.4
+  },
+  "adaga": {
+    "kind": "weapon",
+    "family": "adaga",
+    "req": "assassino",
+    "weight": 1.2
+  },
+  "lanca": {
+    "kind": "weapon",
+    "family": "lanca",
+    "req": "combatente_haste",
+    "weight": 2.8
+  },
+  "foice": {
+    "kind": "weapon",
+    "family": "foice",
+    "req": "combatente_haste",
+    "weight": 2.9
+  },
+  "besta": {
+    "kind": "weapon",
+    "family": "besta",
+    "req": "assassino",
+    "weight": 3
+  },
+  "cajado_gelo": {
+    "kind": "weapon",
+    "family": "cajado_gelo",
+    "req": "magia_elemental",
+    "weight": 2
+  },
+  "tomo_fogo": {
+    "kind": "weapon",
+    "family": "tomo_fogo",
+    "req": "magia_elemental",
+    "weight": 1.8
+  },
+  "cajado_natureza": {
+    "kind": "weapon",
+    "family": "cajado_natureza",
+    "req": "magia_natural",
+    "weight": 2.1
+  },
+  "tomo_vento": {
+    "kind": "weapon",
+    "family": "tomo_vento",
+    "req": "magia_elemental",
+    "weight": 1.6
+  },
+  "tomo_maldicao": {
+    "kind": "weapon",
+    "family": "tomo_maldicao",
+    "req": "artes_espirituais",
+    "weight": 1.7
+  },
+  "fetiche_metamorfose": {
+    "kind": "weapon",
+    "family": "metamorfose",
+    "req": "magia_natural",
+    "weight": 0.8
+  },
+  "cajado_vital": {
+    "kind": "weapon",
+    "family": "cajado_vital",
+    "req": "artes_espirituais",
+    "weight": 1.9
+  },
+  "tomo_sagrado": {
+    "kind": "weapon",
+    "family": "tomo_sagrado",
+    "req": "artes_espirituais",
+    "weight": 1.8
+  }
+}

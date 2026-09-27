@@ -9,3 +9,6 @@
 *.fbx filter=lfs diff=lfs merge=lfs -text
 *.zip filter=lfs diff=lfs merge=lfs -text
 *.pdf filter=lfs diff=lfs merge=lfs -text
+
+# Dados gerados para o C++: sempre LF (a conferência com a demo compara o texto)
+cpp/data/**/*.json text eol=lf

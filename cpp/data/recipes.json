@@ -1,0 +1,219 @@
+[
+  {
+    "out": "lingote",
+    "qty": 1,
+    "in": {
+      "minerio": 2
+    },
+    "req": null
+  },
+  {
+    "out": "ferramentas",
+    "qty": 1,
+    "in": {
+      "lingote": 1,
+      "madeira": 1
+    },
+    "req": null
+  },
+  {
+    "out": "gibao",
+    "qty": 1,
+    "in": {
+      "pele": 3
+    },
+    "req": null
+  },
+  {
+    "out": "cota",
+    "qty": 1,
+    "in": {
+      "lingote": 4
+    },
+    "req": "artesao"
+  },
+  {
+    "out": "instrumento",
+    "qty": 1,
+    "in": {
+      "lingote": 2,
+      "cristal": 1
+    },
+    "req": "artesao"
+  },
+  {
+    "out": "pocao",
+    "qty": 2,
+    "in": {
+      "erva": 3
+    },
+    "req": "alquimista"
+  },
+  {
+    "out": "espada",
+    "qty": 1,
+    "in": {
+      "lingote": 3,
+      "madeira": 1
+    },
+    "req": "artesao"
+  },
+  {
+    "out": "arco",
+    "qty": 1,
+    "in": {
+      "madeira": 3,
+      "pele": 1
+    },
+    "req": "artesao"
+  },
+  {
+    "out": "martelo",
+    "qty": 1,
+    "in": {
+      "lingote": 2,
+      "madeira": 1
+    },
+    "req": "artesao"
+  },
+  {
+    "out": "manoplas",
+    "qty": 1,
+    "in": {
+      "lingote": 2,
+      "pele": 2
+    },
+    "req": "artesao"
+  },
+  {
+    "out": "maca",
+    "qty": 1,
+    "in": {
+      "lingote": 3,
+      "madeira": 1
+    },
+    "req": "artesao"
+  },
+  {
+    "out": "machado",
+    "qty": 1,
+    "in": {
+      "lingote": 3,
+      "madeira": 2
+    },
+    "req": "artesao"
+  },
+  {
+    "out": "adaga",
+    "qty": 1,
+    "in": {
+      "lingote": 2,
+      "pele": 1
+    },
+    "req": "artesao"
+  },
+  {
+    "out": "lanca",
+    "qty": 1,
+    "in": {
+      "lingote": 2,
+      "madeira": 3
+    },
+    "req": "artesao"
+  },
+  {
+    "out": "foice",
+    "qty": 1,
+    "in": {
+      "lingote": 3,
+      "madeira": 2
+    },
+    "req": "artesao"
+  },
+  {
+    "out": "besta",
+    "qty": 1,
+    "in": {
+      "madeira": 3,
+      "lingote": 2,
+      "pele": 1
+    },
+    "req": "artesao"
+  },
+  {
+    "out": "cajado_gelo",
+    "qty": 1,
+    "in": {
+      "madeira": 2,
+      "cristal": 1
+    },
+    "req": "artesao"
+  },
+  {
+    "out": "tomo_fogo",
+    "qty": 1,
+    "in": {
+      "pele": 2,
+      "cristal": 1,
+      "fragmento": 1
+    },
+    "req": "artesao"
+  },
+  {
+    "out": "cajado_natureza",
+    "qty": 1,
+    "in": {
+      "madeira": 3,
+      "erva": 4
+    },
+    "req": "artesao"
+  },
+  {
+    "out": "tomo_vento",
+    "qty": 1,
+    "in": {
+      "pele": 2,
+      "madeira": 1,
+      "fragmento": 1
+    },
+    "req": "artesao"
+  },
+  {
+    "out": "tomo_maldicao",
+    "qty": 1,
+    "in": {
+      "pele": 2,
+      "fragmento": 2
+    },
+    "req": "artesao"
+  },
+  {
+    "out": "fetiche_metamorfose",
+    "qty": 1,
+    "in": {
+      "pele": 4,
+      "madeira": 1
+    },
+    "req": "artesao"
+  },
+  {
+    "out": "cajado_vital",
+    "qty": 1,
+    "in": {
+      "madeira": 2,
+      "erva": 3,
+      "cristal": 1
+    },
+    "req": "artesao"
+  },
+  {
+    "out": "tomo_sagrado",
+    "qty": 1,
+    "in": {
+      "pele": 2,
+      "lingote": 1,
+      "cristal": 2
+    },
+    "req": "artesao"
+  }
+]

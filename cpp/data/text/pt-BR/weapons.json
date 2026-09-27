@@ -1,0 +1,59 @@
+{
+  "punhos": {
+    "name": "Punhos"
+  },
+  "espada": {
+    "name": "Espada"
+  },
+  "arco": {
+    "name": "Arco"
+  },
+  "martelo": {
+    "name": "Martelo"
+  },
+  "manoplas": {
+    "name": "Manoplas"
+  },
+  "maca": {
+    "name": "Maça"
+  },
+  "machado": {
+    "name": "Machado"
+  },
+  "adaga": {
+    "name": "Adagas"
+  },
+  "lanca": {
+    "name": "Lança"
+  },
+  "foice": {
+    "name": "Foice"
+  },
+  "besta": {
+    "name": "Besta"
+  },
+  "cajado_gelo": {
+    "name": "Gelo Perpétuo"
+  },
+  "tomo_fogo": {
+    "name": "Chama Viva"
+  },
+  "cajado_natureza": {
+    "name": "Natureza & Raízes"
+  },
+  "tomo_vento": {
+    "name": "Vento & Ar"
+  },
+  "tomo_maldicao": {
+    "name": "Maldições Sombrias"
+  },
+  "metamorfose": {
+    "name": "Forma da Fera"
+  },
+  "cajado_vital": {
+    "name": "Vitalidade"
+  },
+  "tomo_sagrado": {
+    "name": "Luz Sagrada"
+  }
+}

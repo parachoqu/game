@@ -1,0 +1,34 @@
+{
+  "espadachim": {
+    "label": "Espadachim I",
+    "desc": "Começa com uma espada de ferro e suas técnicas versáteis de corte e estocada."
+  },
+  "arqueiro": {
+    "label": "Arqueiro I",
+    "desc": "Começa com um arco de freixo e suas técnicas de precisão à distância."
+  },
+  "artesao": {
+    "label": "Artesão I",
+    "desc": "Começa com martelo de oficina e receitas de forja e fabricação."
+  },
+  "lutador": {
+    "label": "Lutador I",
+    "desc": "Começa com manoplas de ferro e combate de pressão corporal em curta distância."
+  },
+  "lanceiro": {
+    "label": "Lanceiro I",
+    "desc": "Começa com lança de guarda e técnicas de controle de distância e penetração."
+  },
+  "mago_gelo": {
+    "label": "Mago do Gelo I",
+    "desc": "Começa com cajado gélido e manipulação de água, fluxo e contenção."
+  },
+  "piromante": {
+    "label": "Piromante I",
+    "desc": "Começa com tomo de chamas vivas e combustão explosiva intensa."
+  },
+  "metamorfo": {
+    "label": "Metamorfo I",
+    "desc": "Começa com amuleto primevo e a tradição de assumir a Forma da Fera."
+  }
+}

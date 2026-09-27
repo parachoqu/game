@@ -1,0 +1,74 @@
+{
+  "lingote": {
+    "note": "Refino"
+  },
+  "ferramentas": {
+    "note": "Ofício básico"
+  },
+  "gibao": {
+    "note": "Couro"
+  },
+  "cota": {
+    "note": "Forja"
+  },
+  "instrumento": {
+    "note": "Precisão"
+  },
+  "pocao": {
+    "note": "Alquimia"
+  },
+  "espada": {
+    "note": "Forja"
+  },
+  "arco": {
+    "note": "Carpintaria"
+  },
+  "martelo": {
+    "note": "Forja"
+  },
+  "manoplas": {
+    "note": "Forja & Couro"
+  },
+  "maca": {
+    "note": "Forja"
+  },
+  "machado": {
+    "note": "Forja"
+  },
+  "adaga": {
+    "note": "Forja"
+  },
+  "lanca": {
+    "note": "Haste"
+  },
+  "foice": {
+    "note": "Forja"
+  },
+  "besta": {
+    "note": "Engenho"
+  },
+  "cajado_gelo": {
+    "note": "Canalização"
+  },
+  "tomo_fogo": {
+    "note": "Encadernação"
+  },
+  "cajado_natureza": {
+    "note": "Sintonia"
+  },
+  "tomo_vento": {
+    "note": "Encadernação"
+  },
+  "tomo_maldicao": {
+    "note": "Marcas"
+  },
+  "fetiche_metamorfose": {
+    "note": "Tradição Primeva"
+  },
+  "cajado_vital": {
+    "note": "Restauração"
+  },
+  "tomo_sagrado": {
+    "note": "Luz Sagrada"
+  }
+}

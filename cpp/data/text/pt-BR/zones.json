@@ -1,0 +1,22 @@
+{
+  "protegida": {
+    "name": "Protegida",
+    "rule": "Sem ataque livre entre jogadores. Morrer: retorno ao abrigo e desgaste, sem saque.",
+    "death": "Retorno ao abrigo, desgaste do equipamento. Nada é saqueado."
+  },
+  "fronteira": {
+    "name": "Fronteira",
+    "rule": "Carga transportada (bolsa e alforjes) pode ser saqueada. Conjunto equipado é preservado.",
+    "death": "A carga transportada fica no local. Equipamento, montaria, moedas e conhecimentos permanecem."
+  },
+  "fullloot": {
+    "name": "Full Loot",
+    "rule": "Tudo o que você leva — carga, equipamento e montaria — pode ser saqueado ou destruído.",
+    "death": "Carga, equipamento e item de montaria ficam no local; uma parte é destruída."
+  },
+  "turbulenta": {
+    "name": "Turbulenta",
+    "rule": "Full Loot. Identidades ocultas. Saia por uma extração antes do colapso.",
+    "death": "Tudo o que você leva fica na região."
+  }
+}

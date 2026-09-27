@@ -1,0 +1,58 @@
+name: C++
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cpp/**'
+      - 'demo/src/config.js'
+      - 'demo/src/game/**'
+      - 'demo/tools/export-game-data.mjs'
+      - '.github/workflows/cpp.yml'
+  pull_request:
+    paths:
+      - 'cpp/**'
+      - 'demo/src/config.js'
+      - 'demo/src/game/**'
+      - 'demo/tools/export-game-data.mjs'
+      - '.github/workflows/cpp.yml'
+
+jobs:
+  linux:
+    name: Linux (${{ matrix.preset }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        preset: [ci, asan]
+    defaults:
+      run:
+        working-directory: cpp
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dependências
+        run: sudo apt-get update && sudo apt-get install -y libglm-dev nlohmann-json3-dev catch2 ninja-build
+      - run: cmake --preset ${{ matrix.preset }}
+      - run: cmake --build --preset ${{ matrix.preset }}
+      - run: ctest --preset ${{ matrix.preset }}
+
+  windows:
+    name: Windows (MSVC + vcpkg)
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: cpp
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: vcpkg
+        shell: pwsh
+        working-directory: ${{ runner.temp }}
+        run: |
+          # clone completo: a builtin-baseline do vcpkg.json precisa estar no histórico
+          git clone https://github.com/microsoft/vcpkg vcpkg
+          ./vcpkg/bootstrap-vcpkg.bat -disableMetrics
+          "VCPKG_ROOT=$env:RUNNER_TEMP\vcpkg" >> $env:GITHUB_ENV
+      - run: cmake --preset windows-msvc
+      - run: cmake --build --preset windows-msvc
+      - run: ctest --preset windows-msvc

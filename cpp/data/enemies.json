@@ -1,0 +1,165 @@
+{
+  "garra": {
+    "faction": "beast",
+    "hp": 40,
+    "speed": 6.4,
+    "dmg": 10,
+    "range": 2.3,
+    "arc": 1.4,
+    "windup": 0.62,
+    "cd": 1.5,
+    "aggro": 17,
+    "drop": {
+      "pele": [
+        1,
+        1
+      ]
+    }
+  },
+  "garraLider": {
+    "faction": "beast",
+    "hp": 120,
+    "speed": 6,
+    "dmg": 18,
+    "range": 3.4,
+    "shape": "circle",
+    "windup": 0.9,
+    "cd": 2.2,
+    "aggro": 20,
+    "drop": {
+      "pele": [
+        2,
+        3
+      ]
+    },
+    "scale": 1.45
+  },
+  "garraPalida": {
+    "faction": "beast",
+    "hp": 60,
+    "speed": 6.8,
+    "dmg": 13,
+    "range": 2.4,
+    "arc": 1.4,
+    "windup": 0.55,
+    "cd": 1.4,
+    "aggro": 19,
+    "drop": {
+      "pele": [
+        1,
+        2
+      ]
+    },
+    "scale": 1.15
+  },
+  "saqueador": {
+    "faction": "bandit",
+    "hp": 55,
+    "speed": 6.1,
+    "dmg": 12,
+    "range": 2.6,
+    "arc": 1.7,
+    "windup": 0.55,
+    "cd": 1.35,
+    "aggro": 19,
+    "coins": [
+      4,
+      9
+    ],
+    "weapon": "espada"
+  },
+  "saqueadorArco": {
+    "faction": "bandit",
+    "hp": 42,
+    "speed": 5.8,
+    "dmg": 10,
+    "range": 17,
+    "windup": 0.85,
+    "cd": 1.9,
+    "aggro": 22,
+    "coins": [
+      4,
+      8
+    ],
+    "ranged": true,
+    "weapon": "arco"
+  },
+  "saqueadorLanca": {
+    "faction": "bandit",
+    "hp": 58,
+    "speed": 6,
+    "dmg": 13,
+    "range": 3.4,
+    "arc": 1.4,
+    "windup": 0.58,
+    "cd": 1.45,
+    "aggro": 20,
+    "coins": [
+      5,
+      10
+    ],
+    "weapon": "lanca"
+  },
+  "sombraEspada": {
+    "faction": "shadow",
+    "hp": 75,
+    "speed": 6.3,
+    "dmg": 14,
+    "range": 2.8,
+    "arc": 1.8,
+    "windup": 0.6,
+    "cd": 1.5,
+    "aggro": 22,
+    "drop": {
+      "fragmento": [
+        1,
+        1
+      ]
+    },
+    "weapon": "espada"
+  },
+  "sombraArco": {
+    "faction": "shadow",
+    "hp": 60,
+    "speed": 6,
+    "dmg": 11,
+    "range": 18,
+    "windup": 0.8,
+    "cd": 1.8,
+    "aggro": 24,
+    "drop": {
+      "fragmento": [
+        1,
+        1
+      ]
+    },
+    "ranged": true,
+    "weapon": "arco"
+  },
+  "sombraMagica": {
+    "faction": "shadow",
+    "hp": 70,
+    "speed": 6.1,
+    "dmg": 15,
+    "range": 18,
+    "windup": 0.75,
+    "cd": 1.7,
+    "aggro": 23,
+    "drop": {
+      "fragmento": [
+        1,
+        2
+      ]
+    },
+    "ranged": true,
+    "weapon": "cajado_gelo"
+  },
+  "guarda": {
+    "faction": "guard",
+    "hp": 200,
+    "speed": 6.2,
+    "dmg": 14,
+    "range": 2.4,
+    "weapon": "espada"
+  }
+}

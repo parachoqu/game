@@ -1,0 +1,130 @@
+{
+  "minerio": {
+    "name": "Minério de ferro",
+    "desc": "Refina-se em lingotes na forja."
+  },
+  "madeira": {
+    "name": "Madeira de freixo",
+    "desc": "Cabos, arcos e estruturas."
+  },
+  "erva": {
+    "name": "Erva-lume",
+    "desc": "Base de preparados alquímicos."
+  },
+  "pele": {
+    "name": "Pele de garra",
+    "desc": "Couro para gibões e empunhaduras."
+  },
+  "cristal": {
+    "name": "Cristal celeste",
+    "desc": "Só brota nos Ermos. Valioso no Alto."
+  },
+  "fragmento": {
+    "name": "Fragmento anômalo",
+    "desc": "Trazido de uma Região Turbulenta."
+  },
+  "lingote": {
+    "name": "Lingote de ferro",
+    "desc": "Material de forja e de reparo."
+  },
+  "ferramentas": {
+    "name": "Ferramentas",
+    "desc": "Muito procuradas enquanto a Passagem se recupera."
+  },
+  "instrumento": {
+    "name": "Instrumento astronômico",
+    "desc": "Mede desvios no céu."
+  },
+  "pocao": {
+    "name": "Poção de erva-lume",
+    "desc": "Recupera 45 de vida (tecla 1)."
+  },
+  "espada": {
+    "name": "Espada de ferro",
+    "desc": "Técnicas: Investida e Golpe Giratório."
+  },
+  "arco": {
+    "name": "Arco de freixo",
+    "desc": "Técnicas: Tiro Carregado e Recuo com Disparo."
+  },
+  "martelo": {
+    "name": "Martelo de oficina",
+    "desc": "Ferramenta de trabalho. Técnicas: Golpe Atordoante e Reparo de Campo."
+  },
+  "gibao": {
+    "name": "Gibão de couro",
+    "desc": "+20 de vida. Leve."
+  },
+  "cota": {
+    "name": "Cota de malha",
+    "desc": "+45 de vida. Reduz um pouco o deslocamento."
+  },
+  "bolsa": {
+    "name": "Bolsa de viagem",
+    "desc": "+15 kg de capacidade pessoal."
+  },
+  "montaria": {
+    "name": "Cavalo de carga",
+    "desc": "Item de montaria. Alforjes de 60 kg; mais rápido na estrada."
+  },
+  "manoplas": {
+    "name": "Manoplas de ferro",
+    "desc": "Combate corpo a corpo ágil. Técnicas: Rajada Rápida e Avanço de Impacto."
+  },
+  "maca": {
+    "name": "Maça com cravos",
+    "desc": "Golpes contundentes pesados. Técnicas: Golpe Esmagador e Onda de Choque."
+  },
+  "machado": {
+    "name": "Machado de batalha",
+    "desc": "Cortes agressivos e comprometidos. Técnicas: Machadada Brutal e Dilacerar."
+  },
+  "adaga": {
+    "name": "Adagas de aço",
+    "desc": "Curto alcance e janelas de oportunidade. Técnicas: Passo das Sombras e Golpe Preciso."
+  },
+  "lanca": {
+    "name": "Lança de guarda",
+    "desc": "Controle de distância e estocadas. Técnicas: Estocada Penetrante e Varrer Distância."
+  },
+  "foice": {
+    "name": "Foice de guerra",
+    "desc": "Arco cortante amplo com identidade própria. Técnicas: Ceifa Circular e Puxão Ceifador."
+  },
+  "besta": {
+    "name": "Besta de freixo",
+    "desc": "Disparo reto perfurante cadenciado. Técnicas: Virote Perfurante e Disparo de Repulsão."
+  },
+  "cajado_gelo": {
+    "name": "Cajado do Gelo",
+    "desc": "Manipulação de água e frio. Técnicas: Seta Gélida e Prisão de Gelo."
+  },
+  "tomo_fogo": {
+    "name": "Tomo da Chama Viva",
+    "desc": "Calor e combustão intensa. Técnicas: Bola de Fogo e Erupção Ígnea."
+  },
+  "cajado_natureza": {
+    "name": "Cajado das Raízes",
+    "desc": "Ciclo vegetal e da terra. Técnicas: Enraizar e Florescer Vital."
+  },
+  "tomo_vento": {
+    "name": "Tomo dos Ventos",
+    "desc": "Deslocamento e pressão eólica. Técnicas: Lufada Repulsiva e Salto dos Ventos."
+  },
+  "tomo_maldicao": {
+    "name": "Tomo das Maldições",
+    "desc": "Marcas de enfraquecimento e aflição. Técnicas: Marca Corruptora e Dreno Vital."
+  },
+  "fetiche_metamorfose": {
+    "name": "Amuleto da Fera",
+    "desc": "Alteração corporal e pacto animal. Técnicas: Forma da Fera e Rugido Intimidador."
+  },
+  "cajado_vital": {
+    "name": "Bastão Vital",
+    "desc": "Restauração e estabilização física. Técnicas: Toque Vital e Pulso Restaurador."
+  },
+  "tomo_sagrado": {
+    "name": "Tomo da Luz Celeste",
+    "desc": "Purificação e bênçãos protetoras. Técnicas: Escudo Radiante e Clarão Sagrado."
+  }
+}

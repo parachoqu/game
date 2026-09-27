@@ -36,6 +36,7 @@ Estes são os acoplamentos que a reescrita precisa quebrar. Eles guiam a divisã
 | 12 | O save mistura personagem e mundo (EVT, CAMP, SKY, MKT) num único `localStorage` | `save.js` | Ficam dois registros: `CharacterRecord` (da conta) e `WorldRecord` (do servidor). |
 | 13 | Os textos em português são gerados na simulação (Livro, avisos) | `book.js`, `economy.js`, … | A sim emite `MessageId`/`BookTemplateId` + parâmetros. O cliente localiza (pt-BR hoje). |
 | 14 | A Turbulenta é um deslocamento de coordenadas (`TURB_RUNTIME_OFFSET`, `isTurbulentSpace(x)`) | `coordinates.js`, todo o `game/` | Viram `MapId` e `MapInstance`. Cada incursão é uma instância própria, com a "entrada individual" do documento. |
+| 15 | A regra de equipar (treino exigido) é conferida só na interface (`panels.js`, ação de equipar) | `panels.js` | `Equip` é um `Request`; o servidor confere o treino antes de equipar. |
 
 ---
 
@@ -65,7 +66,7 @@ Estes são os acoplamentos que a reescrita precisa quebrar. Eles guiam a divisã
 | UI do jogo | RmlUi (HTML/CSS-like, casa com `index.html` + `styles.css` atuais). O `RenderInterface` é nosso, sobre SDL_GPU. | cliente |
 | Ferramentas de debug | Dear ImGui (backends SDL3 + SDL_GPU) | cliente |
 | JSON (dados, saves) | nlohmann-json | core |
-| Log | spdlog | core |
+| Log | `std::format` + `core/Log` (sem dependência externa) | core |
 | Testes | Catch2 v3 | tests |
 | Rede (fase futura) | GameNetworkingSockets (mensagens confiáveis e não confiáveis, criptografia) | net |
 | Build | CMake ≥ 3.28 + `CMakePresets.json` + vcpkg manifest | — |
@@ -129,7 +130,7 @@ fixtures de paridade. Entre colchetes está a origem no JS.
 cpp/
   CMakeLists.txt                 alvos rpg_core, rpg_net, rpg_sim, rpg_server, rpg_client, apps, testes
   CMakePresets.json              debug/release/asan; windows-msvc, linux-clang
-  vcpkg.json                     sdl3, glm, fastgltf, meshoptimizer, libwebp, rmlui, imgui, nlohmann-json, spdlog, catch2
+  vcpkg.json                     sdl3, glm, fastgltf, meshoptimizer, libwebp, rmlui, imgui, nlohmann-json, catch2
   cmake/Warnings.cmake, cmake/Sanitizers.cmake, cmake/Shaders.cmake (compila HLSL → SPIR-V/DXIL/MSL)
   data/                          dados de design, compartilhados pelo servidor e pelo cliente   [config.js]
     items.json weapons.json skills.json enemies.json zones.json markets.json recipes.json
@@ -149,23 +150,25 @@ cpp/
 
 **Básico**
 - `core/Types.h`: aliases (`Vec2`, `Vec3` via glm, `Tick`, `Seconds`).
-- `core/Math.h/.cpp`: `clamp`, `lerp`, `smooth`, `angleDiff`, `lerpAngle`, `dist2`, `expSmooth(rate, dt)`.   [state.js, `k()` de player.js]
+- `core/Math.h`: `clamp`, `lerp`, `smooth`, `angleDiff`, `lerpAngle`, `distXZ` (o `dist2` do JS), `expSmooth(rate, dt)`.   [state.js, `k()` de player.js]
 - `core/Rng.h/.cpp`: PCG32 com semente; `range`, `rangeInt`, `pick`, `chance`. Também `Mulberry32` para paridade com `world.js rng(1337)` e `noise.js`.
 - `core/Noise.h/.cpp`: `vnoise`, `fbm2`, `hash2`, `smoothstep`.   [world/noise.js]
 - `core/Handle.h`, `core/SlotMap.h`: `EntityId` geracional e pool tipado.
 - `core/FixedTimestep.h/.cpp`: acumulador de tick fixo.
 - `core/GameClock.h/.cpp`: dia e hora a partir do tempo de jogo (`DAY_LENGTH`, `START_HOUR`).   [state.js `clock()`]
-- `core/Log.h/.cpp`, `core/Assert.h`, `core/Json.h/.cpp`, `core/BinaryReader.h/.cpp` (little-endian, u16).
+- `core/Log.h/.cpp`, `core/Assert.h`, `core/BinaryReader.h/.cpp` (little-endian, u16).
 
 **Dados de design (só os campos de regra; nomes e descrições ficam no cliente)**
 - `core/data/Ids.h`: `ItemId`, `SkillId`, `WeaponFamilyId`, `EnemyTypeId`, `ZoneId`, `MarketId`, `RecipeId`, `TrainingId`, … (índices internados no load).
-- `core/data/ItemDefs.h/.cpp`: peso, tipo, família, requisito, vida/velocidade da armadura, capacidade.   [ITEMS, GEAR_KINDS]
-- `core/data/WeaponDefs.h/.cpp`: ataque básico (tipo, dano, alcance, arco, windup, recover, escola) e as 2 técnicas.   [WEAPONS]
-- `core/data/SkillDefs.h/.cpp`: custo, cooldown e as fases (telegrafia, instante do golpe, fim, raio, dano, efeitos). Os números hoje fixos no `switch` de `updateSkill` passam para `skills.json`.   [SKILLS + player.js]
-- `core/data/EnemyDefs.h/.cpp`: [ENEMIES + guarda embutido em `spawnEnemy`].
-- `core/data/ZoneDefs.h/.cpp`: [ZONES, só a regra de perda].
-- `core/data/MarketDefs.h/.cpp`, `core/data/RecipeDefs.h/.cpp`, `core/data/TrainingDefs.h/.cpp`, `core/data/OriginDefs.h/.cpp`, `core/data/StartDefs.h/.cpp`: [MARKETS, MOUNT_PRICE, RESTART_KIT_PRICE, RECIPES, TRAININGS, ORIGINS, STARTS].
-- `core/data/Balance.h/.cpp`: WALK, RUN, CROUCH, GRAVITY, JUMP, BOOST, AIR_CONTROL, MAX_SLOPE, ROUTE_SLOPE, regeneração, `BASE_CAP`, `OVER_LIMIT`.   [player.js, collide.js, inventory.js]
+- `core/data/DefTable.h`, `core/data/DataError.h`: tabela chave ↔ id na ordem de declaração; erro com arquivo e chave.
+- `core/data/Defs.h`: todas as definições de regra.
+  - `ItemDef`: peso, tipo, família, requisito, vida/velocidade da armadura, capacidade.   [ITEMS, GEAR_KINDS]
+  - `WeaponDef`: ataque básico (tipo, dano, alcance, arco, windup, recover, escola) e as 2 técnicas.   [WEAPONS]
+  - `SkillDef`: custo e cooldown. Na fase 2 ganha as fases (telegrafia, instante do golpe, fim, raio, dano, efeitos), e os números hoje fixos no `switch` de `updateSkill` passam para `skills.json`.   [SKILLS + player.js]
+  - `EnemyDef`: [ENEMIES + guarda embutido em `spawnEnemy`].
+  - `ZoneDef`: [ZONES, só a regra de perda].
+  - `MarketDef`, `RecipeDef`, `TrainingDef`, `OriginDef`, `StartDef`: [MARKETS, MOUNT_PRICE, RESTART_KIT_PRICE, RECIPES, TRAININGS, ORIGINS, STARTS].
+  - `Balance`: WALK, RUN, CROUCH, GRAVITY, JUMP, BOOST, AIR_CONTROL, MAX_SLOPE, ROUTE_SLOPE, `BASE_CAP`, `OVER_LIMIT`. Os números embutidos no meio do código (regeneração, esquiva…) entram junto com o `CharacterMotor`.   [player.js, collide.js, inventory.js]
 - `core/data/GameData.h/.cpp`: carrega tudo e valida as referências cruzadas (receita → item, arma → técnica, …).
 
 **Mundo estático (somente leitura; o servidor usa para autoridade e o cliente para predição, câmera e mira)**
