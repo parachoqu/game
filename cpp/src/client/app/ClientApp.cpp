@@ -11,6 +11,9 @@
 #include "client/ClientWorld.h"
 #include "client/Input.h"
 #include "client/Presentation.h"
+#include "client/assets/EnvironmentMap.h"
+#include "client/assets/Image.h"
+#include "client/assets/ScenePack.h"
 #include "client/fx/FxState.h"
 #include "client/game/Aim.h"
 #include "client/game/CommandBuilder.h"
@@ -27,6 +30,9 @@
 #include "client/ui/Localization.h"
 #include "client/ui/Screens.h"
 #include "client/ui/UiBatch.h"
+#include "client/world/EntityModels.h"
+#include "client/world/PackScene.h"
+#include "client/world/SkyView.h"
 #include "core/Log.h"
 #include "core/Paths.h"
 #include "core/data/GameData.h"
@@ -104,6 +110,16 @@ struct ClientApp::Impl {
   InstanceLists dynamic;
   std::vector<ColorVertex> unlit;
   std::array<bool, 2> mapUploaded{};
+  // pacote visual (cpp/assets/client); sem ele, o cenário grey-box da fase 3
+  std::optional<ScenePack> pack;
+  PackMeshes packMeshes;
+  std::unique_ptr<WorldView> worldView;
+  PackFrame packFrame;
+  DynamicSceneState dynScene;
+  EnvironmentSelector env;
+  DayPalette palette;
+  SkyView skyView;
+  SkyFrame skyFrame;
 
   Impl(const GameData& d, const StaticWorld& s, AppOptions o, std::unique_ptr<net::ITransport> t)
       : data(d),
@@ -140,6 +156,55 @@ struct ClientApp::Impl {
               t.chunks.size(), props.total());
   }
 
+  // Pacote visual: tabelas e binário, malhas (o relevo sai do heightfield), GPU e luz de ambiente.
+  void loadPack() {
+    const std::filesystem::path dir = opt.assetsDir / "client";
+    try {
+      ScenePack sp = ScenePack::load(dir);
+      pack.emplace(std::move(sp));
+      packMeshes = buildPackMeshes(*pack, statics);
+      worldView = std::make_unique<WorldView>(*pack, packMeshes);
+      renderer.loadPack(*pack, packMeshes, worldView->staticInstances());
+      if (pack->environment.present) {
+        env.setKit(decodeRgbe(loadWebp(pack->dir / pathFromUtf8(pack->environment.file))));
+        palette.calibrate(pack->environment.zenith, pack->environment.horizon, pack->environment.ground);
+      }
+    } catch (const std::exception& e) {
+      log::warn("pacote visual indisponível ({}); usando o cenário grey-box", e.what());
+      pack.reset();
+      worldView.reset();
+    }
+  }
+
+  // Estrelas, lua e constelações (sky.js) para este quadro; acerta os uniformes do céu.
+  const SkyFrame* skyFor(FrameUniforms& u, const ViewCamera& v, double hour, bool turbulent, double skyTime,
+                         std::vector<SkyInput::Gone> vanished) {
+    const SceneLighting Lg = lightingAt(hour, turbulent, palette);
+    SkyInput si;
+    si.camPos = glm::vec3(v.position);
+    si.sunDir = Lg.sunDir;
+    si.turbulent = turbulent;
+    si.night = Lg.daylight.night;
+    si.time = skyTime;
+    si.vanished = std::move(vanished);
+    skyView.build(si, skyFrame);
+    u.sky[0] = static_cast<float>(skyTime);
+    u.sky[1] = skyFrame.starNight;
+    u.sky[2] = skyFrame.lineOpacity;
+    u.sky[3] = 1.0f;
+    return &skyFrame;
+  }
+
+  // Cenário do pacote para a câmera deste quadro.
+  const PackFrame* packFor(const ViewCamera& v, double gameTime) {
+    if (!worldView || !renderer.packLoaded()) return nullptr;
+    const glm::vec3 eye(v.position);
+    const glm::vec3 fwd = glm::normalize(glm::vec3(v.target - v.position));
+    dynScene.time = gameTime;
+    worldView->update(eye, glm::mat4(v.viewProj()), fwd, dynScene, packFrame);
+    return &packFrame;
+  }
+
   proto::Hello hello() const {
     proto::Hello h;
     h.name = opt.autoStart && !opt.name.empty() ? opt.name : form.name;
@@ -157,8 +222,8 @@ struct ClientApp::Impl {
   }
 
   // ---------------------------------------------------------------- luz e uniformes
-  FrameUniforms uniforms(const ViewCamera& v, double hour, bool turbulent, double time) const {
-    const SceneLighting Lg = lightingAt(hour, turbulent);
+  FrameUniforms uniforms(const ViewCamera& v, double hour, bool turbulent, double time, const glm::dvec3* occTarget = nullptr) {
+    const SceneLighting Lg = lightingAt(hour, turbulent, palette);
     FrameUniforms u{};
     const glm::mat4 vp = glm::mat4(v.viewProj());
     FrameUniforms::put(u.viewProj, vp);
@@ -175,7 +240,15 @@ struct ClientApp::Impl {
     u.params[1] = turbulent ? 1.0f : 0.0f;
     u.params[2] = Lg.envIntensity;
     // o céu desenha o disco na direção do sol, não da luz (à noite a luz vem da lua)
-    if (!turbulent) FrameUniforms::put4(u.sunDir, Lg.lightDir, Lg.sunIntensity);
+    FrameUniforms::put4(u.skySun, Lg.sunDir, static_cast<float>(Lg.daylight.day));
+    FrameUniforms::put4(u.camDir, glm::normalize(glm::vec3(v.target - v.position)), static_cast<float>(in.width));
+    // recorte pontilhado (OCC): da câmera até o alvo dela; na câmera livre, desligado
+    FrameUniforms::put4(u.occCam, glm::vec3(v.position), static_cast<float>(in.height));
+    FrameUniforms::put4(u.occTarget, glm::vec3(occTarget ? *occTarget : v.position), 80.0f);
+    // luz de ambiente da hora (kit de dia, atmosfera no resto, nenhuma na Turbulenta)
+    if (renderer.packLoaded() && env.update(Lg.sunDir, turbulent, Lg.daylight.day)) renderer.setEnvironment(env.current());
+    for (std::size_t i = 0; i < 9; ++i) FrameUniforms::put4(u.sh[i], env.sh()[i], 0);
+    u.params[3] = renderer.packLoaded() ? env.maxMip() : -1.0f;
     return u;
   }
 
@@ -362,12 +435,28 @@ struct ClientApp::Impl {
     const double gameTime = W ? W->time : 0.0;
     dynamic.clear();
     unlit.clear();
-    const SceneContext sc{&statics, &data, &look};
+    const SceneContext sc{&statics, &data, &look, renderer.packLoaded()};
     buildEntityInstances(sc, world, gameTime, dynamic);
     buildFxGeometry(fx, map, static_cast<std::uint8_t>(mapKind), ring, now, unlit);
     const double hour = opt.hour ? *opt.hour : clockAt(gameTime, ClockConfig{}).hour;
     Renderer::Frame f;
-    f.uniforms = uniforms(vc, hour, mapKind == MapKind::Turbulent, now);
+    f.uniforms = uniforms(vc, hour, mapKind == MapKind::Turbulent, now, view ? nullptr : &vc.target);
+    if (W) {
+      dynScene.nodeDepleted.assign(W->nodes.size(), false);
+      for (std::size_t i = 0; i < W->nodes.size(); ++i) dynScene.nodeDepleted[i] = W->nodes[i].charges == 0;
+      dynScene.campPalisade = W->campState == static_cast<std::uint8_t>(proto::CampPhase::Pressionado);
+    }
+    dynScene.shrineTaken.assign(P->turb.shrinesTaken.size(), false);
+    for (std::size_t i = 0; i < P->turb.shrinesTaken.size(); ++i) dynScene.shrineTaken[i] = P->turb.shrinesTaken[i] != 0;
+    dynScene.models.clear();
+    if (pack && renderer.packLoaded()) collectEntityModels(*pack, world, statics, dynScene.models);
+    f.pack = packFor(vc, gameTime);
+    {
+      std::vector<SkyInput::Gone> gone;
+      if (W)
+        for (const proto::VanishedStar& vs : W->vanished) gone.push_back({vs.index, vs.time});
+      f.sky = skyFor(f.uniforms, vc, hour, mapKind == MapKind::Turbulent, gameTime, std::move(gone));
+    }
     f.map = static_cast<int>(mapKind);
     f.cameraPos = glm::vec3(vc.position);
     f.dynamic = &dynamic;
@@ -432,6 +521,13 @@ struct ClientApp::Impl {
     unlit.clear();
     Renderer::Frame f;
     f.uniforms = uniforms(cam.view(), opt.hour ? *opt.hour : 23.2, false, now);
+    f.pack = packFor(cam.view(), 0);
+    {
+      // a estrela da tela de título some aos 5 s (main.js)
+      std::vector<SkyInput::Gone> gone;
+      if (titleT > 5) gone.push_back({skyView.layout().titleStar, 5.0});
+      f.sky = skyFor(f.uniforms, cam.view(), opt.hour ? *opt.hour : 23.2, false, titleT, std::move(gone));
+    }
     f.map = 0;
     f.cameraPos = glm::vec3(cam.view().position);
     f.dynamic = &dynamic;
@@ -442,14 +538,15 @@ struct ClientApp::Impl {
   }
 
   void loadingFrame() {
-    static const char* steps[] = {"relevo da região", "relevo da Turbulenta", "pronto"};
+    static const char* steps[] = {"relevo da região", "relevo da Turbulenta", "cenário, vegetação e texturas", "pronto"};
     ui.clear();
-    screens.loading(ui, fonts, in, L, loadStep / 2.0, steps[std::min(loadStep, 2)]);
+    screens.loading(ui, fonts, in, L, loadStep / 3.0, steps[std::min(loadStep, 3)]);
     renderEmpty(std::nullopt);
     if (loadStep == 0) loadMap(MapKind::Region);
     else if (loadStep == 1) loadMap(MapKind::Turbulent);
+    else if (loadStep == 2) loadPack();
     ++loadStep;
-    if (loadStep >= 2) {
+    if (loadStep >= 3) {
       titleT = 0;
       if (opt.autoStart) join();
       else mode = Mode::Title;

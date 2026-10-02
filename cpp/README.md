@@ -6,8 +6,13 @@ plano de fases estão em [ARQUITETURA.md](ARQUITETURA.md).
 
 ## Estado
 
-**Fases 0 a 3 concluídas:** o jogo inteiro da demo roda no servidor, e o cliente grey-box (SDL3 +
-SDL_GPU/Vulkan) joga contra ele: andar, correr, pular, mirar, lutar, coletar, morrer e reaparecer.
+**Fases 0 a 3 concluídas:** o jogo inteiro da demo roda no servidor, e o cliente (SDL3 + SDL_GPU/Vulkan)
+joga contra ele: andar, correr, pular, mirar, lutar, coletar, morrer e reaparecer.
+
+**Fase 4 em andamento:** o cenário da demo já é o da demo — relevo com as 10 camadas, construções,
+props, vegetação com LOD por instância, água, céu de Preetham com nuvens, estrelas, lua, luz de
+ambiente do HDRI do kit, portal, sacos e projéteis. Faltam os personagens (ainda cápsulas); sombras,
+cobertura do chão e pós-processamento são da fase 7.
 
 - `rpg_core` (compartilhado por servidor e cliente):
   - dados de design de `config.js`, validados na carga;
@@ -47,8 +52,8 @@ Pré-requisitos:
   `-DRPG_BUILD_CLIENT=OFF` compila só servidor e testes.
 - Node ≥ 18, opcional: sem ele, o teste que confere `cpp/data` com a demo não é registrado.
 
-O C++ não precisa dos arquivos do Git LFS: o pacote de mundo da simulação (`assets/sim`, ~4 MB) já vem
-pronto no repositório.
+O C++ não precisa dos arquivos do Git LFS: o pacote de mundo da simulação (`assets/sim`, ~4 MB) e o
+pacote visual do cliente (`assets/client`, ~31 MB) já vêm prontos no repositório.
 
 ### Linux, com as bibliotecas do sistema
 
@@ -161,6 +166,29 @@ node demo/tools/bake-sim-world.mjs --check # só confere
 Referencial: cada mapa usa as coordenadas da demo (a Turbulenta continua centrada em x = 1.400). Assim
 a paridade fica bit a bit. Como cada entidade carrega o próprio mapa, nenhuma regra depende de
 `x > 1000`.
+
+## Pacote visual do cliente
+
+`cpp/assets/client` também vem da demo, mas do navegador: `demo/tools/bake-client-scene.mjs` abre a
+montagem de cena da própria demo no Chromium do Playwright (texturas procedurais, GLB, o mundo
+inteiro, a Turbulenta, os modelos de jogo) e exporta a cena pronta:
+
+- `scene.json`: geometrias, materiais (com os recursos de `patchMaterial`: tri, occ, splat, wind, water,
+  shore), texturas, blocos de relevo, malhas, instâncias, campos de LOD, modelos dinâmicos e o HDRI do kit;
+- `scene.bin`: fluxos comprimidos com o codec do meshoptimizer (sem perdas). O relevo leva só os pesos
+  das camadas; a malha é refeita do heightfield e confere por hash com a da demo;
+- `tex/*.webp`: texturas em WebP q95 com alfa sem perdas (`--lossless` grava tudo sem perdas, ~54 MB).
+
+```sh
+git lfs pull --include="demo/assets/**"
+(cd demo/tools && npm ci)                       # sharp e meshoptimizer; Playwright 1.5x instalado
+node demo/tools/bake-client-scene.mjs           # regrava cpp/assets/client (~30 s)
+node demo/tools/bake-client-scene.mjs --check   # só confere
+```
+
+Capturas para comparar com a demo: `node demo/tools/capture-reference.mjs DIR` grava os 14
+enquadramentos da demo atual (Chromium com SwiftShader, alguns minutos por enquadramento), e
+`python3 cpp/tools/compare_captures.py DIR shots --out relatorio` compara com as do `rpg_local`.
 
 ## Regras de camada
 

@@ -122,7 +122,7 @@ void buildEntityInstances(const SceneContext& ctx, const ClientWorld& world, dou
   const proto::PrivateState* self = world.self();
 
   // pontos de coleta (esgotados ficam escuros e baixos)
-  if (myMap == MapKind::Region && W && !(self && self->turb.inside)) {
+  if (myMap == MapKind::Region && W && !(self && self->turb.inside) && !ctx.packModels) {
     for (const LayoutInteractable& it : L.interactables) {
       if (it.kind != "node" || it.node < 0) continue;
       const auto ni = static_cast<std::size_t>(it.node);
@@ -142,7 +142,7 @@ void buildEntityInstances(const SceneContext& ctx, const ClientWorld& world, dou
     }
   }
   // santuários e saídas da incursão
-  if (self && self->turb.inside) {
+  if (self && self->turb.inside && !ctx.packModels) {
     const XZ T = L.turbulent.center;
     for (std::size_t i = 0; i < L.turbulent.shrines.size(); ++i) {
       const bool taken = i < self->turb.shrinesTaken.size() && self->turb.shrinesTaken[i];
@@ -156,7 +156,7 @@ void buildEntityInstances(const SceneContext& ctx, const ClientWorld& world, dou
     }
   }
   // o rasgo violeta
-  if (W && W->portal && myMap == MapKind::Region) {
+  if (W && W->portal && myMap == MapKind::Region && !ctx.packModels) {
     const double gy = map.groundHeight(W->portalX, W->portalZ);
     mat4 m = rotY(at(W->portalX, gy + 3, W->portalZ), time * 0.4);
     out.add(Prim::Sphere, makeInstance(scaled(m, 1.4, 3.0, 0.25), 0xb892ff, 0.85f));
@@ -239,6 +239,7 @@ void buildEntityInstances(const SceneContext& ctx, const ClientWorld& world, dou
         break;
       }
       case proto::EntityKind::Projectile: {
+        if (ctx.packModels) break;
         const auto kind = proto::projectileKind(e.type);
         if (kind == proto::ProjectileKind::Spell) {
           out.add(Prim::Sphere, makeInstance(scaled(at(e.x, e.y, e.z), 0.22, 0.22, 0.22), 0xb892ff));
@@ -251,6 +252,7 @@ void buildEntityInstances(const SceneContext& ctx, const ClientWorld& world, dou
         break;
       }
       case proto::EntityKind::LootBag: {
+        if (ctx.packModels) break;
         const bool own = (e.flags & proto::kFlagOwn) != 0;
         out.add(Prim::Box, makeInstance(scaled(at(e.x, e.y + 0.25, e.z), 0.6, 0.5, 0.6), own ? 0xc9a25a : 0x6e5438));
         break;

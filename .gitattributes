@@ -19,3 +19,7 @@ cpp/assets/sim/*.f32 binary
 cpp/assets/sim/*.bin binary
 cpp/assets/sim/*.json text eol=lf
 cpp/tests/parity/fixtures/*.json text eol=lf
+# Pacote visual do cliente (gerado por demo/tools/bake-client-scene.mjs): binários em git comum
+cpp/assets/client/*.bin binary
+cpp/assets/client/tex/*.webp binary
+cpp/assets/client/*.json text eol=lf

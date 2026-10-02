@@ -35,12 +35,13 @@ endif()
 
 # Cliente sem janela (lógica, sessão contra o servidor, textos, geometria): roda em qualquer CI.
 if(RPG_BUILD_CLIENT)
-  add_executable(rpg_client_tests client/ClientTests.cpp)
+  add_executable(rpg_client_tests client/ClientTests.cpp client/ScenePackTests.cpp client/PackSceneTests.cpp)
   target_link_libraries(rpg_client_tests PRIVATE rpg_client_core rpg_server Catch2::Catch2WithMain)
   target_include_directories(rpg_client_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
   target_compile_definitions(rpg_client_tests PRIVATE
     RPG_TEST_DATA_DIR="${RPG_DATA_DIR}"
     RPG_TEST_SIM_DIR="${RPG_SIM_DIR}"
+    RPG_TEST_ASSETS_DIR="${RPG_ASSETS_DIR}"
   )
   rpg_set_warnings(rpg_client_tests)
   if(WIN32)

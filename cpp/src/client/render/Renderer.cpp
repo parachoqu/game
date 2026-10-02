@@ -2,276 +2,19 @@
 
 #include <algorithm>
 #include <cstring>
-#include <stdexcept>
-#include <string>
 
-#include <SDL3/SDL.h>
-
-#include "client/geom/Primitives.h"
 #include "client/image/PngWriter.h"
-#include "client/render/ShaderBlobs.h"
+#include "client/render/RendererImpl.h"
 
 namespace rpg::client {
-
-namespace {
-
-[[noreturn]] void fail(const std::string& what) { throw std::runtime_error(what + ": " + SDL_GetError()); }
-
-struct GpuMesh {
-  SDL_GPUBuffer* vb = nullptr;
-  SDL_GPUBuffer* ib = nullptr;
-  Uint32 indexCount = 0;
-};
-
-struct ChunkDraw {
-  Uint32 firstIndex[2] = {0, 0}, indexCount[2] = {0, 0};
-  Sint32 vertexOffset[2] = {0, 0};
-  glm::vec3 center{0.0f};
-  float radius = 0;
-};
-
-struct GpuMap {
-  bool loaded = false;
-  SDL_GPUBuffer* terrainVB = nullptr;
-  SDL_GPUBuffer* terrainIB = nullptr;
-  std::vector<ChunkDraw> chunks;
-  GpuMesh water, bridges;
-  SDL_GPUBuffer* props = nullptr;
-  std::array<Uint32, kPrimCount> propFirst{}, propCount{};
-};
-
-struct DynBuffer {
-  SDL_GPUBuffer* buf = nullptr;
-  Uint32 cap = 0;
-};
-
-// Planos do frustum (Gribb–Hartmann) para profundidade 0–1.
-struct Frustum {
-  glm::vec4 p[6];
-  explicit Frustum(const glm::mat4& m) {
-    const auto row = [&](int i) { return glm::vec4(m[0][i], m[1][i], m[2][i], m[3][i]); };
-    p[0] = row(3) + row(0);
-    p[1] = row(3) - row(0);
-    p[2] = row(3) + row(1);
-    p[3] = row(3) - row(1);
-    p[4] = row(2);
-    p[5] = row(3) - row(2);
-    for (auto& v : p) v /= glm::length(glm::vec3(v));
-  }
-  bool sphere(glm::vec3 c, float r) const {
-    for (const auto& v : p)
-      if (glm::dot(glm::vec3(v), c) + v.w < -r) return false;
-    return true;
-  }
-};
-
-}  // namespace
-
-struct Renderer::Impl {
-  SDL_Window* window = nullptr;
-  SDL_GPUDevice* dev = nullptr;
-  SDL_GPUTextureFormat swapFmt = SDL_GPU_TEXTUREFORMAT_INVALID;
-  SDL_GPUTextureFormat depthFmt = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
-  static constexpr SDL_GPUTextureFormat kHdrFmt = SDL_GPU_TEXTUREFORMAT_R16G16B16A16_FLOAT;
-  static constexpr SDL_GPUTextureFormat kOutFmt = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
-
-  SDL_GPUGraphicsPipeline *scene = nullptr, *water = nullptr, *unlit = nullptr, *sky = nullptr, *composite = nullptr, *ui = nullptr;
-  SDL_GPUSampler* linear = nullptr;
-  SDL_GPUTexture *hdr = nullptr, *depth = nullptr, *out = nullptr, *atlas = nullptr;
-  int texW = 0, texH = 0, atlasSize = 0;
-  std::uint32_t atlasGeneration = ~0u;
-
-  std::array<GpuMesh, kPrimCount> prims;
-  SDL_GPUBuffer* identity = nullptr;
-  std::array<GpuMap, 2> maps;
-  DynBuffer instances, unlitVerts, uiVerts;
-  SDL_GPUTransferBuffer* staging = nullptr;
-  Uint32 stagingCap = 0;
-  SDL_GPUTransferBuffer* download = nullptr;
-  Uint32 downloadCap = 0;
-
-  SDL_GPUShader* shader(const char* name, SDL_GPUShaderStage stage, Uint32 samplers, Uint32 uniforms) {
-    const auto code = shaderBlob(name);
-    if (code.empty()) throw std::runtime_error(std::string("shader não embutido: ") + name);
-    SDL_GPUShaderCreateInfo ci{};
-    ci.code = code.data();
-    ci.code_size = code.size();
-    ci.entrypoint = "main";
-    ci.format = SDL_GPU_SHADERFORMAT_SPIRV;
-    ci.stage = stage;
-    ci.num_samplers = samplers;
-    ci.num_uniform_buffers = uniforms;
-    SDL_GPUShader* s = SDL_CreateGPUShader(dev, &ci);
-    if (!s) fail(std::string("SDL_CreateGPUShader(") + name + ")");
-    return s;
-  }
-
-  SDL_GPUBuffer* buffer(SDL_GPUBufferUsageFlags usage, Uint32 size) {
-    SDL_GPUBufferCreateInfo ci{};
-    ci.usage = usage;
-    ci.size = std::max<Uint32>(size, 16);
-    SDL_GPUBuffer* b = SDL_CreateGPUBuffer(dev, &ci);
-    if (!b) fail("SDL_CreateGPUBuffer");
-    return b;
-  }
-
-  // Sobe dados estáticos na hora (comando próprio).
-  SDL_GPUBuffer* staticBuffer(SDL_GPUBufferUsageFlags usage, const void* data, Uint32 size) {
-    SDL_GPUBuffer* b = buffer(usage, size);
-    if (size == 0) return b;
-    SDL_GPUTransferBufferCreateInfo ti{};
-    ti.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
-    ti.size = size;
-    SDL_GPUTransferBuffer* tb = SDL_CreateGPUTransferBuffer(dev, &ti);
-    if (!tb) fail("SDL_CreateGPUTransferBuffer");
-    void* dst = SDL_MapGPUTransferBuffer(dev, tb, false);
-    std::memcpy(dst, data, size);
-    SDL_UnmapGPUTransferBuffer(dev, tb);
-    SDL_GPUCommandBuffer* cmd = SDL_AcquireGPUCommandBuffer(dev);
-    SDL_GPUCopyPass* cp = SDL_BeginGPUCopyPass(cmd);
-    SDL_GPUTransferBufferLocation src{tb, 0};
-    SDL_GPUBufferRegion reg{b, 0, size};
-    SDL_UploadToGPUBuffer(cp, &src, &reg, false);
-    SDL_EndGPUCopyPass(cp);
-    SDL_SubmitGPUCommandBuffer(cmd);
-    SDL_ReleaseGPUTransferBuffer(dev, tb);
-    return b;
-  }
-
-  GpuMesh mesh(const MeshData& m) {
-    GpuMesh g;
-    g.vb = staticBuffer(SDL_GPU_BUFFERUSAGE_VERTEX, m.vertices.data(), static_cast<Uint32>(m.vertices.size() * sizeof(Vertex)));
-    g.ib = staticBuffer(SDL_GPU_BUFFERUSAGE_INDEX, m.indices.data(), static_cast<Uint32>(m.indices.size() * sizeof(std::uint32_t)));
-    g.indexCount = static_cast<Uint32>(m.indices.size());
-    return g;
-  }
-
-  void release(GpuMesh& m) {
-    if (m.vb) SDL_ReleaseGPUBuffer(dev, m.vb);
-    if (m.ib) SDL_ReleaseGPUBuffer(dev, m.ib);
-    m = {};
-  }
-
-  SDL_GPUTexture* texture(SDL_GPUTextureFormat fmt, SDL_GPUTextureUsageFlags usage, int w, int h) {
-    SDL_GPUTextureCreateInfo ci{};
-    ci.type = SDL_GPU_TEXTURETYPE_2D;
-    ci.format = fmt;
-    ci.usage = usage;
-    ci.width = static_cast<Uint32>(w);
-    ci.height = static_cast<Uint32>(h);
-    ci.layer_count_or_depth = 1;
-    ci.num_levels = 1;
-    SDL_GPUTexture* t = SDL_CreateGPUTexture(dev, &ci);
-    if (!t) fail("SDL_CreateGPUTexture");
-    return t;
-  }
-
-  void ensureTargets(int w, int h) {
-    if (w == texW && h == texH && hdr) return;
-    if (hdr) SDL_ReleaseGPUTexture(dev, hdr);
-    if (depth) SDL_ReleaseGPUTexture(dev, depth);
-    if (out) SDL_ReleaseGPUTexture(dev, out);
-    hdr = texture(kHdrFmt, SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER, w, h);
-    depth = texture(depthFmt, SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET, w, h);
-    out = texture(kOutFmt, SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER, w, h);
-    texW = w;
-    texH = h;
-  }
-
-  void ensureDyn(DynBuffer& d, SDL_GPUBufferUsageFlags usage, Uint32 size) {
-    if (size <= d.cap) return;
-    if (d.buf) SDL_ReleaseGPUBuffer(dev, d.buf);
-    d.cap = std::max<Uint32>(size + size / 2, 64 * 1024);
-    d.buf = buffer(usage, d.cap);
-  }
-
-  SDL_GPUGraphicsPipeline* pipeline(SDL_GPUShader* vs, SDL_GPUShader* fs, const SDL_GPUVertexInputState& vin,
-                                    SDL_GPUTextureFormat color, bool blend, bool depthTarget, bool depthTest, bool depthWrite,
-                                    SDL_GPUPrimitiveType prim = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST) {
-    SDL_GPUColorTargetDescription ct{};
-    ct.format = color;
-    if (blend) {
-      ct.blend_state.enable_blend = true;
-      ct.blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
-      ct.blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
-      ct.blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
-      ct.blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
-      ct.blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
-      ct.blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
-    }
-    SDL_GPUGraphicsPipelineCreateInfo pi{};
-    pi.vertex_shader = vs;
-    pi.fragment_shader = fs;
-    pi.vertex_input_state = vin;
-    pi.primitive_type = prim;
-    pi.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
-    pi.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
-    pi.rasterizer_state.front_face = SDL_GPU_FRONTFACE_COUNTER_CLOCKWISE;
-    pi.rasterizer_state.enable_depth_clip = true;
-    pi.depth_stencil_state.enable_depth_test = depthTest;
-    pi.depth_stencil_state.enable_depth_write = depthWrite;
-    pi.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
-    pi.target_info.color_target_descriptions = &ct;
-    pi.target_info.num_color_targets = 1;
-    pi.target_info.has_depth_stencil_target = depthTarget;
-    pi.target_info.depth_stencil_format = depthFmt;
-    SDL_GPUGraphicsPipeline* p = SDL_CreateGPUGraphicsPipeline(dev, &pi);
-    if (!p) fail("SDL_CreateGPUGraphicsPipeline");
-    return p;
-  }
-
-  void createPipelines() {
-    // cena iluminada: vértice (pos, normal, cor) + instância (matriz, cor)
-    const SDL_GPUVertexBufferDescription sceneBufs[2] = {
-        {0, sizeof(Vertex), SDL_GPU_VERTEXINPUTRATE_VERTEX, 0},
-        {1, sizeof(Instance), SDL_GPU_VERTEXINPUTRATE_INSTANCE, 0},
-    };
-    const SDL_GPUVertexAttribute sceneAttrs[8] = {
-        {0, 0, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3, 0},        {1, 0, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3, 12},
-        {2, 0, SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4_NORM, 24},  {3, 1, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4, 0},
-        {4, 1, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4, 16},       {5, 1, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4, 32},
-        {6, 1, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4, 48},       {7, 1, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4, 64},
-    };
-    const SDL_GPUVertexInputState sceneIn{sceneBufs, 2, sceneAttrs, 8};
-    const SDL_GPUVertexBufferDescription unlitBuf{0, sizeof(ColorVertex), SDL_GPU_VERTEXINPUTRATE_VERTEX, 0};
-    const SDL_GPUVertexAttribute unlitAttrs[2] = {{0, 0, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3, 0},
-                                                  {1, 0, SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4_NORM, 12}};
-    const SDL_GPUVertexInputState unlitIn{&unlitBuf, 1, unlitAttrs, 2};
-    const SDL_GPUVertexBufferDescription uiBuf{0, sizeof(UiVertex), SDL_GPU_VERTEXINPUTRATE_VERTEX, 0};
-    const SDL_GPUVertexAttribute uiAttrs[3] = {{0, 0, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2, 0},
-                                               {1, 0, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2, 8},
-                                               {2, 0, SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4_NORM, 16}};
-    const SDL_GPUVertexInputState uiIn{&uiBuf, 1, uiAttrs, 3};
-    const SDL_GPUVertexInputState none{nullptr, 0, nullptr, 0};
-
-    SDL_GPUShader* sceneV = shader("scene.vert", SDL_GPU_SHADERSTAGE_VERTEX, 0, 1);
-    SDL_GPUShader* sceneF = shader("scene.frag", SDL_GPU_SHADERSTAGE_FRAGMENT, 0, 1);
-    SDL_GPUShader* waterF = shader("water.frag", SDL_GPU_SHADERSTAGE_FRAGMENT, 0, 1);
-    SDL_GPUShader* unlitV = shader("unlit.vert", SDL_GPU_SHADERSTAGE_VERTEX, 0, 1);
-    SDL_GPUShader* unlitF = shader("unlit.frag", SDL_GPU_SHADERSTAGE_FRAGMENT, 0, 0);
-    SDL_GPUShader* fullV = shader("fullscreen.vert", SDL_GPU_SHADERSTAGE_VERTEX, 0, 0);
-    SDL_GPUShader* skyF = shader("sky.frag", SDL_GPU_SHADERSTAGE_FRAGMENT, 0, 1);
-    SDL_GPUShader* compF = shader("composite.frag", SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 1);
-    SDL_GPUShader* uiV = shader("ui.vert", SDL_GPU_SHADERSTAGE_VERTEX, 0, 1);
-    SDL_GPUShader* uiF = shader("ui.frag", SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 0);
-
-    scene = pipeline(sceneV, sceneF, sceneIn, kHdrFmt, true, true, true, true);
-    water = pipeline(sceneV, waterF, sceneIn, kHdrFmt, true, true, true, false);
-    unlit = pipeline(unlitV, unlitF, unlitIn, kHdrFmt, true, true, true, false);
-    sky = pipeline(fullV, skyF, none, kHdrFmt, false, true, false, false);
-    composite = pipeline(fullV, compF, none, kOutFmt, false, false, false, false);
-    ui = pipeline(uiV, uiF, uiIn, kOutFmt, true, false, false, false);
-    for (SDL_GPUShader* s : {sceneV, sceneF, waterF, unlitV, unlitF, fullV, skyF, compF, uiV, uiF}) SDL_ReleaseGPUShader(dev, s);
-  }
-};
 
 Renderer::Renderer(SDL_Window* window, const RendererOptions& o) : impl_(std::make_unique<Impl>()) {
   Impl& I = *impl_;
   I.window = window;
   I.dev = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV, o.debug, nullptr);
-  if (!I.dev) fail("SDL_CreateGPUDevice (é preciso Vulkan)");
+  if (!I.dev) gpuFail("SDL_CreateGPUDevice (é preciso Vulkan)");
   if (window) {
-    if (!SDL_ClaimWindowForGPUDevice(I.dev, window)) fail("SDL_ClaimWindowForGPUDevice");
+    if (!SDL_ClaimWindowForGPUDevice(I.dev, window)) gpuFail("SDL_ClaimWindowForGPUDevice");
     SDL_GPUPresentMode mode = SDL_GPU_PRESENTMODE_VSYNC;
     if (!o.vsync) {
       if (SDL_WindowSupportsGPUPresentMode(I.dev, window, SDL_GPU_PRESENTMODE_MAILBOX)) mode = SDL_GPU_PRESENTMODE_MAILBOX;
@@ -294,7 +37,7 @@ Renderer::Renderer(SDL_Window* window, const RendererOptions& o) : impl_(std::ma
   si.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_LINEAR;
   si.address_mode_u = si.address_mode_v = si.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
   I.linear = SDL_CreateGPUSampler(I.dev, &si);
-  if (!I.linear) fail("SDL_CreateGPUSampler");
+  if (!I.linear) gpuFail("SDL_CreateGPUSampler");
 
   const MeshData meshes[kPrimCount] = {prim::box(), prim::cylinder(), prim::cone(), prim::sphere(), prim::capsule(0.38, 1.8), prim::ring(0.72, 1.0)};
   for (std::size_t i = 0; i < kPrimCount; ++i) I.prims[i] = I.mesh(meshes[i]);
@@ -308,6 +51,8 @@ Renderer::~Renderer() {
   Impl& I = *impl_;
   if (!I.dev) return;
   SDL_WaitForGPUIdle(I.dev);
+  for (SDL_GPUFence*& fence : I.inFlight)
+    if (fence) SDL_ReleaseGPUFence(I.dev, fence);
   for (auto& m : I.prims) I.release(m);
   for (GpuMap& m : I.maps) {
     if (m.terrainVB) SDL_ReleaseGPUBuffer(I.dev, m.terrainVB);
@@ -316,15 +61,16 @@ Renderer::~Renderer() {
     I.release(m.water);
     I.release(m.bridges);
   }
-  for (DynBuffer* d : {&I.instances, &I.unlitVerts, &I.uiVerts})
+  for (DynBuffer* d : {&I.instances, &I.unlitVerts, &I.uiVerts, &I.skyStars, &I.skyLines, &I.skyOverlay})
     if (d->buf) SDL_ReleaseGPUBuffer(I.dev, d->buf);
+  I.releasePack();
   if (I.identity) SDL_ReleaseGPUBuffer(I.dev, I.identity);
   if (I.staging) SDL_ReleaseGPUTransferBuffer(I.dev, I.staging);
   if (I.download) SDL_ReleaseGPUTransferBuffer(I.dev, I.download);
   for (SDL_GPUTexture* t : {I.hdr, I.depth, I.out, I.atlas})
     if (t) SDL_ReleaseGPUTexture(I.dev, t);
   if (I.linear) SDL_ReleaseGPUSampler(I.dev, I.linear);
-  for (SDL_GPUGraphicsPipeline* p : {I.scene, I.water, I.unlit, I.sky, I.composite, I.ui})
+  for (SDL_GPUGraphicsPipeline* p : {I.scene, I.water, I.unlit, I.sky, I.composite, I.ui, I.stars, I.lines})
     if (p) SDL_ReleaseGPUGraphicsPipeline(I.dev, p);
   if (I.window) SDL_ReleaseWindowFromGPUDevice(I.dev, I.window);
   SDL_DestroyGPUDevice(I.dev);
@@ -368,12 +114,17 @@ void Renderer::uploadMap(int mapIndex, const TerrainBuild& terrain, const Instan
 bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>& capture) {
   Impl& I = *impl_;
   stats_ = {};
+  if (SDL_GPUFence*& fence = I.inFlight[I.frameSlot]) {
+    SDL_WaitForGPUFences(I.dev, true, &fence, 1);
+    SDL_ReleaseGPUFence(I.dev, fence);
+    fence = nullptr;
+  }
   SDL_GPUCommandBuffer* cmd = SDL_AcquireGPUCommandBuffer(I.dev);
-  if (!cmd) fail("SDL_AcquireGPUCommandBuffer");
+  if (!cmd) gpuFail("SDL_AcquireGPUCommandBuffer");
   SDL_GPUTexture* swap = nullptr;
   Uint32 sw = 0, sh = 0;
   if (I.window) {
-    if (!SDL_WaitAndAcquireGPUSwapchainTexture(cmd, I.window, &swap, &sw, &sh)) fail("SDL_WaitAndAcquireGPUSwapchainTexture");
+    if (!SDL_WaitAndAcquireGPUSwapchainTexture(cmd, I.window, &swap, &sw, &sh)) gpuFail("SDL_WaitAndAcquireGPUSwapchainTexture");
     if (swap) {
       outW_ = static_cast<int>(sw);
       outH_ = static_cast<int>(sh);
@@ -400,7 +151,12 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
   const Uint32 uiBytes = f.ui ? static_cast<Uint32>(f.ui->vertices().size() * sizeof(UiVertex)) : 0;
   const bool atlasUpload = f.atlas && (f.atlas->dirty() || !I.atlas);
   const Uint32 atlasBytes = atlasUpload ? static_cast<Uint32>(f.atlas->pixels().size()) : 0;
-  const Uint32 total = instBytes + unlitBytes + uiBytes + atlasBytes;
+  const bool packOn = I.pack.loaded && f.pack;
+  const Uint32 packInstBytes = packOn ? static_cast<Uint32>(f.pack->instances.size() * sizeof(Instance)) : 0;
+  const Uint32 starBytes = f.sky ? static_cast<Uint32>(f.sky->stars.size() * sizeof(StarInstance)) : 0;
+  const Uint32 lineBytes = f.sky ? static_cast<Uint32>(f.sky->lines.size() * sizeof(ColorVertex)) : 0;
+  const Uint32 overlayBytes = f.sky ? static_cast<Uint32>(f.sky->overlay.size() * sizeof(ColorVertex)) : 0;
+  const Uint32 total = instBytes + unlitBytes + uiBytes + atlasBytes + packInstBytes + starBytes + lineBytes + overlayBytes;
   if (f.atlas && (!I.atlas || I.atlasSize != f.atlas->size())) {
     if (I.atlas) SDL_ReleaseGPUTexture(I.dev, I.atlas);
     I.atlas = I.texture(SDL_GPU_TEXTUREFORMAT_R8_UNORM, SDL_GPU_TEXTUREUSAGE_SAMPLER, f.atlas->size(), f.atlas->size());
@@ -414,11 +170,15 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
       ti.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
       ti.size = I.stagingCap;
       I.staging = SDL_CreateGPUTransferBuffer(I.dev, &ti);
-      if (!I.staging) fail("SDL_CreateGPUTransferBuffer");
+      if (!I.staging) gpuFail("SDL_CreateGPUTransferBuffer");
     }
     I.ensureDyn(I.instances, SDL_GPU_BUFFERUSAGE_VERTEX, instBytes);
     I.ensureDyn(I.unlitVerts, SDL_GPU_BUFFERUSAGE_VERTEX, unlitBytes);
     I.ensureDyn(I.uiVerts, SDL_GPU_BUFFERUSAGE_VERTEX, uiBytes);
+    I.ensureDyn(I.pack.frameInst, SDL_GPU_BUFFERUSAGE_VERTEX, packInstBytes);
+    I.ensureDyn(I.skyStars, SDL_GPU_BUFFERUSAGE_VERTEX, starBytes);
+    I.ensureDyn(I.skyLines, SDL_GPU_BUFFERUSAGE_VERTEX, lineBytes);
+    I.ensureDyn(I.skyOverlay, SDL_GPU_BUFFERUSAGE_VERTEX, overlayBytes);
     auto* dst = static_cast<std::uint8_t*>(SDL_MapGPUTransferBuffer(I.dev, I.staging, true));
     Uint32 off = 0;
     if (instBytes) std::memcpy(dst + off, inst.data(), instBytes);
@@ -428,6 +188,14 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
     if (uiBytes) std::memcpy(dst + off, f.ui->vertices().data(), uiBytes);
     off += uiBytes;
     if (atlasBytes) std::memcpy(dst + off, f.atlas->pixels().data(), atlasBytes);
+    off += atlasBytes;
+    if (packInstBytes) std::memcpy(dst + off, f.pack->instances.data(), packInstBytes);
+    off += packInstBytes;
+    if (starBytes) std::memcpy(dst + off, f.sky->stars.data(), starBytes);
+    off += starBytes;
+    if (lineBytes) std::memcpy(dst + off, f.sky->lines.data(), lineBytes);
+    off += lineBytes;
+    if (overlayBytes) std::memcpy(dst + off, f.sky->overlay.data(), overlayBytes);
     SDL_UnmapGPUTransferBuffer(I.dev, I.staging);
     SDL_GPUCopyPass* cp = SDL_BeginGPUCopyPass(cmd);
     off = 0;
@@ -450,6 +218,11 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
       SDL_UploadToGPUTexture(cp, &src, &reg, false);
       f.atlas->markClean();
     }
+    off += atlasBytes;
+    up(I.pack.frameInst.buf, packInstBytes);
+    up(I.skyStars.buf, starBytes);
+    up(I.skyLines.buf, lineBytes);
+    up(I.skyOverlay.buf, overlayBytes);
     SDL_EndGPUCopyPass(cp);
   }
 
@@ -478,8 +251,9 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
   std::memcpy(&vp[0][0], f.uniforms.viewProj, sizeof(float) * 16);
   const Frustum fr(vp);
   const GpuMap& M = I.maps[static_cast<std::size_t>(f.map)];
+  if (packOn) I.drawPack(cmd, rp, *f.pack, false, stats_);
   SDL_BindGPUGraphicsPipeline(rp, I.scene);
-  if (M.loaded) {
+  if (M.loaded && !packOn) {
     // relevo
     SDL_GPUBufferBinding vb[2] = {{M.terrainVB, 0}, {I.identity, 0}};
     SDL_BindGPUVertexBuffers(rp, 0, vb, 2);
@@ -514,10 +288,33 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
       stats_.triangles += static_cast<std::uint64_t>(I.prims[p].indexCount / 3) * count[p];
     }
   };
-  if (M.loaded && M.props) drawInstances(M.props, M.propFirst, M.propCount);
+  if (M.loaded && M.props && !packOn) drawInstances(M.props, M.propFirst, M.propCount);
   if (instBytes) drawInstances(I.instances.buf, dynFirst, dynCount);
+  // céu noturno: lua e anel da lacuna, estrelas (aditivas), linhas das constelações
+  if (overlayBytes) {
+    SDL_BindGPUGraphicsPipeline(rp, I.unlit);
+    SDL_GPUBufferBinding ob{I.skyOverlay.buf, 0};
+    SDL_BindGPUVertexBuffers(rp, 0, &ob, 1);
+    SDL_DrawGPUPrimitives(rp, static_cast<Uint32>(f.sky->overlay.size()), 1, 0, 0);
+    ++stats_.drawCalls;
+  }
+  if (starBytes) {
+    SDL_BindGPUGraphicsPipeline(rp, I.stars);
+    SDL_GPUBufferBinding sb{I.skyStars.buf, 0};
+    SDL_BindGPUVertexBuffers(rp, 0, &sb, 1);
+    SDL_DrawGPUPrimitives(rp, 6, static_cast<Uint32>(f.sky->stars.size()), 0, 0);
+    ++stats_.drawCalls;
+  }
+  if (lineBytes) {
+    SDL_BindGPUGraphicsPipeline(rp, I.lines);
+    SDL_GPUBufferBinding lb{I.skyLines.buf, 0};
+    SDL_BindGPUVertexBuffers(rp, 0, &lb, 1);
+    SDL_DrawGPUPrimitives(rp, static_cast<Uint32>(f.sky->lines.size()), 1, 0, 0);
+    ++stats_.drawCalls;
+  }
+  if (packOn) I.drawPack(cmd, rp, *f.pack, true, stats_);
 
-  if (M.loaded && M.water.indexCount) {
+  if (M.loaded && M.water.indexCount && !packOn) {
     SDL_BindGPUGraphicsPipeline(rp, I.water);
     SDL_GPUBufferBinding wb[2] = {{M.water.vb, 0}, {I.identity, 0}};
     SDL_BindGPUVertexBuffers(rp, 0, wb, 2);
@@ -575,7 +372,8 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
     SDL_BlitGPUTexture(cmd, &bi);
   }
   if (!capture) {
-    SDL_SubmitGPUCommandBuffer(cmd);
+    I.inFlight[I.frameSlot] = SDL_SubmitGPUCommandBufferAndAcquireFence(cmd);
+    I.frameSlot = (I.frameSlot + 1) % I.inFlight.size();
     return true;
   }
   const Uint32 bytes = static_cast<Uint32>(outW_ * outH_ * 4);
@@ -585,7 +383,7 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
     ti.usage = SDL_GPU_TRANSFERBUFFERUSAGE_DOWNLOAD;
     ti.size = bytes;
     I.download = SDL_CreateGPUTransferBuffer(I.dev, &ti);
-    if (!I.download) fail("SDL_CreateGPUTransferBuffer (download)");
+    if (!I.download) gpuFail("SDL_CreateGPUTransferBuffer (download)");
     I.downloadCap = bytes;
   }
   SDL_GPUCopyPass* cp = SDL_BeginGPUCopyPass(cmd);
@@ -598,7 +396,7 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
   SDL_DownloadFromGPUTexture(cp, &reg, &dst);
   SDL_EndGPUCopyPass(cp);
   SDL_GPUFence* fence = SDL_SubmitGPUCommandBufferAndAcquireFence(cmd);
-  if (!fence) fail("SDL_SubmitGPUCommandBufferAndAcquireFence");
+  if (!fence) gpuFail("SDL_SubmitGPUCommandBufferAndAcquireFence");
   SDL_WaitForGPUFences(I.dev, true, &fence, 1);
   SDL_ReleaseGPUFence(I.dev, fence);
   const auto* px = static_cast<const std::uint8_t*>(SDL_MapGPUTransferBuffer(I.dev, I.download, false));

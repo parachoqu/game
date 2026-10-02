@@ -64,7 +64,8 @@ jobs:
 
   # O jogo de verdade, sem monitor: Vulkan por software (mesa lavapipe) e X11 virtual (Xvfb).
   # Roda os testes que precisam de GPU, abre a janela uma vez e grava as capturas dos enquadramentos
-  # da demo (demo/captures/after) como artefato do CI.
+  # da demo (os de demo/tools/capture-reference.mjs) como artefato do CI, com o pacote visual
+  # (cpp/assets/client).
   linux-client:
     name: Linux (cliente com Xvfb + lavapipe)
     runs-on: ubuntu-24.04
@@ -91,7 +92,8 @@ jobs:
           for v in 01_title_screen 02_mercado 03_ponte_principal 04_passagem_garganta 05_bosque_forjas 06_mina \
                    07_observatorio 08_entreposto_norte 09_campos 10_margens_rio 11_ermos 12_portal_turbulenta \
                    12b_turbulenta_interior 13_vista_elevada_horizonte; do
-            ./build/ci/apps/local/rpg_local --headless --size 1100x700 --view "$v" --screenshot "shots/$v.png"
+            frames=30; [ "$v" = 01_title_screen ] && frames=90
+            ./build/ci/apps/local/rpg_local --headless --size 1100x700 --view "$v" --frames "$frames" --screenshot "shots/$v.png"
           done
       - uses: actions/upload-artifact@v4
         with:

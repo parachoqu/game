@@ -1,6 +1,8 @@
 #pragma once
 // Luz do dia (engine/sky.js `applyDaylight`): cor do céu, sol e lua, hemisfério, névoa e ambiente
 // para uma hora do dia. Cores lineares, como THREE.Color guarda.
+#include <cstdint>
+
 #include <glm/glm.hpp>
 
 #include "core/GameClock.h"
@@ -22,7 +24,15 @@ struct SceneLighting {
   Daylight daylight;
 };
 
-SceneLighting lightingAt(double hour, bool turbulent);
+// Paleta do dia (sky.js `P`). `calibrate` aplica as cores dominantes do HDRI do kit
+// (kit-manifest.json → sky.colors), como `calibrateDaylight`.
+struct DayPalette {
+  glm::vec3 dayTop, dayHor, dayGround;
+  DayPalette();
+  void calibrate(std::uint32_t zenith, std::uint32_t horizon, std::uint32_t ground);
+};
+
+SceneLighting lightingAt(double hour, bool turbulent, const DayPalette& palette = DayPalette{});
 
 // "#rrggbb" sRGB → linear (THREE.Color com gerenciamento de cor).
 glm::vec3 srgbHexToLinear(std::uint32_t rgb);

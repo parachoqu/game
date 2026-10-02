@@ -23,16 +23,24 @@ add_library(rpg_client_core STATIC
   geom/TerrainMesh.cpp
   geom/SceneBatch.cpp
   image/PngWriter.cpp
+  assets/ScenePack.cpp
+  assets/Image.cpp
+  assets/EnvironmentMap.cpp
+  world/PackScene.cpp
+  world/PackMaterials.cpp
+  world/SkyView.cpp
+  world/EntityModels.cpp
 )
 target_link_libraries(rpg_client_core
   PUBLIC rpg_core rpg_net Freetype::Freetype
-  PRIVATE nlohmann_json::nlohmann_json
+  PRIVATE nlohmann_json::nlohmann_json rpg_meshopt rpg_webp
 )
 rpg_set_warnings(rpg_client_core)
 
 add_library(rpg_client STATIC
   platform/Platform.cpp
   render/Renderer.cpp
+  render/RendererPack.cpp
   app/ClientApp.cpp
 )
 target_link_libraries(rpg_client PUBLIC rpg_client_core rpg_shaders SDL3::SDL3)

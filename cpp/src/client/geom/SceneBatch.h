@@ -27,6 +27,8 @@ struct SceneContext {
   const StaticWorld* statics = nullptr;
   const GameData* data = nullptr;
   const Presentation* look = nullptr;
+  // Com o pacote visual, pontos de coleta, santuários, saídas, portal, sacos e projéteis vêm dele.
+  bool packModels = false;
 };
 
 enum class Prim : std::uint8_t { Box, Cylinder, Cone, Sphere, Capsule, Ring, Count };

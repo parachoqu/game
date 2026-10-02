@@ -16,7 +16,9 @@
       "description": "Cliente: janela, GPU e texto (SDL3 + SDL_GPU, FreeType)",
       "dependencies": [
         "sdl3",
-        { "name": "freetype", "default-features": false }
+        { "name": "freetype", "default-features": false },
+        { "name": "libwebp", "default-features": false },
+        "meshoptimizer"
       ]
     }
   },
