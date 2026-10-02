@@ -23,10 +23,18 @@ elseif(RPG_FETCH_DEPS)
   set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
   set(SDL_TESTS OFF CACHE BOOL "" FORCE)
   set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
+  # Sem os headers de X11/Wayland a SDL aborta o configure. A opção só tira esse erro: com eles
+  # instalados, a SDL continua usando X11/Wayland normalmente. Sem eles o cliente compila, mas só roda
+  # sem janela (--headless) — o caso dos jobs de CI que não desenham.
+  set(SDL_UNIX_CONSOLE_BUILD ON CACHE BOOL "" FORCE)
   set(SDL_INSTALL OFF CACHE BOOL "" FORCE)
   set(SDL_DISABLE_INSTALL ON CACHE BOOL "" FORCE)
   FetchContent_Declare(SDL3 GIT_REPOSITORY https://github.com/libsdl-org/SDL.git GIT_TAG release-3.4.16 GIT_SHALLOW TRUE SYSTEM)
   FetchContent_MakeAvailable(SDL3)
+  if(UNIX AND NOT APPLE AND NOT SDL_X11 AND NOT SDL_WAYLAND)
+    message(WARNING "SDL3 sem X11 nem Wayland (faltam os headers de desenvolvimento): o rpg_local só roda "
+                    "com --headless. Para jogar com janela, instale os pacotes listados no README e reconfigure.")
+  endif()
 else()
   message(WARNING "SDL3 não encontrada e RPG_FETCH_DEPS=OFF: o cliente não será compilado")
   set(RPG_BUILD_CLIENT OFF)
