@@ -64,6 +64,7 @@ Renderer::~Renderer() {
   for (DynBuffer* d : {&I.instances, &I.unlitVerts, &I.uiVerts, &I.skyStars, &I.skyLines, &I.skyOverlay})
     if (d->buf) SDL_ReleaseGPUBuffer(I.dev, d->buf);
   I.releasePack();
+  I.releaseRml();
   if (I.identity) SDL_ReleaseGPUBuffer(I.dev, I.identity);
   if (I.staging) SDL_ReleaseGPUTransferBuffer(I.dev, I.staging);
   if (I.download) SDL_ReleaseGPUTransferBuffer(I.dev, I.download);
@@ -157,7 +158,17 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
   const Uint32 starBytes = f.sky ? static_cast<Uint32>(f.sky->stars.size() * sizeof(StarInstance)) : 0;
   const Uint32 lineBytes = f.sky ? static_cast<Uint32>(f.sky->lines.size() * sizeof(ColorVertex)) : 0;
   const Uint32 overlayBytes = f.sky ? static_cast<Uint32>(f.sky->overlay.size() * sizeof(ColorVertex)) : 0;
-  const Uint32 total = instBytes + unlitBytes + uiBytes + atlasBytes + packInstBytes + boneBytes + starBytes + lineBytes + overlayBytes;
+  // interface RmlUi: texturas novas sobem já; a geometria do quadro vai junto com o resto
+  const bool rmlOn = f.rml && !f.rml->commands().empty();
+  if (rmlOn) {
+    I.initRml();
+    I.syncRmlTextures(*f.rml);
+    I.packRml(*f.rml);
+  }
+  const Uint32 rmlVtxBytes = rmlOn ? static_cast<Uint32>(I.rml.vtx.size()) : 0;
+  const Uint32 rmlIdxBytes = rmlOn ? static_cast<Uint32>(I.rml.idx.size()) : 0;
+  const Uint32 total = instBytes + unlitBytes + uiBytes + atlasBytes + packInstBytes + boneBytes + starBytes + lineBytes + overlayBytes +
+                       rmlVtxBytes + rmlIdxBytes;
   if (f.atlas && (!I.atlas || I.atlasSize != f.atlas->size())) {
     if (I.atlas) SDL_ReleaseGPUTexture(I.dev, I.atlas);
     I.atlas = I.texture(SDL_GPU_TEXTUREFORMAT_R8_UNORM, SDL_GPU_TEXTUREUSAGE_SAMPLER, f.atlas->size(), f.atlas->size());
@@ -181,6 +192,8 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
     I.ensureDyn(I.skyStars, SDL_GPU_BUFFERUSAGE_VERTEX, starBytes);
     I.ensureDyn(I.skyLines, SDL_GPU_BUFFERUSAGE_VERTEX, lineBytes);
     I.ensureDyn(I.skyOverlay, SDL_GPU_BUFFERUSAGE_VERTEX, overlayBytes);
+    I.ensureDyn(I.rml.vb, SDL_GPU_BUFFERUSAGE_VERTEX, rmlVtxBytes);
+    I.ensureDyn(I.rml.ib, SDL_GPU_BUFFERUSAGE_INDEX, rmlIdxBytes);
     auto* dst = static_cast<std::uint8_t*>(SDL_MapGPUTransferBuffer(I.dev, I.staging, true));
     Uint32 off = 0;
     if (instBytes) std::memcpy(dst + off, inst.data(), instBytes);
@@ -200,6 +213,10 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
     if (lineBytes) std::memcpy(dst + off, f.sky->lines.data(), lineBytes);
     off += lineBytes;
     if (overlayBytes) std::memcpy(dst + off, f.sky->overlay.data(), overlayBytes);
+    off += overlayBytes;
+    if (rmlVtxBytes) std::memcpy(dst + off, I.rml.vtx.data(), rmlVtxBytes);
+    off += rmlVtxBytes;
+    if (rmlIdxBytes) std::memcpy(dst + off, I.rml.idx.data(), rmlIdxBytes);
     SDL_UnmapGPUTransferBuffer(I.dev, I.staging);
     SDL_GPUCopyPass* cp = SDL_BeginGPUCopyPass(cmd);
     off = 0;
@@ -228,6 +245,8 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
     up(I.skyStars.buf, starBytes);
     up(I.skyLines.buf, lineBytes);
     up(I.skyOverlay.buf, overlayBytes);
+    up(I.rml.vb.buf, rmlVtxBytes);
+    up(I.rml.ib.buf, rmlIdxBytes);
     SDL_EndGPUCopyPass(cp);
   }
 
@@ -362,6 +381,7 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
     ++stats_.drawCalls;
   }
   SDL_EndGPURenderPass(rp);
+  if (rmlOn) I.drawRml(cmd, *f.rml, stats_);
 
   // ---------------------------------------------------------------- janela e captura
   if (swap) {

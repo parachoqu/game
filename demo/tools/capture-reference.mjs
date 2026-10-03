@@ -74,9 +74,24 @@ if (want('01_title_screen')) {
 
 await page.evaluate(() => {
   document.getElementById('btn-new')?.click();
+  // nome fixo: o rpg_local usa o primeiro dos sugeridos nas capturas
+  const n = document.getElementById('c-name');
+  if (n) n.value = 'Maren';
+});
+if (want('01b_create_screen')) {
+  await frames(3);
+  await shot('01b_create_screen');
+}
+await page.evaluate(() => {
   document.getElementById('create-form')?.requestSubmit();
 });
 await page.waitForFunction(() => window.__demo.mode() === 'game', null, { timeout: 120000, polling: 500 });
+// HUD no começo do jogo, ao meio-dia (rpg_local --view 14_hud)
+if (want('14_hud')) {
+  await page.evaluate(() => { window.__demo.G.time = 52.5; });
+  await frames(60);
+  await shot('14_hud');
+}
 await page.evaluate(() => {
   const D = window.__demo;
   D.G.time = 52.5;  // 12h (ciclo de 420 s começando às 9h)

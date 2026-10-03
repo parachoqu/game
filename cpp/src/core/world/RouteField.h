@@ -12,6 +12,7 @@ namespace rpg {
 struct Polyline {
   std::string id;
   double width = 0.0;
+  std::string risk;  // baixo, moderado, alto, turbulenta (o mapa desenha a de risco alto mais escura)
   std::vector<XZ> pts;
 };
 

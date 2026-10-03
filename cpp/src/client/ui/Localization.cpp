@@ -81,6 +81,19 @@ Localization Localization::load(const std::filesystem::path& dir, const GameData
     const nlohmann::json titles = b.value("titles", nlohmann::json::object());
     for (const auto& [k, v] : entries.items()) L.book_[k] = {v.value("title", k), v.value("text", std::string{})};
     for (const auto& [k, v] : titles.items()) L.titles_[k] = {v.value("name", k), v.value("why", std::string{})};
+    const nlohmann::json chapters = b.value("chapters", nlohmann::json::object());
+    for (const auto& [k, v] : chapters.items()) L.chapters_[k] = v.get<std::string>();
+  }
+  if (std::filesystem::exists(dir / "travelers.json")) {
+    const nlohmann::json travelers = readJson(dir / "travelers.json");
+    for (const auto& [k, v] : travelers.items()) {
+      TravelerText t;
+      t.name = v.value("name", k);
+      t.role = v.value("role", std::string{});
+      for (const auto& g : v.value("gear", nlohmann::json::array())) t.gear.push_back(g.get<std::string>());
+      for (const auto& e : v.value("public", nlohmann::json::array())) t.publicEntries.emplace_back(e.at(0).get<std::string>(), e.at(1).get<std::string>());
+      L.travelers_[k] = std::move(t);
+    }
   }
   for (const char* table : {"items", "places", "zones", "enemies", "trainings", "skills", "weapons", "origins", "starts",
                             "markets", "travelers", "discoveries", "recipes"}) {
@@ -114,6 +127,7 @@ std::string Localization::zoneRule(ZoneKind z) const { return field("zones", zon
 std::string Localization::zoneDeath(ZoneKind z) const { return field("zones", zoneKey(z), "death"); }
 std::string Localization::enemy(EnemyTypeId id) const { return field("enemies", data_->enemies.key(id), "name"); }
 std::string Localization::training(TrainingId id) const { return field("trainings", data_->trainings.key(id), "name"); }
+std::string Localization::trainingDesc(TrainingId id) const { return field("trainings", data_->trainings.key(id), "desc"); }
 std::string Localization::skill(SkillId id) const { return field("skills", data_->skills.key(id), "name"); }
 std::string Localization::skillDesc(SkillId id) const { return field("skills", data_->skills.key(id), "desc"); }
 std::string Localization::weapon(WeaponFamilyId id) const { return field("weapons", data_->weapons.key(id), "name"); }
@@ -122,29 +136,39 @@ std::string Localization::originHint(OriginId id) const { return field("origins"
 std::string Localization::start(StartId id) const { return field("starts", data_->starts.key(id), "label"); }
 std::string Localization::startDesc(StartId id) const { return field("starts", data_->starts.key(id), "desc"); }
 std::string Localization::market(MarketId id) const { return field("markets", data_->markets.key(id), "name"); }
+std::string Localization::recipeNote(ItemId out) const { return field("recipes", data_->items.key(out), "note"); }
 std::string Localization::travelerName(std::string_view key) const { return field("travelers", key, "name"); }
+const TravelerText* Localization::traveler(std::string_view key) const {
+  const auto it = travelers_.find(key);
+  return it == travelers_.end() ? nullptr : &it->second;
+}
 
 std::string Localization::interactable(std::string_view key) const {
   const auto it = interactables_.find(key);
   return it == interactables_.end() ? std::string(key) : it->second;
 }
 
-std::string Localization::bookTitle(const protocol::BookEntry& e) const {
-  if (e.literal) return e.literalTitle;
-  const auto it = book_.find(e.tmpl);
-  return it == book_.end() ? e.tmpl : format(it->second.first, e.args);
-}
-
-std::string Localization::bookText(const protocol::BookEntry& e) const {
-  if (e.literal) return e.literalText;
-  const auto it = book_.find(e.tmpl);
-  return it == book_.end() ? std::string{} : format(it->second.second, e.args);
-}
-
 std::string Localization::bookTitleName(const protocol::BookTitle& t) const {
   if (!t.literalName.empty()) return t.literalName;
   const auto it = titles_.find(t.id);
   return it == titles_.end() ? t.id : it->second.first;
+}
+
+std::string Localization::bookTitleWhy(const protocol::BookTitle& t) const {
+  if (!t.literalName.empty()) return t.literalWhy;
+  const auto it = titles_.find(t.id);
+  return it == titles_.end() ? std::string{} : it->second.second;
+}
+
+std::string Localization::bookChapter(std::string_view domain) const {
+  const auto it = chapters_.find(domain);
+  return it == chapters_.end() ? std::string(domain) : it->second;
+}
+
+std::string Localization::bookPart(std::string_view key, const protocol::MsgArgs& args, bool title) const {
+  const auto it = book_.find(key);
+  if (it == book_.end()) return std::string(key);
+  return format(title ? it->second.first : it->second.second, args);
 }
 
 std::string Localization::ui(std::string_view key) const {

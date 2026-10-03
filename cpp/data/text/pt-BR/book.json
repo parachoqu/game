@@ -1,0 +1,244 @@
+{
+  "entries": {
+    "first.chegada": {
+      "title": "Chegada ao Entreposto do Vale",
+      "text": "{0} chegou ao Vale com {1} como primeiro conhecimento e {2} na mão."
+    },
+    "first.venda": {
+      "title": "Vendeu {0}",
+      "text": "Negociou {0} no {1}. Materiais de risco encontram compradores próprios."
+    },
+    "first.compra-montaria": {
+      "title": "Montaria de carga",
+      "text": "Comprou um cavalo de carga no estábulo do Vale. Mais capacidade, mais exposição."
+    },
+    "first.recomeco": {
+      "title": "Recomeço",
+      "text": "Recebeu um kit básico no Vale para retomar o trabalho depois de uma perda."
+    },
+    "first.treino": {
+      "title": "Aprendeu {0}",
+      "text": "Estudou com o instrutor do Vale. {1} O conhecimento acompanha a trajetória, mesmo após perdas."
+    },
+    "first.disc_board": {
+      "title": "Relatos do Vale",
+      "text": "Leu o quadro de relatos do Entreposto do Vale: a Passagem instável, as Garras e um céu que ninguém explica do mesmo jeito."
+    },
+    "first.recuperou-carga": {
+      "title": "Carga recuperada",
+      "text": "Voltou a {0} e recolheu parte do que havia deixado para trás."
+    },
+    "first.primeira-derrota": {
+      "title": "Primeira derrota",
+      "text": "Caiu em {0}, numa área {1}. O Livro guarda também os recomeços."
+    },
+    "log.derrota": {
+      "title": "Derrota em {0}",
+      "text": "Caiu diante de {1} ({2}). {3}"
+    },
+    "log.derrota.lost": {
+      "title": "",
+      "text": "Deixou para trás {0} item(ns){1}."
+    },
+    "log.derrota.destroyed": {
+      "title": "",
+      "text": "; {0} foram destruídos"
+    },
+    "log.derrota.nothing": {
+      "title": "",
+      "text": "Nada foi saqueado."
+    },
+    "tally.entregas-alto": {
+      "title": "Temporada de entregas",
+      "text": "Levou ferramentas ao Entreposto Alto: {0} unidades vendidas, {1} moedas no total."
+    },
+    "tally.entregas-alto.1": {
+      "title": "Primeira venda no Entreposto Alto",
+      "text": "Vendeu ferramentas no Entreposto Alto, onde a Passagem instável deixou o abastecimento escasso."
+    },
+    "tally.oficio": {
+      "title": "Trabalho de bancada",
+      "text": "Fabricou {0} na bancada do Vale."
+    },
+    "tally.oficio.10": {
+      "title": "Ofício reconhecido na bancada",
+      "text": "Fabricou {0} na bancada do Vale."
+    },
+    "tally.reparos": {
+      "title": "Reparos na bancada",
+      "text": "Reparou equipamentos {0} {1}. Desgaste virou trabalho de oficina."
+    },
+    "tally.coleta-minerio": {
+      "title": "Mineração",
+      "text": "{0} unidade{0|s} de minério de ferro coletada{0|s} com as próprias mãos."
+    },
+    "tally.coleta-madeira": {
+      "title": "Corte de madeira",
+      "text": "{0} unidade{0|s} de madeira de freixo coletada{0|s} com as próprias mãos."
+    },
+    "tally.coleta-erva": {
+      "title": "Colheita de erva-lume",
+      "text": "{0} unidade{0|s} de erva-lume coletada{0|s} com as próprias mãos."
+    },
+    "tally.coleta-cristal": {
+      "title": "Cristais dos Ermos",
+      "text": "{0} unidade{0|s} de cristal celeste coletada{0|s} com as próprias mãos."
+    },
+    "tally.montaria": {
+      "title": "Um cavalo de carga",
+      "text": "Seguiu viagem com a montaria de carga ({0} partidas registradas). Os alforjes acompanham o animal, não o abrigo."
+    },
+    "tally.montaria.1": {
+      "title": "Um cavalo de carga",
+      "text": "Seguiu viagem com a montaria de carga pela primeira vez. Os alforjes acompanham o animal, não o abrigo."
+    },
+    "tally.resgates": {
+      "title": "Resgatado em campo",
+      "text": "Foi levantado por guardas {0} vezes após ser derrubado."
+    },
+    "tally.resgates.1": {
+      "title": "Resgatado em campo",
+      "text": "Foi levantado por um guarda após ser derrubado. A derrubada não virou perda."
+    },
+    "tally.garras": {
+      "title": "Enfrentou as Garras",
+      "text": "{0} Garra{0|s} abatida{0|s} nos arredores do acampamento e da Passagem."
+    },
+    "first.camp-pressionado": {
+      "title": "Pressão sobre o acampamento",
+      "text": "Participou dos combates que fizeram o Acampamento das Garras recolher as patrulhas da Passagem Estreita."
+    },
+    "first.camp-deslocado": {
+      "title": "O acampamento se deslocou",
+      "text": "Esteve entre os que pressionaram as Garras até que deixassem o acampamento. Parte delas foi vista a oeste."
+    },
+    "log.reabertura": {
+      "title": "A reabertura da Passagem Estreita",
+      "text": "Participou do abastecimento que reabriu a Passagem Estreita. {0}Sua parte corresponde a cerca de {1}% das contribuições registradas; outros participantes responderam pelo restante."
+    },
+    "log.reabertura.ferramentas": {
+      "title": "",
+      "text": "entregou {0} ferramenta{0|s}"
+    },
+    "log.reabertura.lingote": {
+      "title": "",
+      "text": "{0} lingote{0|s}"
+    },
+    "log.reabertura.reconhecimento": {
+      "title": "",
+      "text": "registrou o movimento da passagem"
+    },
+    "log.reabertura.saqueadores": {
+      "title": "",
+      "text": "afastou saqueadores"
+    },
+    "log.reabertura.acampamento": {
+      "title": "",
+      "text": "participou da pressão sobre o acampamento"
+    },
+    "log.reabertura-outros": {
+      "title": "A Passagem foi reaberta",
+      "text": "Outros participantes reabriram a Passagem Estreita enquanto seguia outros caminhos."
+    },
+    "first.reconhecimento": {
+      "title": "Movimento na Passagem",
+      "text": "Da ruína de vigia, registrou rotas de saqueadores e trilhas de Garras dentro da Passagem Estreita. O registro foi levado ao canteiro."
+    },
+    "first.obs-inicial": {
+      "title": "Primeira leitura do céu",
+      "text": "Usou o instrumento do Observatório Antigo. A Lanterna apresentava um desvio de brilho, sem ausências."
+    },
+    "log.obs-dia": {
+      "title": "Um desvio nos instrumentos",
+      "text": "No Observatório Antigo, o instrumento registrou a falta de um ponto {0} ({1})."
+    },
+    "log.obs-noite": {
+      "title": "Uma ausência {0}",
+      "text": "Do Observatório Antigo, observou que {1} (nome provisório) perdeu um ponto de luz. Registro feito no {2}."
+    },
+    "sky.where.isolated": {
+      "title": "",
+      "text": "num ponto isolado do céu"
+    },
+    "sky.where.constellation": {
+      "title": "",
+      "text": "na constelação da {0}"
+    },
+    "sky.label.isolated": {
+      "title": "",
+      "text": "um ponto isolado do céu"
+    },
+    "sky.label.constellation": {
+      "title": "",
+      "text": "a constelação da {0}"
+    },
+    "sky.short.isolated": {
+      "title": "",
+      "text": "num ponto isolado"
+    },
+    "sky.short.constellation": {
+      "title": "",
+      "text": "na {0}"
+    },
+    "log.instrumento": {
+      "title": "Um instrumento para o Observatório",
+      "text": "Forneceu um instrumento astronômico ao Observatório Antigo. As medições seguintes usam uma peça fabricada por esta personagem."
+    },
+    "log.incursao": {
+      "title": "Incursão em uma Região Turbulenta",
+      "text": "Atravessou sem companhia um portal temporário para ruínas sob névoa violeta. Objetivo: reunir fragmentos. Resultado: extraiu com {0} fragmento{1}. Encontros: {2}. Identidades preservadas."
+    },
+    "log.incursao-perdida": {
+      "title": "Uma incursão sem retorno",
+      "text": "Entrou numa Região Turbulenta e não alcançou uma saída. Tudo o que levava ficou lá. Encontros: {0}. Identidades preservadas."
+    },
+    "encounter": {
+      "title": "",
+      "text": "uma figura desconhecida que portava {0}"
+    },
+    "encounter.none": {
+      "title": "",
+      "text": "nenhum confronto"
+    },
+    "encounter.fell": {
+      "title": "",
+      "text": "a figura caiu"
+    },
+    "encounter.stood": {
+      "title": "",
+      "text": "terminou o encontro de pé"
+    },
+    "encounter.nooutcome": {
+      "title": "",
+      "text": "sem desfecho"
+    },
+    "note": {
+      "title": "Anotação pessoal",
+      "text": "{0}"
+    }
+  },
+  "titles": {
+    "mao-passagem": {
+      "name": "Mão da Passagem",
+      "why": "Contribuiu para a reabertura da Passagem Estreita."
+    },
+    "olhar-observatorio": {
+      "name": "Olhar do Observatório",
+      "why": "Registrou uma ausência no céu com os próprios olhos."
+    },
+    "voltou-turbulenta": {
+      "name": "Quem voltou da Turbulenta",
+      "why": "Extraiu de uma Região Turbulenta."
+    }
+  },
+  "chapters": {
+    "trabalho": "Dias de oficina",
+    "comercio": "Carga e estrada",
+    "exploracao": "Caminhos novos",
+    "combate": "Aço e poeira",
+    "risco": "O que se arrisca",
+    "ceu": "Sob um céu diferente",
+    "comunidade": "Trabalho em conjunto",
+    "none": "Chegada"
+  }
+}

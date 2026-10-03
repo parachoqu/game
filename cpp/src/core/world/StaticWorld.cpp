@@ -9,13 +9,14 @@
 namespace rpg {
 
 StaticMap::StaticMap(MapKind kind, MapTerrain terrain, CollisionGrid collision, std::optional<RouteField> routeField,
-                     std::vector<Polyline> routes, XZ center, double moveLimit, Balance::Collision rules)
+                     std::vector<Polyline> routes, XZ center, double half, double moveLimit, Balance::Collision rules)
     : kind_(kind),
       terrain_(std::move(terrain)),
       collision_(std::move(collision)),
       routeField_(std::move(routeField)),
       routes_(std::move(routes)),
       center_(center),
+      half_(half),
       moveLimit_(moveLimit),
       rules_(rules) {}
 
@@ -85,9 +86,9 @@ StaticWorld StaticWorld::load(const std::filesystem::path& simDir, const Balance
   // Limites de movimento de collide.js: HALF − 8 na região; TURB.half − 6 em volta do centro da Turbulenta.
   StaticMap regionMap(MapKind::Region, std::move(region), std::move(regionGrid),
                       RouteField(std::move(p.region.routeField), p.region.routeN, p.region.routeStep, p.region.routeOrigin),
-                      std::move(p.region.routes), XZ{0, 0}, p.region.half - 8, rules);
+                      std::move(p.region.routes), XZ{0, 0}, p.region.half, p.region.half - 8, rules);
   StaticMap turbulentMap(MapKind::Turbulent, std::move(turbulent), std::move(turbulentGrid), std::nullopt,
-                         std::move(p.turbulent.routes), XZ{p.turbulentOffsetX, p.turbulentOffsetZ}, p.turbulent.half - 6, rules);
+                         std::move(p.turbulent.routes), XZ{p.turbulentOffsetX, p.turbulentOffsetZ}, p.turbulent.half, p.turbulent.half - 6, rules);
 
   GameplayLayout layout = GameplayLayout::load(simDir / "gameplay-layout.json");
   return StaticWorld({std::move(regionMap), std::move(turbulentMap)}, ZoneMap(std::move(z)), p.turbulentGateX,

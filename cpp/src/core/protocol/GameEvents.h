@@ -14,6 +14,7 @@
 #include "core/protocol/BookData.h"
 #include "core/protocol/ByteStream.h"
 #include "core/protocol/Messages.h"
+#include "core/protocol/Snapshot.h"
 
 namespace rpg::protocol {
 
@@ -176,9 +177,19 @@ struct EvBookSync {
   template <class A> void io(A& a) { a(entries); a(titles); a(shownTitle); }
 };
 
+// Conteúdo de um saco de carga aberto (panels.js `lootPanel`): na abertura e depois de cada retirada.
+struct EvLootView {
+  std::uint32_t bag = 0;
+  std::vector<ItemEntry> items;  // vazio: nada restou (o saco sumiu)
+  double expires = 0;
+  std::uint8_t place = 0, zone = 0;
+  bool own = false;
+  template <class A> void io(A& a) { a(bag); a(items); a(expires); a(place); a(zone); a(own); }
+};
+
 using GameEvent = std::variant<EvSound, EvToast, EvFloatText, EvBurst, EvTelegraph, EvTelegraphCancel, EvHitmarker,
                                EvCamRecoil, EvCamShake, EvZoneChanged, EvPlaceChanged, EvPlayerHurt, EvPlayerDown,
                                EvPlayerDied, EvRespawned, EvServiceOpened, EvEventDone, EvObserve, EvObserveEnd,
-                               EvStarVanished, EvTurbEnter, EvTurbLeave, EvBookEntry, EvBookTitle, EvBookSync>;
+                               EvStarVanished, EvTurbEnter, EvTurbLeave, EvBookEntry, EvBookTitle, EvBookSync, EvLootView>;
 
 }  // namespace rpg::protocol

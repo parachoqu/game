@@ -14,3 +14,4 @@ Thumbs.db
 # Pacotes temporários das ferramentas da demo
 demo/tools/bake/.*.bundle.mjs
 demo/tests/.*.bundle.mjs
+__pycache__/

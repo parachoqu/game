@@ -10,6 +10,8 @@ set(RPG_SHADERS
   unlit.vert unlit.frag
   fullscreen.vert sky.frag composite.frag stars.vert stars.frag
   ui.vert ui.frag
+  rml.vert rml_color.frag rml_texture.frag rml_gradient.frag
+  rml_fs.vert rml_copy.frag rml_blur.frag rml_shadow.frag rml_matrix.frag rml_mask.frag
 )
 set(_src "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(_committed "${CMAKE_CURRENT_SOURCE_DIR}/spv")

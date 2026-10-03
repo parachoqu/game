@@ -18,7 +18,15 @@ add_library(rpg_client_core STATIC
   ui/FontAtlas.cpp
   ui/UiBatch.cpp
   ui/Hud.cpp
-  ui/Screens.cpp
+  ui/GameUi.cpp
+  ui/GameHud.cpp
+  ui/WorldMap.cpp
+  ui/BookText.cpp
+  ui/GamePanels.cpp
+  ui/GameBook.cpp
+  ui/RmlRender.cpp
+  ui/UiSystem.cpp
+  ui/UiDecorators.cpp
   geom/Primitives.cpp
   geom/TerrainMesh.cpp
   geom/SceneBatch.cpp
@@ -37,7 +45,7 @@ add_library(rpg_client_core STATIC
   entities/CharacterViews.cpp
 )
 target_link_libraries(rpg_client_core
-  PUBLIC rpg_core rpg_net Freetype::Freetype
+  PUBLIC rpg_core rpg_net Freetype::Freetype rpg_rmlui
   PRIVATE nlohmann_json::nlohmann_json rpg_meshopt rpg_webp
 )
 rpg_set_warnings(rpg_client_core)
@@ -46,6 +54,7 @@ add_library(rpg_client STATIC
   platform/Platform.cpp
   render/Renderer.cpp
   render/RendererPack.cpp
+  render/RendererRml.cpp
   app/ClientApp.cpp
 )
 target_link_libraries(rpg_client PUBLIC rpg_client_core rpg_shaders SDL3::SDL3)

@@ -345,6 +345,8 @@ void giveInstrument(Sim& s, Player& p);
 void updateTurbulent(Sim& s, double dt);
 void forcePortalNear(Sim& s, Player& p);
 std::optional<protocol::MessageId> canEnter(const Player& p);
+// panels.js `lootPanel`: o conteúdo do saco para o painel de quem o abriu (vazio se ele sumiu).
+void sendLootView(Sim& s, const Player& p, EntityId bag);
 void enterTurbulent(Sim& s, Player& p);
 void leaveTurbulent(Sim& s, Player& p, bool success);
 void onTurbulentDeath(Sim& s, Player& p, const DamageSource& src);

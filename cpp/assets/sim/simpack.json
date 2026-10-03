@@ -50,6 +50,7 @@
   "routes": {
    "mine_spur": {
     "width": 2.5,
+    "risk": "baixo",
     "pts": [
      [
       0,
@@ -187,6 +188,7 @@
    },
    "observatory_trail": {
     "width": 2.5,
+    "risk": "alto",
     "pts": [
      [
       -25,
@@ -324,6 +326,7 @@
    },
    "safe_east": {
     "width": 5,
+    "risk": "moderado",
     "pts": [
      [
       10,
@@ -589,6 +592,7 @@
    },
    "short_gorge": {
     "width": 4,
+    "risk": "alto",
     "pts": [
      [
       10,
@@ -805,6 +809,7 @@
   "routes": {
    "alternate_exit": {
     "width": 2.5,
+    "risk": "turbulenta",
     "pts": [
      [
       1400,
@@ -878,6 +883,7 @@
    },
    "anomalous_crossing": {
     "width": 3,
+    "risk": "turbulenta",
     "pts": [
      [
       1400,

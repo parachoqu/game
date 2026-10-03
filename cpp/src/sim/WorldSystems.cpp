@@ -10,6 +10,7 @@
 
 #include "core/JsMath.h"
 #include "core/Math.h"
+#include "core/rules/Economy.h"
 #include "core/world/RouteField.h"
 #include "sim/Sim.h"
 
@@ -323,9 +324,9 @@ void deliver(Sim& s, Player& p, ItemId id) {
   }
   const std::string& key = s.data.items.key(id);
   const bool tools = key == "ferramentas";
-  const double payEach = tools ? 16 : 6, ptsEach = tools ? 8 : 3;
+  const double ptsEach = tools ? 8 : 3;
   removeFrom(p.inv, id, n);
-  const double pay = n * (s.evt.done ? jsRound(payEach * 0.6) : payEach);
+  const double pay = n * rules::canteiroPay(tools, s.evt.done);
   p.coins += pay;
   s.sfx(p, SoundId::Coin);
   p.evt.delivered[key] += n;

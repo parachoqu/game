@@ -143,6 +143,19 @@ std::optional<protocol::ItemEntry> gearEntry(const std::optional<Gear>& g) {
 
 }  // namespace
 
+void sendLootView(Sim& s, const Player& p, EntityId bagId) {
+  protocol::EvLootView v;
+  v.bag = bagId;
+  if (const LootBag* bag = s.lootBag(bagId)) {
+    v.items = itemEntries(bag->items);
+    v.expires = bag->expires;
+    v.place = static_cast<std::uint8_t>(bag->place);
+    v.zone = static_cast<std::uint8_t>(bag->zone);
+    v.own = bag->owner == p.id;
+  }
+  s.toPlayer(p, std::move(v));
+}
+
 // ---------------------------------------------------------------- construção
 World::World(const GameData& data, const StaticWorld& statics, WorldConfig config)
     : World(data, statics, std::make_unique<Pcg32Random>(config.seed), config.options, config.devCommands) {}
@@ -320,6 +333,7 @@ void World::handleRequest(EntityId player, const protocol::Request& req) {
           } else {
             takeFromBag(s, p, *bag, static_cast<std::size_t>(r.index));
           }
+          sendLootView(s, p, r.bag);
         } else if constexpr (std::is_same_v<T, protocol::ReqEnterPortal>) {
           if (!s.turb.portal || p.turb.inside) return;
           if (jsHypot(s.turb.portal->x - p.pos.x, s.turb.portal->z - p.pos.z) > 6.5) return tooFar(s, p);

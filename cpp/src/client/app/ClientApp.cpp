@@ -29,8 +29,9 @@
 #include "client/ui/FontAtlas.h"
 #include "client/ui/Hud.h"
 #include "client/ui/Localization.h"
-#include "client/ui/Screens.h"
+#include "client/ui/GameUi.h"
 #include "client/ui/UiBatch.h"
+#include "client/ui/UiSystem.h"
 #include "client/world/EntityModels.h"
 #include "client/world/PackScene.h"
 #include "client/world/SkyView.h"
@@ -79,7 +80,10 @@ enum class Mode : std::uint8_t { Loading, Title, Create, Joining, Game, Failed }
 
 }  // namespace
 
-bool ClientApp::knownView(const std::string& name) { return name == "01_title_screen" || findView(name) != nullptr; }
+bool ClientApp::knownView(const std::string& name) {
+  return name == "01_title_screen" || name == "01b_create_screen" || name == "14_hud" || name == "15_inventario" || name == "16_livro" ||
+         name == "17_mapa" || findView(name) != nullptr;
+}
 
 struct ClientApp::Impl {
   const GameData& data;
@@ -98,15 +102,18 @@ struct ClientApp::Impl {
   ThirdPersonCamera cam;
   CommandBuilder commands;
   Hud hud;
-  Screens screens;
+  std::unique_ptr<UiSystem> rmlUi;  // index.html da demo em RmlUi (assets/ui)
+  std::unique_ptr<GameUi> gameUi;
   CreationForm form;
   InputState in;
   Mode mode = Mode::Loading;
-  int loadStep = 0;
+  int loadStep = 0, bootPhase = -1, bootSubs = 0;
   double titleT = 0, lastCmdSent = -1;
   bool tabChord = false, paused = false, snapCamera = true, viewTeleported = false;
   int gameFrames = 0, totalFrames = 0;
-  std::optional<proto::Service> openService;
+  bool deathShown = false, eventShown = false, introShown = false, observing = false;
+  std::string quality = "alta";
+  bool muted = false;
   std::string failure;
   InstanceLists dynamic;
   std::vector<ColorVertex> unlit;
@@ -140,10 +147,29 @@ struct ClientApp::Impl {
     fonts.body = atlas.addFace(opt.assetsDir / "fonts" / "DejaVuSans.ttf");
     fonts.bold = atlas.addFace(opt.assetsDir / "fonts" / "DejaVuSans-Bold.ttf");
     std::random_device rd;
-    form.name = kSuggestedNames[rd() % kSuggestedNames.size()];
+    form.name = kSuggestedNames[opt.view ? 0 : rd() % kSuggestedNames.size()];  // capturas: sempre o primeiro
     in.width = opt.width;
     in.height = opt.height;
     log::info("GPU: {}", renderer.driver());
+    rmlUi = std::make_unique<UiSystem>(UiSystem::Options{opt.assetsDir / "ui", opt.assetsDir / "fonts", opt.width, opt.height});
+    gameUi = std::make_unique<GameUi>(*rmlUi, L, data, look);
+    // main.js PHASES: as mesmas fases e pesos da barra
+    gameUi->setBootPhases({{"texturas", 0.28}, {"modelos", 0.18}, {"mundo", 0.26}, {"construções e floresta", 0.14}, {"sombreadores", 0.14}});
+  }
+
+  // Interface RmlUi deste quadro: tamanho, input, animações e o desenho gravado.
+  const RmlRender* drawUi(double now) {
+    rmlUi->resize(in.width, in.height);
+    rmlUi->input(in);
+    rmlUi->update(now);
+    rmlUi->draw();
+    return &rmlUi->render();
+  }
+
+  void render(Renderer::Frame& f, const std::optional<std::filesystem::path>& capture) {
+    f.rml = drawUi(platform.now());
+    renderer.render(f, capture);
+    rmlUi->render().endFrame();
   }
 
   const StaticMap& mapOf(MapKind k) const { return statics.map(k); }
@@ -159,21 +185,27 @@ struct ClientApp::Impl {
               t.chunks.size(), props.total());
   }
 
-  // Pacote visual: tabelas e binário, malhas (o relevo sai do heightfield), GPU e luz de ambiente.
-  void loadPack() {
+  // Pacote visual em etapas (a tela de carregamento anda entre elas): tabelas, binário e texturas;
+  // moldes dos personagens; luz de ambiente; malhas e GPU. Sem ele, o cenário grey-box da fase 3.
+  void packStage(int stage) {
+    if (stage > 0 && !pack) return;
     const std::filesystem::path dir = opt.assetsDir / "client";
     try {
-      ScenePack sp = ScenePack::load(dir);
-      pack.emplace(std::move(sp));
-      // moldes dos personagens e as variantes de material (entram no pacote antes da GPU)
-      if (!pack->rigs.empty()) characters = std::make_unique<CharacterLibrary>(*pack);
-      packMeshes = buildPackMeshes(*pack, statics);
-      worldView = std::make_unique<WorldView>(*pack, packMeshes);
-      renderer.loadPack(*pack, packMeshes, worldView->staticInstances());
-      if (characters) characterViews = std::make_unique<CharacterViews>(*pack, *characters);
-      if (pack->environment.present) {
-        env.setKit(decodeRgbe(loadWebp(pack->dir / pathFromUtf8(pack->environment.file))));
-        palette.calibrate(pack->environment.zenith, pack->environment.horizon, pack->environment.ground);
+      if (stage == 0) {
+        pack.emplace(ScenePack::load(dir));
+      } else if (stage == 1) {
+        // moldes dos personagens e as variantes de material (entram no pacote antes da GPU)
+        if (!pack->rigs.empty()) characters = std::make_unique<CharacterLibrary>(*pack);
+      } else if (stage == 2) {
+        if (pack->environment.present) {
+          env.setKit(decodeRgbe(loadWebp(pack->dir / pathFromUtf8(pack->environment.file))));
+          palette.calibrate(pack->environment.zenith, pack->environment.horizon, pack->environment.ground);
+        }
+      } else {
+        packMeshes = buildPackMeshes(*pack, statics);
+        worldView = std::make_unique<WorldView>(*pack, packMeshes);
+        renderer.loadPack(*pack, packMeshes, worldView->staticInstances());
+        if (characters) characterViews = std::make_unique<CharacterViews>(*pack, *characters);
       }
     } catch (const std::exception& e) {
       log::warn("pacote visual indisponível ({}); usando o cenário grey-box", e.what());
@@ -262,7 +294,7 @@ struct ClientApp::Impl {
 
   bool canAim(const proto::PrivateState& P) const {
     const auto st = static_cast<proto::PlayerState>(P.state);
-    return !P.mounted && !P.cinematic && !openService && !fx.death &&
+    return !P.mounted && !P.cinematic && !uiOpen() && !fx.death &&
            (st == proto::PlayerState::Free || st == proto::PlayerState::Attack || st == proto::PlayerState::Skill);
   }
 
@@ -277,24 +309,75 @@ struct ClientApp::Impl {
     }
     fx.respawned = fx.turbEntered = fx.turbLeft = false;
     if (fx.service) {
-      openService = fx.service->service;
+      gameUi->openPanel(panelFor(fx.service->service), fx.service->data);
       fx.service.reset();
     }
+    // main.js: o painel de derrota aparece 0,7 s depois; as quatro perguntas fecham o que estiver aberto
+    if (fx.death && fx.deathDelay <= 0 && !deathShown) {
+      deathShown = true;
+      gameUi->closeBook();
+      gameUi->openPanel(Panel::Death);
+    }
+    if (!fx.death) deathShown = false;
+    if (fx.eventDone && !eventShown) {
+      eventShown = true;
+      gameUi->closeBook();
+      gameUi->closePanel();
+      gameUi->openPanel(Panel::Event);
+    }
+  }
+
+  bool uiOpen() const { return gameUi->panel() != Panel::None || gameUi->bookOpen(); }
+
+  static Panel panelFor(proto::Service s) {
+    switch (s) {
+      case proto::Service::Market: return Panel::Market;
+      case proto::Service::Forge: return Panel::Forge;
+      case proto::Service::Trainer: return Panel::Trainer;
+      case proto::Service::Storage: return Panel::Storage;
+      case proto::Service::Stable: return Panel::Stable;
+      case proto::Service::Board: return Panel::Board;
+      case proto::Service::Canteiro: return Panel::Canteiro;
+      case proto::Service::Astronomer: return Panel::Astronomer;
+      case proto::Service::Loot: return Panel::Loot;
+      case proto::Service::Traveler: return Panel::Traveler;
+      case proto::Service::Portal: return Panel::Portal;
+    }
+    return Panel::None;
   }
 
   void handleKeys() {
     const proto::PrivateState* P = world.self();
+    // observação do céu (stars.js): Esc ou F encerram
+    if (P && P->cinematic) {
+      if (in.hit(Key::Escape) || in.hit(Key::F)) session.send(proto::Request{proto::ReqEndObserve{}});
+      return;
+    }
+    if (rmlUi->wantsKeyboard()) return;  // digitando no Livro
     if (in.hit(Key::Escape)) {
-      if (openService) {
-        openService.reset();
-      } else if (!fx.death) {
-        paused = !paused;
-        session.send(proto::Request{proto::ReqPause{paused}});
+      if (gameUi->bookOpen()) gameUi->closeBook();
+      else if (gameUi->panel() != Panel::None) gameUi->closePanel();
+      else {
+        gameUi->openPanel(Panel::Pause);
+        paused = true;
+        session.send(proto::Request{proto::ReqPause{true}});
       }
+      return;
     }
     if (!P || P->state == static_cast<std::uint8_t>(proto::PlayerState::Dead)) return;
     if (in.hit(Key::Tab)) tabChord = false;
-    if (in.down(Key::Tab) && !openService) {
+    if (in.up(Key::Tab)) {
+      const bool chord = tabChord;
+      tabChord = false;
+      if (!chord) gameUi->toggleMenu();
+    } else if (in.hit(Key::I)) {
+      gameUi->toggleMenu("inventory");
+    } else if (in.hit(Key::B)) {
+      gameUi->toggleMenu("book");
+    } else if (in.hit(Key::J)) {
+      gameUi->toggleMenu("intents");
+    }
+    if (in.down(Key::Tab) && !uiOpen()) {
       for (int n = 1; n <= 3; ++n) {
         const Key k = n == 1 ? Key::Digit1 : n == 2 ? Key::Digit2 : Key::Digit3;
         if (in.hit(k)) {
@@ -304,12 +387,52 @@ struct ClientApp::Impl {
         }
       }
     }
-    if (in.up(Key::Tab)) tabChord = false;
-    if (in.hit(Key::V) && !openService) {
+    if (in.hit(Key::V) && !uiOpen()) {
       cam.toggleShoulder();
       fx.toast(L.ui(cam.shoulder() > 0 ? "hud.camera.right" : "hud.camera.left"), proto::ToastKind::Info, 1.6);
     }
+    if (in.hit(Key::M) && !uiOpen()) gameUi->toggleMinimap();
     if (opt.dev && in.hit(Key::F12)) session.send(proto::Request{proto::ReqDev{proto::DevCommand::Night, 0, 0, 0}});
+  }
+
+  // stars.js: legenda da observação
+  std::pair<std::string, std::string> observeCaption(const proto::EvObserve& o) const {
+    using proto::MsgArg;
+    const auto part = [&](const char* kind) {
+      return o.constellation < 0 ? L.bookPart(std::string("sky.") + kind + ".isolated", {})
+                                 : L.bookPart(std::string("sky.") + kind + ".constellation",
+                                              {MsgArg::str(skyView.layout().constellations[static_cast<std::size_t>(o.constellation)].key)});
+    };
+    switch (o.caption) {
+      case proto::ObserveCaption::Intact:
+        return {"A Lanterna, ainda inteira", "O instrumento registra um leve desvio de brilho na Lanterna (nome provisório). Nenhum ponto sumiu — por enquanto."};
+      case proto::ObserveCaption::Daylight:
+        return {"Céu claro demais", "À luz do dia, o anel de bronze ainda aponta para " + part("label") + ": o instrumento marca um vazio onde havia um ponto."};
+      case proto::ObserveCaption::Absence: {
+        std::string w = part("where");
+        if (!w.empty()) w[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(w[0])));
+        return {"Uma ausência", w + " falta um ponto que os mapas antigos registram. A causa não é conhecida."};
+      }
+    }
+    return {};
+  }
+
+  // interact.js `updateInteract`: o que a tecla F ou o clique fariam agora.
+  std::string promptText(const proto::PrivateState& P, const HudContext& hc, bool uiOpen) const {
+    const auto st = static_cast<proto::PlayerState>(P.state);
+    if (uiOpen || P.cinematic || st == proto::PlayerState::Down || st == proto::PlayerState::Dead || st == proto::PlayerState::Channel) return {};
+    const auto arg = [](const std::string& t) { return proto::MsgArgs{proto::MsgArg::str(UiSystem::escape(t))}; };
+    if (hc.prompt) return L.format(L.ui("hud.prompt.use"), arg(hud.useLabel(*hc.prompt, hc)));
+    if (hc.hover && hc.hover->kind == Hover::Kind::Use) return L.format(L.ui("hud.prompt.click"), arg(hud.useLabel(hc.hover->use, hc)));
+    if (hc.hover && hc.hover->kind == Hover::Kind::Enemy) {
+      std::string name = L.ui("hud.shadowTarget");
+      if (const auto* e = world.find(hc.hover->enemy); e && data.enemies.contains(EnemyTypeId{e->type}) &&
+                                                         data.enemies[EnemyTypeId{e->type}].faction != Faction::Shadow)
+        name = UiSystem::lower(L.enemy(EnemyTypeId{e->type}));
+      return L.format(L.ui("hud.prompt.attack"), arg(name));
+    }
+    if (P.mounted) return L.ui("hud.prompt.dismount");
+    return {};
   }
 
   // ---------------------------------------------------------------- quadro de jogo
@@ -329,17 +452,26 @@ struct ClientApp::Impl {
     const proto::PrivateState* P = world.self();
     ui.clear();
     if (!me || !P) {
-      screens.notice(ui, fonts, in, L.ui("session.joining"));
+      gameUi->notice(L.ui("session.joining"));
       renderEmpty(capture);
       return;
     }
+    if (mode != Mode::Game) gameUi->notice({});
     mode = Mode::Game;
     ++gameFrames;
     handleKeys();
 
     const ViewDef* view = opt.view ? findView(*opt.view) : nullptr;
     MapKind mapKind = static_cast<MapKind>(me->map);
-    const bool uiOpen = openService.has_value() || (fx.death && fx.deathDelay <= 0) || paused;
+    if (!introShown && !opt.hideHud) {
+      // main.js: uma trajetória nova começa com as intenções
+      introShown = true;
+      if (opt.view && *opt.view == "15_inventario") gameUi->openMenu("inventory");
+      else if (opt.view && *opt.view == "16_livro") gameUi->openMenu("book");
+      else if (opt.view && *opt.view == "17_mapa") gameUi->openMenu("map");
+      else gameUi->openPanel(Panel::Intents, 0, true);
+    }
+    const bool uiOpen = this->uiOpen() || P->cinematic;
     const bool aiming = !uiOpen && in.right && canAim(*P);
     platform.setRelativeMouse(aiming);
 
@@ -402,12 +534,79 @@ struct ClientApp::Impl {
     hc.aimDist = aim.dist;
     hc.aimEnemy = aim.enemy;
     Hud::Action act = Hud::Action::None;
-    if (!opt.hideHud) {
-      act = hud.draw(ui, fonts, hc);
-      if (openService) drawServicePlaceholder();
-      if (paused) screens.notice(ui, fonts, in, "Pausa — Esc volta ao jogo");
+    if (!opt.hideHud) act = hud.draw(ui, fonts, hc);
+    gameUi->notice({});
+    // HUD do documento (hud.js) e o prompt de interact.js
+    gameUi->showHud(!opt.hideHud);
+    HudInput hi;
+    hi.world = &world;
+    hi.fx = &fx;
+    hi.statics = &statics;
+    hi.dt = dt;
+    hi.now = now;
+    hi.camYaw = cam.yaw();
+    hi.camPitch = cam.pitch();
+    hi.aiming = aiming;
+    hi.aimOnTarget = aim.enemy != 0 || (hover && hover->kind == Hover::Kind::Enemy);
+    hi.aimDist = aim.dist;
+    hi.mouseX = aiming ? in.width * 0.5 : in.mouseX;
+    hi.mouseY = aiming ? in.height * 0.5 : in.mouseY;
+    hi.uiOpen = uiOpen;
+    hi.prompt = promptText(*P, hc, uiOpen);
+    for (const GameUi::HudAction a : gameUi->hud(hi)) {
+      switch (a) {
+        case GameUi::HudAction::Potion: session.send(proto::Request{proto::ReqUsePotion{}}); break;
+        case GameUi::HudAction::Mount: session.send(proto::Request{proto::ReqMountAction{}}); break;
+        case GameUi::HudAction::CamNorth: cam.resetNorth(); break;
+        case GameUi::HudAction::MiniSize: gameUi->toggleMinimap(); break;
+        case GameUi::HudAction::CaptionClose: session.send(proto::Request{proto::ReqEndObserve{}}); break;
+      }
     }
-    const bool clickOnUi = act != Hud::Action::None || hud.blocks(in.mouseX, in.mouseY);
+    {
+      PanelInput pi;
+      pi.world = &world;
+      pi.fx = &fx;
+      pi.statics = &statics;
+      pi.dt = dt;
+      pi.camYaw = cam.yaw();
+      pi.camSens = cam.prefs.sens == CamSensitivity::Baixa ? "baixa" : cam.prefs.sens == CamSensitivity::Alta ? "alta" : "media";
+      pi.camInvert = cam.prefs.invert;
+      pi.quality = quality;
+      pi.muted = muted;
+      PanelOutput po = gameUi->panels(pi);
+      for (const proto::Request& r : po.requests) session.send(r);
+      for (const std::string& l : po.local) {
+        if (l == "camsens:baixa") cam.prefs.sens = CamSensitivity::Baixa;
+        else if (l == "camsens:media") cam.prefs.sens = CamSensitivity::Media;
+        else if (l == "camsens:alta") cam.prefs.sens = CamSensitivity::Alta;
+        else if (l == "caminvert") cam.prefs.invert = !cam.prefs.invert;
+        else if (l.rfind("quality:", 0) == 0) quality = l.substr(8);
+        else if (l == "mute") muted = !muted;
+        else if (l == "restart") fx.toast("Nova trajetória: feche o jogo e abra de novo (o progresso é salvo na fase 6).", proto::ToastKind::Info);
+      }
+      for (const Panel c : po.closed) {
+        if (c == Panel::Pause && paused) {
+          paused = false;
+          session.send(proto::Request{proto::ReqPause{false}});
+        }
+        if (c == Panel::Event) {
+          fx.eventDone.reset();
+          eventShown = false;
+        }
+      }
+    }
+    // observação do céu: legenda e câmera na estrela (stars.js `observe`)
+    if (fx.observe && !observing) {
+      observing = true;
+      const auto d = skyView.layout().dir(fx.observe->star);
+      cam.setSkyDirection(glm::dvec3(d[0], d[1], d[2]));
+      gameUi->caption(observeCaption(*fx.observe));
+    } else if (!fx.observe && observing) {
+      observing = false;
+      cam.setSkyDirection(std::nullopt);
+      gameUi->caption({});
+    }
+    const bool clickOnUi = act != Hud::Action::None || hud.blocks(in.mouseX, in.mouseY) || rmlUi->wantsMouse();
     switch (act) {
       case Hud::Action::Potion: session.send(proto::Request{proto::ReqUsePotion{}}); break;
       case Hud::Action::Mount: session.send(proto::Request{proto::ReqMountAction{}}); break;
@@ -480,18 +679,7 @@ struct ClientApp::Impl {
     f.unlit = &unlit;
     f.ui = &ui;
     f.atlas = &atlas;
-    renderer.render(f, capture);
-  }
-
-  void drawServicePlaceholder() {
-    const float sw = static_cast<float>(in.width), sh = static_cast<float>(in.height);
-    const float w = std::min(520.0f, sw - 40), h = 120;
-    drawPanel(ui, sw / 2 - w / 2, sh / 2 - h / 2, w, h);
-    static const char* names[] = {"Mercado", "Bancada", "Instrutor", "Armazém", "Estábulo", "Quadro de relatos", "Canteiro",
-                                  "Astrônoma", "Carga no chão", "Viajante", "Rasgo violeta"};
-    const auto i = static_cast<std::size_t>(*openService);
-    ui.text(fonts.display, 22, sw / 2, sh / 2 - 40, i < std::size(names) ? names[i] : "Painel", Rgba::hex(0xece4d2), Align::Center);
-    ui.text(fonts.body, 13, sw / 2, sh / 2 + 4, "Esc fecha", Rgba::hex(0xa8a193), Align::Center);
+    render(f, capture);
   }
 
   void renderEmpty(const std::optional<std::filesystem::path>& capture) {
@@ -502,7 +690,7 @@ struct ClientApp::Impl {
     f.map = 0;
     f.ui = &ui;
     f.atlas = &atlas;
-    renderer.render(f, capture);
+    render(f, capture);
   }
 
   // ---------------------------------------------------------------- título e criação
@@ -518,21 +706,23 @@ struct ClientApp::Impl {
     cam.setFixed(pos, pos + glm::dvec3(std::sin(az) * 100, std::tan(el) * 100, -std::cos(az) * 100), 55);
     cam.view().aspect = static_cast<double>(std::max(1, in.width)) / std::max(1, in.height);
     ui.clear();
+    GameUi::ScreenAction r = gameUi->screenInput(in, form);
+    // captura da criação: abre direto (como o clique em "Nova trajetória")
+    if (mode == Mode::Title && opt.view && *opt.view == "01b_create_screen") r = GameUi::ScreenAction::NewGame;
     if (mode == Mode::Title) {
-      const Screens::Result r = screens.title(ui, fonts, in, L, false, std::min(1.0, titleT / 0.6));
-      if (r == Screens::Result::NewGame) {
+      if (r == GameUi::ScreenAction::NewGame) {
         mode = Mode::Create;
+        gameUi->showCreate(form);
         platform.setTextInput(true);
       }
-    } else {
-      const Screens::Result r = screens.create(ui, fonts, in, L, data, look, form);
-      if (r == Screens::Result::Back) {
-        mode = Mode::Title;
-        platform.setTextInput(false);
-      } else if (r == Screens::Result::Start) {
-        platform.setTextInput(false);
-        join();
-      }
+    } else if (r == GameUi::ScreenAction::Back) {
+      mode = Mode::Title;
+      gameUi->showTitle(false);
+      platform.setTextInput(false);
+    } else if (r == GameUi::ScreenAction::Start) {
+      platform.setTextInput(false);
+      gameUi->hideScreens();
+      join();
     }
     dynamic.clear();
     unlit.clear();
@@ -551,22 +741,47 @@ struct ClientApp::Impl {
     f.unlit = &unlit;
     f.ui = &ui;
     f.atlas = &atlas;
-    renderer.render(f, capture);
+    render(f, capture);
   }
 
-  void loadingFrame() {
-    static const char* steps[] = {"relevo da região", "relevo da Turbulenta", "cenário, vegetação e texturas", "pronto"};
+  // main.js boot: uma etapa por quadro, com a barra e as fases na tela antes de cada uma.
+  void loadingFrame(double now) {
+    struct Step {
+      int phase;
+      const char* sub;
+    };
+    static const Step steps[] = {{0, ""}, {1, ""}, {2, "relevo da região"}, {2, "Região Turbulenta"}, {2, "luz do ambiente"}, {3, ""}, {3, "mapa da região"}, {4, ""}};
+    const Step& st = steps[std::min<std::size_t>(static_cast<std::size_t>(loadStep), std::size(steps) - 1)];
+    if (st.phase != bootPhase) {
+      bootPhase = st.phase;
+      bootSubs = 0;
+    }
+    if (*st.sub) ++bootSubs;
+    gameUi->bootProgress(st.phase, st.sub, bootSubs);
+    gameUi->bootLore(now);
     ui.clear();
-    screens.loading(ui, fonts, in, L, loadStep / 3.0, steps[std::min(loadStep, 3)]);
     renderEmpty(std::nullopt);
-    if (loadStep == 0) loadMap(MapKind::Region);
-    else if (loadStep == 1) loadMap(MapKind::Turbulent);
-    else if (loadStep == 2) loadPack();
+    switch (loadStep) {
+      case 0: packStage(0); break;
+      case 1: packStage(1); break;
+      case 2: loadMap(MapKind::Region); break;
+      case 3: loadMap(MapKind::Turbulent); break;
+      case 4: packStage(2); break;
+      case 5: packStage(3); break;
+      case 6: gameUi->worldMap().build(statics, look); break;
+      default: break;
+    }
     ++loadStep;
-    if (loadStep >= 3) {
+    if (loadStep >= static_cast<int>(std::size(steps))) {
+      gameUi->bootDone();
       titleT = 0;
-      if (opt.autoStart) join();
-      else mode = Mode::Title;
+      if (opt.autoStart) {
+        gameUi->hideScreens();
+        join();
+      } else {
+        mode = Mode::Title;
+        gameUi->showTitle(false);
+      }
     }
   }
 
@@ -580,20 +795,20 @@ struct ClientApp::Impl {
       if (in.quit) break;
       ++totalFrames;
       // capturas: o quadro final (N quadros depois de entrar no jogo, ou no título)
-      const bool titleCapture = opt.view && *opt.view == "01_title_screen";
-      const int counted = titleCapture ? (mode == Mode::Title ? totalFrames : 0) : gameFrames;
+      const bool titleCapture = opt.view && (*opt.view == "01_title_screen" || *opt.view == "01b_create_screen");
+      const int counted = titleCapture ? (mode == Mode::Title || mode == Mode::Create ? totalFrames : 0) : gameFrames;
       const bool last_ = opt.frames > 0 && counted + 1 >= opt.frames;
       std::optional<std::filesystem::path> capture;
       if (last_ && opt.screenshot) capture = opt.screenshot;
       switch (mode) {
-        case Mode::Loading: loadingFrame(); break;
+        case Mode::Loading: loadingFrame(now); break;
         case Mode::Title:
         case Mode::Create: titleFrame(dt, now, capture); break;
         case Mode::Joining:
         case Mode::Game: gameFrame(dt, now, capture); break;
         case Mode::Failed:
           ui.clear();
-          screens.notice(ui, fonts, in, failure);
+          gameUi->notice(failure);
           renderEmpty(std::nullopt);
           if (opt.frames > 0) {
             log::error("cliente: {}", failure);

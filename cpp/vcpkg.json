@@ -13,12 +13,13 @@
       "dependencies": ["catch2"]
     },
     "client": {
-      "description": "Cliente: janela, GPU e texto (SDL3 + SDL_GPU, FreeType)",
+      "description": "Cliente: janela, GPU, texto e interface (SDL3 + SDL_GPU, FreeType, RmlUi)",
       "dependencies": [
         "sdl3",
         { "name": "freetype", "default-features": false },
         { "name": "libwebp", "default-features": false },
-        "meshoptimizer"
+        "meshoptimizer",
+        { "name": "rmlui", "default-features": false, "features": ["freetype"] }
       ]
     }
   },

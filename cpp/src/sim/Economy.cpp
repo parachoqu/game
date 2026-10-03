@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "core/Math.h"
+#include "core/rules/Economy.h"
 #include "sim/Sim.h"
 
 namespace rpg::sim {
@@ -27,10 +28,7 @@ double demandOf(const Sim& s, MarketId mk, ItemId id) {
 std::optional<double> sellPrice(const Sim& s, MarketId mk, ItemId id, const InvEntry* entry) {
   const auto& table = s.sell[mk.value];
   if (id.value >= table.size() || !table[id.value]) return std::nullopt;
-  const double base = *table[id.value];
-  const double d = demandOf(s, mk, id);
-  const double condK = entry && entry->uid ? std::max(0.3, entry->cond / 100) : 1.0;
-  return std::max(1.0, jsRound(base * d * condK));
+  return rules::sellPrice(*table[id.value], demandOf(s, mk, id), entry && entry->uid, entry ? entry->cond : 100);
 }
 
 std::optional<double> buyPrice(const Sim& s, MarketId mk, ItemId id) { return s.data.markets[mk].buyPrice(id); }
@@ -183,8 +181,8 @@ bool craft(Sim& s, Player& p, RecipeId id, bool useStorage) {
 }
 
 RepairCost repairCost(const Gear& g) {
-  const double missing = 100 - g.cond;
-  return {std::ceil(missing / 10) * 2, g.cond < 40 ? 1 : 0};
+  const rules::RepairCost c = rules::repairCost(g.cond);
+  return {c.coins, c.lingote};
 }
 
 void repair(Sim& s, Player& p, GearSlot slot) {

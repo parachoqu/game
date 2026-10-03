@@ -20,7 +20,7 @@ namespace rpg {
 class StaticMap {
  public:
   StaticMap(MapKind kind, MapTerrain terrain, CollisionGrid collision, std::optional<RouteField> routeField,
-            std::vector<Polyline> routes, XZ center, double moveLimit, Balance::Collision rules);
+            std::vector<Polyline> routes, XZ center, double half, double moveLimit, Balance::Collision rules);
 
   MapKind kind() const { return kind_; }
   const MapTerrain& terrain() const { return terrain_; }
@@ -38,6 +38,7 @@ class StaticMap {
   // Limite de movimento (collide.js): a entidade fica a `moveLimit` do centro em x e em z.
   XZ clampToBounds(XZ p) const;
   XZ center() const { return center_; }
+  double half() const { return half_; }  // meia largura do mapa (layout.js HALF na região)
   double moveLimit() const { return moveLimit_; }
 
  private:
@@ -47,6 +48,7 @@ class StaticMap {
   std::optional<RouteField> routeField_;
   std::vector<Polyline> routes_;
   XZ center_;
+  double half_;
   double moveLimit_;
   Balance::Collision rules_;
 };

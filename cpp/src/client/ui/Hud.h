@@ -1,7 +1,7 @@
 #pragma once
-// HUD do jogo (ui/hud.js + a parte de fx.js que é HTML): vitais, faixa de zona, relógio e widgets,
-// avisos, prompt da tecla F, canalização, barra de ações, carga, mira, marcador de acerto, textos
-// flutuantes, barras sobre inimigos, tela de derrubado e o relatório de derrota.
+// O que o HUD desenha em modo imediato, por cima do mundo: as partes de fx.js presas a posições 3D
+// (textos flutuantes, barras sobre inimigos). O resto do HUD (hud.js) e os painéis são o documento
+// RmlUi (ver GameUi).
 #include <cstdint>
 #include <optional>
 #include <vector>

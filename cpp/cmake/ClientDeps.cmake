@@ -103,6 +103,35 @@ else()
   return()
 endif()
 
+# ---------------------------------------------------------------- RmlUi (interface: o HTML/CSS da demo)
+# O RmlUi traz layout de documentos (RML) e folhas de estilo (RCSS) parecidas com HTML/CSS; a interface
+# da demo (index.html, styles.css, ui/*.js) é portada para ele. Só o núcleo é usado: o desenho passa
+# pelo renderizador do jogo (ui/RmlRender grava; o Renderer desenha).
+find_package(RmlUi 6 CONFIG QUIET)
+if(TARGET RmlUi::RmlUi)
+  message(STATUS "RmlUi do sistema: ${RmlUi_VERSION}")
+  add_library(rpg_rmlui INTERFACE)
+  target_link_libraries(rpg_rmlui INTERFACE RmlUi::RmlUi)
+elseif(RPG_FETCH_DEPS)
+  message(STATUS "RmlUi não encontrado: baixando 6.3 por git")
+  set(_rpg_shared ${BUILD_SHARED_LIBS})
+  set(BUILD_SHARED_LIBS OFF)
+  set(RMLUI_SAMPLES OFF CACHE BOOL "" FORCE)
+  set(RMLUI_FONT_ENGINE "freetype" CACHE STRING "" FORCE)
+  set(RMLUI_LUA_BINDINGS OFF CACHE BOOL "" FORCE)
+  set(RMLUI_PRECOMPILED_HEADERS OFF CACHE BOOL "" FORCE)
+  set(RMLUI_COMPILER_OPTIONS OFF CACHE BOOL "" FORCE)
+  FetchContent_Declare(RmlUi GIT_REPOSITORY https://github.com/mikke89/RmlUi.git GIT_TAG 6.3 GIT_SHALLOW TRUE SYSTEM)
+  FetchContent_MakeAvailable(RmlUi)
+  set(BUILD_SHARED_LIBS ${_rpg_shared})
+  add_library(rpg_rmlui INTERFACE)
+  target_link_libraries(rpg_rmlui INTERFACE RmlUi::RmlUi)
+else()
+  message(WARNING "RmlUi não encontrado e RPG_FETCH_DEPS=OFF: o cliente não será compilado")
+  set(RPG_BUILD_CLIENT OFF)
+  return()
+endif()
+
 # ---------------------------------------------------------------- shaders (GLSL → SPIR-V)
 # Com glslangValidator instalado, os shaders são compilados no build; sem ele, valem os .spv
 # versionados em shaders/spv (atualize-os com `cmake --build <dir> --target rpg_update_shaders`).

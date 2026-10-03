@@ -66,7 +66,7 @@ const circle = (p) => ({ x: p.x, z: p.z, r: p.r });
 
 export function snapshot() {
   const field = (f) => ({ w: f.w, h: f.h, step: f.step, x0: f.x0, y0: f.y0, min: f.min, scale: f.scale, data: f.data });
-  const lines = (table) => Object.fromEntries(Object.entries(table).map(([id, l]) => [id, { width: l.width, pts: l.pts }]));
+  const lines = (table) => Object.fromEntries(Object.entries(table).map(([id, l]) => [id, { width: l.width, risk: l.risk, pts: l.pts }]));
   return {
     meta: {
       worldLayoutVersion: WORLD.world_layout_version,

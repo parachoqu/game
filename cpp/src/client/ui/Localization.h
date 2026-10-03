@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "core/data/GameData.h"
 #include "core/protocol/BookData.h"
@@ -13,6 +14,13 @@
 #include "core/world/ZoneMap.h"
 
 namespace rpg::client {
+
+// Viajante inspecionável (travelers.json): equipamento e a biografia pública, separados.
+struct TravelerText {
+  std::string name, role;
+  std::vector<std::string> gear;
+  std::vector<std::pair<std::string, std::string>> publicEntries;
+};
 
 class Localization {
  public:
@@ -32,6 +40,7 @@ class Localization {
   std::string zoneDeath(ZoneKind z) const;
   std::string enemy(EnemyTypeId id) const;
   std::string training(TrainingId id) const;
+  std::string trainingDesc(TrainingId id) const;
   std::string skill(SkillId id) const;
   std::string skillDesc(SkillId id) const;
   std::string weapon(WeaponFamilyId id) const;
@@ -40,14 +49,21 @@ class Localization {
   std::string start(StartId id) const;
   std::string startDesc(StartId id) const;
   std::string market(MarketId id) const;
+  std::string recipeNote(ItemId out) const;  // recipes.json: nota da receita pelo item fabricado
   // Rótulo de um interagível do layout (interactables.json: "market.vale", "forge"…).
   std::string interactable(std::string_view key) const;
   std::string travelerName(std::string_view key) const;
+  const TravelerText* traveler(std::string_view key) const;
   // Livro: título e texto de uma entrada (book.json: modelo → {title, text}); saves importados da
   // demo trazem o texto pronto.
   std::string bookTitle(const protocol::BookEntry& e) const;
   std::string bookText(const protocol::BookEntry& e) const;
   std::string bookTitleName(const protocol::BookTitle& t) const;
+  std::string bookTitleWhy(const protocol::BookTitle& t) const;
+  // Nome do capítulo do dia pelo domínio que mais aparece (book.js CHAPTER_NAMES; "none" = Chegada).
+  std::string bookChapter(std::string_view domain) const;
+  // Um modelo de book.json aplicado a argumentos (partes que BookText junta).
+  std::string bookPart(std::string_view key, const protocol::MsgArgs& args, bool title = false) const;
 
   // Rótulos soltos da interface (ui.json); devolve a própria chave se não houver texto.
   std::string ui(std::string_view key) const;
@@ -59,6 +75,8 @@ class Localization {
   const GameData* data_ = nullptr;
   std::map<std::string, std::string, std::less<>> messages_, ui_, interactables_;
   std::map<std::string, std::pair<std::string, std::string>, std::less<>> book_, titles_;
+  std::map<std::string, std::string, std::less<>> chapters_;
+  std::map<std::string, TravelerText, std::less<>> travelers_;
   // tabela → chave → campo → texto
   std::map<std::string, std::map<std::string, std::map<std::string, std::string>>, std::less<>> tables_;
   std::string field(std::string_view table, std::string_view key, std::string_view f) const;

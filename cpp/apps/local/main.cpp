@@ -124,10 +124,11 @@ int main(int argc, char** argv) {
       rpg::log::error("enquadramento desconhecido: {}", *opt.view);
       return 2;
     }
-    if (*opt.view != "01_title_screen") {
+    if (*opt.view != "01_title_screen" && *opt.view != "01b_create_screen") {
       opt.autoStart = true;
       opt.dev = cfg.devCommands = true;
-      opt.hideHud = true;
+      // 14–17: o HUD e o menu (intenções, inventário, Livro, mapa) por cima do jogo
+      opt.hideHud = !(opt.view->starts_with("14_") || opt.view->starts_with("15_") || opt.view->starts_with("16_") || opt.view->starts_with("17_"));
       if (!opt.hour) opt.hour = 12.0;  // capture-demo-views.mjs: G.time = 52,5 (meio-dia)
     }
     if (opt.frames <= 0) opt.frames = 90;

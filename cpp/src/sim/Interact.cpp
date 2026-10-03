@@ -224,7 +224,10 @@ void runTarget(Sim& s, Player& p, const InteractRef& ref) {
       if (node >= 0 && s.nodes[static_cast<std::size_t>(node)].charges > 0) gather(s, p, static_cast<std::size_t>(node));
       break;
     }
-    case InteractKind::LootBag: openService(s, p, Service::Loot, ref.id); break;
+    case InteractKind::LootBag:
+      openService(s, p, Service::Loot, ref.id);
+      sendLootView(s, p, ref.id);
+      break;
     case InteractKind::Traveler: {
       if (const Npc* n = s.npc(ref.id)) openService(s, p, Service::Traveler, static_cast<std::uint32_t>(n->traveler));
       break;

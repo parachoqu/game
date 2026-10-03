@@ -21,6 +21,7 @@
 #include "client/geom/SceneBatch.h"
 #include "client/geom/TerrainMesh.h"
 #include "client/render/FrameUniforms.h"
+#include "client/ui/RmlRender.h"
 #include "client/ui/UiBatch.h"
 #include "client/world/PackScene.h"
 #include "client/world/SkyView.h"
@@ -70,6 +71,7 @@ class Renderer {
     const std::vector<ColorVertex>* unlit = nullptr;
     const UiBatch* ui = nullptr;
     FontAtlas* atlas = nullptr;
+    const RmlRender* rml = nullptr;  // interface RmlUi (por cima de tudo)
     float exposure = 1.0f;
   };
   // Desenha um quadro. `capture`: grava a saída em PNG (espera a GPU terminar).

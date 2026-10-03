@@ -40,6 +40,7 @@ struct ToastFx {
   std::string text;
   protocol::ToastKind kind = protocol::ToastKind::Info;
   double left = 4.2, total = 4.2;
+  std::uint32_t id = 0;  // a interface casa cada aviso com o elemento dele
 };
 
 class FxState {
@@ -76,6 +77,7 @@ class FxState {
   std::optional<protocol::EvServiceOpened> service;
   std::optional<protocol::EvEventDone> eventDone;
   std::optional<protocol::EvObserve> observe;
+  std::optional<protocol::EvLootView> loot;  // conteúdo do saco aberto (painel de carga)
   bool respawned = false;      // o app volta a câmera para o norte
   bool turbEntered = false, turbLeft = false;
 
@@ -87,6 +89,7 @@ class FxState {
  private:
   const Localization* L_;
   std::mt19937 rng_{12345};
+  std::uint32_t toastSeq_ = 0;
 };
 
 }  // namespace rpg::client

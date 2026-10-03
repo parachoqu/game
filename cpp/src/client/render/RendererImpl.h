@@ -1,5 +1,5 @@
 #pragma once
-// Estado interno do Renderer (compartilhado entre Renderer.cpp e RendererPack.cpp).
+// Estado interno do Renderer (compartilhado entre Renderer.cpp, RendererPack.cpp e RendererRml.cpp).
 #include <array>
 #include <cstdint>
 #include <map>
@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <string>
 #include <tuple>
+#include <unordered_map>
 #include <vector>
 
 #include <SDL3/SDL.h>
@@ -103,6 +104,39 @@ struct PackGpu {
   DynBuffer frameInst, bones;
 };
 
+// Interface RmlUi na GPU (RendererRml.cpp): camadas, máscara de recorte no stencil, filtros e as
+// cópias das texturas e da geometria gravadas por RmlRender.
+struct RmlGpu {
+  bool ready = false;
+  SDL_GPUTextureFormat dsFmt = SDL_GPU_TEXTUREFORMAT_INVALID;
+  SDL_GPUShader *vs = nullptr, *fsColor = nullptr, *fsTex = nullptr, *fsGrad = nullptr, *vsFull = nullptr, *fsCopy = nullptr,
+                *fsBlur = nullptr, *fsShadow = nullptr, *fsMatrix = nullptr, *fsMask = nullptr;
+  // [0] sem máscara, [1] com a máscara de recorte (teste de stencil EQUAL)
+  SDL_GPUGraphicsPipeline *color[2]{}, *tex[2]{}, *grad[2]{};
+  SDL_GPUGraphicsPipeline *clipReplace = nullptr, *clipIncr = nullptr, *stencilClear = nullptr;
+  SDL_GPUGraphicsPipeline *copyBlend = nullptr, *copyReplace = nullptr, *copyOpacity = nullptr;
+  SDL_GPUGraphicsPipeline *blur = nullptr, *shadow = nullptr, *matrix = nullptr, *mask = nullptr;
+  SDL_GPUSampler *linear = nullptr, *clampLinear = nullptr;
+  int w = 0, h = 0;
+  SDL_GPUTexture* ds = nullptr;
+  std::vector<SDL_GPUTexture*> layers;  // [0] = a saída (Impl::out); as outras sob demanda
+  std::array<SDL_GPUTexture*, 3> post{};
+  SDL_GPUTexture* maskTex = nullptr;
+  SDL_GPUTexture* clearTex = nullptr;  // 1×1 transparente
+  struct Tex {
+    SDL_GPUTexture* tex = nullptr;
+    std::uint32_t version = 0;
+  };
+  std::unordered_map<std::uint64_t, Tex> textures;
+  DynBuffer vb, ib;
+  struct Slice {
+    Sint32 baseVertex = 0;
+    Uint32 firstIndex = 0, indexCount = 0;
+  };
+  std::unordered_map<std::uint64_t, Slice> slices;  // geometria do quadro → faixa nos buffers
+  std::vector<std::uint8_t> vtx, idx;
+};
+
 struct Renderer::Impl {
   SDL_Window* window = nullptr;
   SDL_GPUDevice* dev = nullptr;
@@ -127,6 +161,7 @@ struct Renderer::Impl {
   SDL_GPUTransferBuffer* download = nullptr;
   Uint32 downloadCap = 0;
   PackGpu pack;
+  RmlGpu rml;
   // Sem janela nada limita a CPU: até 2 quadros em voo (senão a fila cresce sem fim no lavapipe).
   std::array<SDL_GPUFence*, 2> inFlight{};
   std::size_t frameSlot = 0;
@@ -139,7 +174,15 @@ struct Renderer::Impl {
   SDL_GPUGraphicsPipeline* packPipeline(const MaterialSetup& m, bool mirrored, bool skinned);
   void drawPack(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* rp, const PackFrame& f, bool transparent, FrameStats& stats);
 
-  SDL_GPUShader* shader(const char* name, SDL_GPUShaderStage stage, Uint32 samplers, Uint32 uniforms, Uint32 storageBuffers = 0) {
+  // RendererRml.cpp
+  void initRml();
+  void releaseRml();
+  void ensureRmlTargets(int w, int h);
+  void syncRmlTextures(const RmlRender& r);
+  void packRml(const RmlRender& r);  // geometria do quadro em RmlGpu::vtx/idx
+  void drawRml(SDL_GPUCommandBuffer* cmd, const RmlRender& r, FrameStats& stats);
+
+  SDL_GPUShader* shader(const char* name, SDL_GPUShaderStage stage, Uint32 samplers, Uint32 uniforms, Uint32 storageBuffers = 0) const {
     const auto code = shaderBlob(name);
     if (code.empty()) throw std::runtime_error(std::string("shader não embutido: ") + name);
     SDL_GPUShaderCreateInfo ci{};

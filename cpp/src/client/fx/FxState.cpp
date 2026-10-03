@@ -12,7 +12,7 @@ namespace rpg::client {
 namespace proto = protocol;
 
 void FxState::toast(std::string text, proto::ToastKind kind, double seconds) {
-  toasts.push_front({std::move(text), kind, seconds, seconds});
+  toasts.push_front({std::move(text), kind, seconds, seconds, ++toastSeq_});
   while (toasts.size() > kMaxToasts) toasts.pop_back();
 }
 
@@ -97,6 +97,8 @@ void FxState::apply(const proto::GameEvent& event) {
         } else if constexpr (std::is_same_v<T, proto::EvBookTitle>) {
           titles.push_back({ev.title, {}, {}});
           toast(L_->ui("book.newTitle") + " " + L_->bookTitleName({ev.title, {}, {}}), proto::ToastKind::Book, 6.0);
+        } else if constexpr (std::is_same_v<T, proto::EvLootView>) {
+          loot = ev;
         } else if constexpr (std::is_same_v<T, proto::EvBookSync>) {
           book = ev.entries;
           titles = ev.titles;

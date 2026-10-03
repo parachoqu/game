@@ -56,6 +56,7 @@ std::vector<Polyline> polylines(const Json& routes, std::string_view where) {
     Polyline p;
     p.id = id;
     p.width = num(r, "width", std::string(where) + " › " + id);
+    if (r.contains("risk") && r.at("risk").is_string()) p.risk = r.at("risk").get<std::string>();
     for (const auto& pt : r.at("pts")) p.pts.push_back({pt.at(0).get<double>(), pt.at(1).get<double>()});
     out.push_back(std::move(p));
   }
