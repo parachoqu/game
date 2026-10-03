@@ -1,0 +1,49 @@
+{
+  "v": 2,
+  "world": { "layout": 2, "pos": [30.5, 380.25], "yaw": 1.571 },
+  "time": 1834.6,
+  "stats": { "kills": 7, "crafted": 3, "crafted_lingote": 2, "crafted_ferramentas": 1, "gathered": 9 },
+  "flags": { "disc_passagem": true, "disc_mina": true, "intro": false },
+  "profile": { "name": "Iara", "origin": "humano", "start": "artesao", "model": "eve" },
+  "P": {
+    "coins": 87.5,
+    "trainings": ["artesao", "alquimista"],
+    "inv": [
+      { "id": "pocao", "qty": 3 },
+      { "id": "minerio", "qty": 4 },
+      { "id": "espada", "uid": 4, "cond": 61.5 },
+      { "id": "item_que_nao_existe", "qty": 2 }
+    ],
+    "saddle": [{ "id": "madeira", "qty": 5 }],
+    "storage": [{ "id": "lingote", "qty": 2 }, { "id": "gibao", "uid": 7, "cond": 100 }],
+    "equip": {
+      "weapon": { "id": "martelo", "uid": 2, "cond": 74 },
+      "armor": { "id": "gibao", "uid": 5, "cond": 55 },
+      "bag": null,
+      "mount": null
+    },
+    "stableBags": []
+  },
+  "book": {
+    "entries": [
+      { "id": 1, "time": 0.5, "when": "Dia 1 · 08h", "day": 1, "count": 1, "public": false, "key": "chegada", "cat": "historia", "domain": null,
+        "title": "Chegada ao Entreposto do Vale", "text": "Iara chegou ao Vale com Artesão como primeiro conhecimento e martelo na mão." },
+      { "id": 2, "time": 620.2, "when": "Dia 1 · 12h", "day": 1, "count": 3, "public": true, "key": "oficio", "cat": "feitos", "domain": "trabalho",
+        "title": "Ofício na forja", "text": "Três peças saíram da forja do Vale.", "data": { "lingote": 2, "ferramentas": 1 }, "updated": "Dia 1 · 14h" },
+      { "id": 3, "time": 900, "when": "Dia 1 · 15h", "day": 1, "count": 1, "public": false, "key": "nota3", "cat": "historia", "domain": null,
+        "title": "Anotação pessoal", "text": "Voltar à mina antes do anoitecer.", "personal": true }
+    ],
+    "titles": [{ "id": "ferreira", "name": "Ferreira do Vale", "why": "Forjou peças para o canteiro." }],
+    "shownTitle": "ferreira",
+    "seq": 4
+  },
+  "evt": {
+    "progress": 34.5, "done": false, "doneAt": null, "othersPts": 21, "playerPts": 13.5, "othersT": 14,
+    "contrib": { "ferramentas": 8, "lingotes": 3, "reconhecimento": 2.5, "saqueadores": 0, "acampamento": 0 },
+    "delivered": { "ferramentas": 1, "lingote": 1 }
+  },
+  "camp": { "pop": 6, "state": "pressionado" },
+  "sky": { "vanished": [{ "index": 41, "constellation": 2, "time": 1200, "when": "Dia 1 · 18h" }], "observed": [41], "instrumentGiven": false },
+  "mkt": { "vale": { "demand": { "minerio": 0.78 } }, "alto": { "demand": { "pele": 0.9 } } },
+  "marketBase": { "alto": 16, "vale": 12 }
+}

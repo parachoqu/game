@@ -1,0 +1,156 @@
+# Dependências do cliente (janela, GPU, texto). O servidor e os testes de simulação não usam nada disto.
+#
+# Procura primeiro o que está instalado (apt/dnf/brew/vcpkg). O que faltar é baixado por git com tag
+# fixa (RPG_FETCH_DEPS), para o build funcionar em distros sem SDL3 empacotada (Ubuntu 24.04).
+option(RPG_BUILD_CLIENT "Compila o cliente (SDL3 + SDL_GPU) e o jogo local" ON)
+option(RPG_FETCH_DEPS "Baixa por git as dependências do cliente que não estiverem instaladas" ON)
+
+if(NOT RPG_BUILD_CLIENT)
+  return()
+endif()
+
+include(FetchContent)
+set(FETCHCONTENT_QUIET ON)
+
+# ---------------------------------------------------------------- SDL3
+find_package(SDL3 3.2 CONFIG QUIET)
+if(SDL3_FOUND)
+  message(STATUS "SDL3 do sistema: ${SDL3_VERSION}")
+elseif(RPG_FETCH_DEPS)
+  message(STATUS "SDL3 não encontrada: baixando release-3.4.16 por git")
+  set(SDL_SHARED OFF CACHE BOOL "" FORCE)
+  set(SDL_STATIC ON CACHE BOOL "" FORCE)
+  set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
+  set(SDL_TESTS OFF CACHE BOOL "" FORCE)
+  set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
+  # Sem os headers de X11/Wayland a SDL aborta o configure. A opção só tira esse erro: com eles
+  # instalados, a SDL continua usando X11/Wayland normalmente. Sem eles o cliente compila, mas só roda
+  # sem janela (--headless) — o caso dos jobs de CI que não desenham.
+  set(SDL_UNIX_CONSOLE_BUILD ON CACHE BOOL "" FORCE)
+  set(SDL_INSTALL OFF CACHE BOOL "" FORCE)
+  set(SDL_DISABLE_INSTALL ON CACHE BOOL "" FORCE)
+  FetchContent_Declare(SDL3 GIT_REPOSITORY https://github.com/libsdl-org/SDL.git GIT_TAG release-3.4.16 GIT_SHALLOW TRUE SYSTEM)
+  FetchContent_MakeAvailable(SDL3)
+  if(UNIX AND NOT APPLE AND NOT SDL_X11 AND NOT SDL_WAYLAND)
+    message(WARNING "SDL3 sem X11 nem Wayland (faltam os headers de desenvolvimento): o rpg_local só roda "
+                    "com --headless. Para jogar com janela, instale os pacotes listados no README e reconfigure.")
+  endif()
+else()
+  message(WARNING "SDL3 não encontrada e RPG_FETCH_DEPS=OFF: o cliente não será compilado")
+  set(RPG_BUILD_CLIENT OFF)
+  return()
+endif()
+
+# ---------------------------------------------------------------- FreeType (texto do HUD e da interface)
+find_package(Freetype QUIET)
+if(NOT Freetype_FOUND)
+  if(RPG_FETCH_DEPS)
+    message(STATUS "FreeType não encontrada: baixando VER-2-13-3 por git")
+    set(FT_DISABLE_HARFBUZZ ON CACHE BOOL "" FORCE)
+    set(FT_DISABLE_BROTLI ON CACHE BOOL "" FORCE)
+    set(FT_DISABLE_PNG ON CACHE BOOL "" FORCE)
+    set(FT_DISABLE_BZIP2 ON CACHE BOOL "" FORCE)
+    set(FT_DISABLE_ZLIB ON CACHE BOOL "" FORCE)
+    FetchContent_Declare(freetype GIT_REPOSITORY https://github.com/freetype/freetype.git GIT_TAG VER-2-13-3 GIT_SHALLOW TRUE SYSTEM)
+    FetchContent_MakeAvailable(freetype)
+    add_library(Freetype::Freetype ALIAS freetype)
+  else()
+    message(WARNING "FreeType não encontrada e RPG_FETCH_DEPS=OFF: o cliente não será compilado")
+    set(RPG_BUILD_CLIENT OFF)
+    return()
+  endif()
+endif()
+
+# ---------------------------------------------------------------- WebP (texturas da demo e dos GLB)
+find_package(WebP CONFIG QUIET)
+if(TARGET WebP::webp)
+  message(STATUS "libwebp do sistema")
+  add_library(rpg_webp INTERFACE)
+  target_link_libraries(rpg_webp INTERFACE WebP::webp)
+elseif(RPG_FETCH_DEPS)
+  message(STATUS "libwebp não encontrada: baixando v1.4.0 por git")
+  foreach(opt WEBP_BUILD_ANIM_UTILS WEBP_BUILD_CWEBP WEBP_BUILD_DWEBP WEBP_BUILD_GIF2WEBP WEBP_BUILD_IMG2WEBP
+              WEBP_BUILD_VWEBP WEBP_BUILD_WEBPINFO WEBP_BUILD_WEBPMUX WEBP_BUILD_EXTRAS WEBP_BUILD_LIBWEBPMUX)
+    set(${opt} OFF CACHE BOOL "" FORCE)
+  endforeach()
+  FetchContent_Declare(libwebp GIT_REPOSITORY https://github.com/webmproject/libwebp.git GIT_TAG v1.4.0 GIT_SHALLOW TRUE SYSTEM)
+  FetchContent_MakeAvailable(libwebp)
+  add_library(rpg_webp INTERFACE)
+  target_link_libraries(rpg_webp INTERFACE webp)
+  target_include_directories(rpg_webp SYSTEM INTERFACE "${libwebp_SOURCE_DIR}/src")
+else()
+  message(WARNING "libwebp não encontrada e RPG_FETCH_DEPS=OFF: o cliente não será compilado")
+  set(RPG_BUILD_CLIENT OFF)
+  return()
+endif()
+
+# ---------------------------------------------------------------- meshoptimizer (geometria do pacote e dos GLB)
+# O pacote do cliente usa o codec v1 do meshoptimizer 1.x; as versões 0.x das distros não o leem.
+find_package(meshoptimizer 1.0 CONFIG QUIET)
+if(TARGET meshoptimizer::meshoptimizer)
+  message(STATUS "meshoptimizer do sistema: ${meshoptimizer_VERSION}")
+  add_library(rpg_meshopt INTERFACE)
+  target_link_libraries(rpg_meshopt INTERFACE meshoptimizer::meshoptimizer)
+elseif(RPG_FETCH_DEPS)
+  message(STATUS "meshoptimizer ≥ 1.0 não encontrado: baixando v1.3 por git")
+  FetchContent_Declare(meshoptimizer GIT_REPOSITORY https://github.com/zeux/meshoptimizer.git GIT_TAG v1.3 GIT_SHALLOW TRUE SYSTEM)
+  FetchContent_MakeAvailable(meshoptimizer)
+  add_library(rpg_meshopt INTERFACE)
+  target_link_libraries(rpg_meshopt INTERFACE meshoptimizer)
+else()
+  message(WARNING "meshoptimizer não encontrado e RPG_FETCH_DEPS=OFF: o cliente não será compilado")
+  set(RPG_BUILD_CLIENT OFF)
+  return()
+endif()
+
+# ---------------------------------------------------------------- RmlUi (interface: o HTML/CSS da demo)
+# O RmlUi traz layout de documentos (RML) e folhas de estilo (RCSS) parecidas com HTML/CSS; a interface
+# da demo (index.html, styles.css, ui/*.js) é portada para ele. Só o núcleo é usado: o desenho passa
+# pelo renderizador do jogo (ui/RmlRender grava; o Renderer desenha).
+find_package(RmlUi 6 CONFIG QUIET)
+if(TARGET RmlUi::RmlUi)
+  message(STATUS "RmlUi do sistema: ${RmlUi_VERSION}")
+  add_library(rpg_rmlui INTERFACE)
+  target_link_libraries(rpg_rmlui INTERFACE RmlUi::RmlUi)
+elseif(RPG_FETCH_DEPS)
+  message(STATUS "RmlUi não encontrado: baixando 6.3 por git")
+  set(_rpg_shared ${BUILD_SHARED_LIBS})
+  set(BUILD_SHARED_LIBS OFF)
+  set(RMLUI_SAMPLES OFF CACHE BOOL "" FORCE)
+  set(RMLUI_FONT_ENGINE "freetype" CACHE STRING "" FORCE)
+  set(RMLUI_LUA_BINDINGS OFF CACHE BOOL "" FORCE)
+  set(RMLUI_PRECOMPILED_HEADERS OFF CACHE BOOL "" FORCE)
+  set(RMLUI_COMPILER_OPTIONS OFF CACHE BOOL "" FORCE)
+  FetchContent_Declare(RmlUi GIT_REPOSITORY https://github.com/mikke89/RmlUi.git GIT_TAG 6.3 GIT_SHALLOW TRUE SYSTEM)
+  FetchContent_MakeAvailable(RmlUi)
+  set(BUILD_SHARED_LIBS ${_rpg_shared})
+  add_library(rpg_rmlui INTERFACE)
+  target_link_libraries(rpg_rmlui INTERFACE RmlUi::RmlUi)
+else()
+  message(WARNING "RmlUi não encontrado e RPG_FETCH_DEPS=OFF: o cliente não será compilado")
+  set(RPG_BUILD_CLIENT OFF)
+  return()
+endif()
+
+# ---------------------------------------------------------------- Dear ImGui (ferramentas de depuração)
+# Sempre por git (tag fixa): o pacote precisa dos backends SDL3 e SDL_GPU, que nem toda distro empacota.
+# Sem ele (RPG_FETCH_DEPS=OFF) o cliente compila sem as ferramentas.
+if(RPG_FETCH_DEPS)
+  FetchContent_Declare(imgui GIT_REPOSITORY https://github.com/ocornut/imgui.git GIT_TAG v1.92.9b GIT_SHALLOW TRUE)
+  FetchContent_MakeAvailable(imgui)
+  add_library(rpg_imgui STATIC
+    ${imgui_SOURCE_DIR}/imgui.cpp ${imgui_SOURCE_DIR}/imgui_draw.cpp ${imgui_SOURCE_DIR}/imgui_tables.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp ${imgui_SOURCE_DIR}/imgui_demo.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlgpu3.cpp)
+  target_include_directories(rpg_imgui SYSTEM PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
+  target_link_libraries(rpg_imgui PUBLIC SDL3::SDL3)
+  target_compile_definitions(rpg_imgui PUBLIC RPG_HAS_IMGUI=1)
+  set_target_properties(rpg_imgui PROPERTIES POSITION_INDEPENDENT_CODE ON)
+else()
+  add_library(rpg_imgui INTERFACE)
+endif()
+
+# ---------------------------------------------------------------- shaders (GLSL → SPIR-V)
+# Com glslangValidator instalado, os shaders são compilados no build; sem ele, valem os .spv
+# versionados em shaders/spv (atualize-os com `cmake --build <dir> --target rpg_update_shaders`).
+find_program(GLSLANG_VALIDATOR glslangValidator)

@@ -9,3 +9,17 @@
 *.fbx filter=lfs diff=lfs merge=lfs -text
 *.zip filter=lfs diff=lfs merge=lfs -text
 *.pdf filter=lfs diff=lfs merge=lfs -text
+
+# Dados gerados para o C++: sempre LF (a conferência com a demo compara o texto)
+cpp/data/**/*.json text eol=lf
+# Pacote de mundo da simulação (binários gerados por demo/tools/bake-sim-world.mjs) e fixtures
+cpp/assets/sim/*.u16 binary
+cpp/assets/sim/*.u8 binary
+cpp/assets/sim/*.f32 binary
+cpp/assets/sim/*.bin binary
+cpp/assets/sim/*.json text eol=lf
+cpp/tests/parity/fixtures/*.json text eol=lf
+# Pacote visual do cliente (gerado por demo/tools/bake-client-scene.mjs): binários em git comum
+cpp/assets/client/*.bin binary
+cpp/assets/client/tex/*.webp binary
+cpp/assets/client/*.json text eol=lf

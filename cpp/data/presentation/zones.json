@@ -1,0 +1,18 @@
+{
+  "protegida": {
+    "color": "#62b98e",
+    "mark": "◈"
+  },
+  "fronteira": {
+    "color": "#e3b24c",
+    "mark": "◭"
+  },
+  "fullloot": {
+    "color": "#d85a43",
+    "mark": "✕"
+  },
+  "turbulenta": {
+    "color": "#a07cf2",
+    "mark": "◌"
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "minerio": {
+    "glyph": "⬢︎",
+    "color": "#9a7b64"
+  },
+  "madeira": {
+    "glyph": "▮︎",
+    "color": "#a57a45"
+  },
+  "erva": {
+    "glyph": "✿︎",
+    "color": "#8cc97a"
+  },
+  "pele": {
+    "glyph": "◗︎",
+    "color": "#b48a62"
+  },
+  "cristal": {
+    "glyph": "◆︎",
+    "color": "#8fd6ea"
+  },
+  "fragmento": {
+    "glyph": "✦︎",
+    "color": "#b892ff"
+  },
+  "lingote": {
+    "glyph": "▬︎",
+    "color": "#c4bfb3"
+  },
+  "ferramentas": {
+    "glyph": "⚒︎",
+    "color": "#dcaa48"
+  },
+  "instrumento": {
+    "glyph": "⊕︎",
+    "color": "#e6c774"
+  },
+  "pocao": {
+    "glyph": "⚱︎",
+    "color": "#d8674f"
+  },
+  "espada": {
+    "glyph": "†︎",
+    "color": "#cfd6da"
+  },
+  "arco": {
+    "glyph": "⌒︎",
+    "color": "#c79a5c"
+  },
+  "martelo": {
+    "glyph": "⚒︎",
+    "color": "#b0a18a"
+  },
+  "gibao": {
+    "glyph": "▣︎",
+    "color": "#a47a52"
+  },
+  "cota": {
+    "glyph": "▦︎",
+    "color": "#a9b0b3"
+  },
+  "bolsa": {
+    "glyph": "◘︎",
+    "color": "#8d6b4a"
+  },
+  "montaria": {
+    "glyph": "♞︎",
+    "color": "#a8875e"
+  },
+  "manoplas": {
+    "glyph": "⚔︎",
+    "color": "#d2b48c"
+  },
+  "maca": {
+    "glyph": "ϙ︎",
+    "color": "#c49a45"
+  },
+  "machado": {
+    "glyph": "🪓︎",
+    "color": "#ba604d"
+  },
+  "adaga": {
+    "glyph": "🗡︎",
+    "color": "#b0c4de"
+  },
+  "lanca": {
+    "glyph": "⤊︎",
+    "color": "#deb887"
+  },
+  "foice": {
+    "glyph": "⟆︎",
+    "color": "#8b008b"
+  },
+  "besta": {
+    "glyph": "⤅︎",
+    "color": "#cd853f"
+  },
+  "cajado_gelo": {
+    "glyph": "❄︎",
+    "color": "#70d6ff"
+  },
+  "tomo_fogo": {
+    "glyph": "🔥︎",
+    "color": "#ff6b35"
+  },
+  "cajado_natureza": {
+    "glyph": "🌿︎",
+    "color": "#52b788"
+  },
+  "tomo_vento": {
+    "glyph": "🌪︎",
+    "color": "#90e0ef"
+  },
+  "tomo_maldicao": {
+    "glyph": "👁︎",
+    "color": "#9b5de5"
+  },
+  "fetiche_metamorfose": {
+    "glyph": "🐾︎",
+    "color": "#bc6c25"
+  },
+  "cajado_vital": {
+    "glyph": "✨︎",
+    "color": "#a7c957"
+  },
+  "tomo_sagrado": {
+    "glyph": "☼︎",
+    "color": "#ffd166"
+  }
+}

@@ -1,0 +1,146 @@
+{
+  "investida": {
+    "name": "Investida",
+    "desc": "Avança 7 m e fere quem estiver no caminho."
+  },
+  "giro": {
+    "name": "Golpe Giratório",
+    "desc": "Breve preparo; atinge tudo ao redor e empurra."
+  },
+  "tiroCarregado": {
+    "name": "Tiro Carregado",
+    "desc": "Prepara 0,6 s e dispara uma flecha perfurante."
+  },
+  "recuo": {
+    "name": "Recuo com Disparo",
+    "desc": "Salta para trás e dispara."
+  },
+  "atordoar": {
+    "name": "Golpe Atordoante",
+    "desc": "Golpe lento que atordoa por 1,5 s."
+  },
+  "reparoCampo": {
+    "name": "Reparo de Campo",
+    "desc": "Recupera 25% da condição da arma e da armadura."
+  },
+  "comboManopla": {
+    "name": "Rajada Rápida",
+    "desc": "Sequência rápida de 3 socos contundentes em alta velocidade."
+  },
+  "avancoImpacto": {
+    "name": "Avanço de Impacto",
+    "desc": "Projeta o corpo à frente desferindo um soco demolidor que atordoa."
+  },
+  "golpeEsmagador": {
+    "name": "Golpe Esmagador",
+    "desc": "Impacto violento descendente que ignora armadura e reduz a velocidade do alvo."
+  },
+  "ondaChoque": {
+    "name": "Onda de Choque",
+    "desc": "Bate a maça no chão com tremendo impacto, repelindo todos ao redor."
+  },
+  "machadadaPesada": {
+    "name": "Machadada Brutal",
+    "desc": "Golpe comprometido e pesado que causa dano massivo frontal."
+  },
+  "dilacerar": {
+    "name": "Dilacerar",
+    "desc": "Corte semicircular afiado que abre feridas contínuas no inimigo."
+  },
+  "passoSombras": {
+    "name": "Passo das Sombras",
+    "desc": "Desliza velozmente e golpeia um ponto fraco do oponente."
+  },
+  "golpePreciso": {
+    "name": "Golpe Preciso",
+    "desc": "Estocada cirúrgica de curto alcance com altíssimo dano crítico."
+  },
+  "estocadaLonga": {
+    "name": "Estocada Penetrante",
+    "desc": "Golpe longo e direto de até 4,5 m que mantém o alvo à distância."
+  },
+  "varrerDistancia": {
+    "name": "Varrer Distância",
+    "desc": "Varredura circular ampla com a haste que repele atacantes próximos."
+  },
+  "ceifaCircular": {
+    "name": "Ceifa Circular",
+    "desc": "Giro ceifador com a foice que corta múltiplos alvos ao redor."
+  },
+  "puxaoFoice": {
+    "name": "Puxão Ceifador",
+    "desc": "Engata a lâmina curva no oponente e puxa-o em sua direção."
+  },
+  "tiroBesta": {
+    "name": "Virote Perfurante",
+    "desc": "Disparo potente em linha reta que atravessa múltiplos inimigos."
+  },
+  "disparoRepulsao": {
+    "name": "Tiro de Repulsão",
+    "desc": "Disparo de altíssima pressão que arremessa o alvo para trás."
+  },
+  "setaGelo": {
+    "name": "Seta Gélida",
+    "desc": "Dispara um projétil de água congelada que causa lentidão ao acertar."
+  },
+  "prisaoGelo": {
+    "name": "Prisão de Gelo",
+    "desc": "Forma um anel gélido no solo que congela e danifica inimigos."
+  },
+  "bolaFogo": {
+    "name": "Bola de Fogo",
+    "desc": "Esfera ígnea de combustão intensa que explode no impacto."
+  },
+  "erupcaoFogo": {
+    "name": "Erupção Ígnea",
+    "desc": "Detona o chão sob os adversários em uma explosão de labaredas."
+  },
+  "enraizar": {
+    "name": "Enraizamento",
+    "desc": "Raízes brotam do chão imobilizando o adversário por 2 s."
+  },
+  "bencaoTerra": {
+    "name": "Bênção da Terra",
+    "desc": "Sintonia vital que restaura vigor e concede proteção física temporária."
+  },
+  "lufadaVento": {
+    "name": "Lufada Repulsiva",
+    "desc": "Rajada de pressão eólica em cone que afasta inimigos e desvia projéteis."
+  },
+  "saltoVento": {
+    "name": "Salto dos Ventos",
+    "desc": "Impulso de vento veloz que projeta o conjurador na direção desejada."
+  },
+  "marcaCorruptora": {
+    "name": "Marca Corruptora",
+    "desc": "Marca o alvo com maldição que causa dano persistente com leitura clara."
+  },
+  "drenoVital": {
+    "name": "Dreno Vital",
+    "desc": "Canaliza energia corrupta, drenando pontos de vida do oponente."
+  },
+  "formaFera": {
+    "name": "Forma da Fera",
+    "desc": "Metamorfoseia o corpo em forma bestial (urso), ganhando vigor e patadas ferozes."
+  },
+  "rugidoFera": {
+    "name": "Rugido Intimidador",
+    "desc": "Rugido estarrecedor que desestabiliza e atordoa oponentes em área."
+  },
+  "curaVital": {
+    "name": "Toque Vital",
+    "desc": "Concentra o ciclo vital para recuperar 50 pontos de vida do corpo."
+  },
+  "auraRestauracao": {
+    "name": "Aura Restauradora",
+    "desc": "Cria uma área de florescência no solo com regeneração de vida contínua."
+  },
+  "escudoRadiante": {
+    "name": "Escudo Radiante",
+    "desc": "Purificação celeste que envolve o conjurador em uma barreira luminosa protetora."
+  },
+  "purificacaoSagrada": {
+    "name": "Clarão Sagrado",
+    "desc": "Emanação sagrada resplandecente que afasta sombras e queima inimigos próximos."
+  }
+}

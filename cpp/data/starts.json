@@ -1,0 +1,26 @@
+{
+  "espadachim": {
+    "weapon": "espada"
+  },
+  "arqueiro": {
+    "weapon": "arco"
+  },
+  "artesao": {
+    "weapon": "martelo"
+  },
+  "lutador": {
+    "weapon": "manoplas"
+  },
+  "lanceiro": {
+    "weapon": "lanca"
+  },
+  "mago_gelo": {
+    "weapon": "cajado_gelo"
+  },
+  "piromante": {
+    "weapon": "tomo_fogo"
+  },
+  "metamorfo": {
+    "weapon": "fetiche_metamorfose"
+  }
+}

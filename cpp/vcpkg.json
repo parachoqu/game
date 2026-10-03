@@ -1,0 +1,27 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "projeto-game",
+  "version-string": "0.1.0",
+  "builtin-baseline": "07f4812200df3d3c931c0c8a6081d3b21fe2bf9f",
+  "dependencies": [
+    "glm",
+    "nlohmann-json"
+  ],
+  "features": {
+    "tests": {
+      "description": "Testes (Catch2)",
+      "dependencies": ["catch2"]
+    },
+    "client": {
+      "description": "Cliente: janela, GPU, texto e interface (SDL3 + SDL_GPU, FreeType, RmlUi)",
+      "dependencies": [
+        "sdl3",
+        { "name": "freetype", "default-features": false },
+        { "name": "libwebp", "default-features": false },
+        "meshoptimizer",
+        { "name": "rmlui", "default-features": false, "features": ["freetype"] }
+      ]
+    }
+  },
+  "default-features": ["tests", "client"]
+}

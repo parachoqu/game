@@ -1,0 +1,18 @@
+{
+  "humano": {
+    "name": "Humano",
+    "hint": "Povos das estradas e dos canais."
+  },
+  "elfo": {
+    "name": "Elfo",
+    "hint": "Herdeiros de antigas estruturas do oeste."
+  },
+  "anao": {
+    "name": "Anão",
+    "hint": "Cidades escalonadas nas encostas."
+  },
+  "orc": {
+    "name": "Orc",
+    "hint": "Clãs de caravaneiros e pastores."
+  }
+}

@@ -1,0 +1,130 @@
+name: C++
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cpp/**'
+      - 'demo/src/config.js'
+      - 'demo/src/game/**'
+      - 'demo/tools/export-game-data.mjs'
+      - '.github/workflows/cpp.yml'
+  pull_request:
+    paths:
+      - 'cpp/**'
+      - 'demo/src/config.js'
+      - 'demo/src/game/**'
+      - 'demo/tools/export-game-data.mjs'
+      - '.github/workflows/cpp.yml'
+
+jobs:
+  linux:
+    name: Linux (${{ matrix.preset }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        preset: [ci, asan]
+    defaults:
+      run:
+        working-directory: cpp
+    steps:
+      - uses: actions/checkout@v4
+      # SDL3 não é empacotada no Ubuntu 24.04: o CMake a baixa por git (release-3.4.16) e compila
+      - name: Dependências
+        run: sudo apt-get update && sudo apt-get install -y libglm-dev nlohmann-json3-dev catch2 ninja-build libfreetype-dev glslang-tools
+      - run: cmake --preset ${{ matrix.preset }}
+      - run: cmake --build --preset ${{ matrix.preset }}
+      - run: ctest --preset ${{ matrix.preset }}
+
+  # Reproduz o ambiente em que o build já quebrou (Kali rolling): CMake 4 + GCC ≥ 14, que fazem o
+  # escaneamento de módulos C++20, com o projeto num caminho com espaço e acento.
+  linux-accented-path:
+    name: Linux (GCC 14 + CMake 4, caminho com espaço e acento)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: 'Área de trabalho/rpg'
+      - name: Dependências
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++-14 libglm-dev nlohmann-json3-dev catch2 ninja-build libfreetype-dev
+          pip install --user 'cmake>=4,<5'
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Build e testes
+        working-directory: 'Área de trabalho/rpg/cpp'
+        env:
+          CXX: g++-14
+        run: |
+          cmake --version
+          cmake --preset ci
+          cmake --build --preset ci
+          ctest --preset ci
+
+  # O jogo de verdade, sem monitor: Vulkan por software (mesa lavapipe) e X11 virtual (Xvfb).
+  # Roda os testes que precisam de GPU, abre a janela uma vez e grava as capturas dos enquadramentos
+  # da demo (os de demo/tools/capture-reference.mjs) como artefato do CI, com o pacote visual
+  # (cpp/assets/client).
+  linux-client:
+    name: Linux (cliente com Xvfb + lavapipe)
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: cpp
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dependências
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libglm-dev nlohmann-json3-dev catch2 ninja-build libfreetype-dev glslang-tools \
+            mesa-vulkan-drivers libvulkan1 vulkan-tools xvfb xauth \
+            libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxss-dev libxtst-dev libxkbcommon-dev \
+            libwayland-dev libegl-dev libdrm-dev libgbm-dev
+      - run: cmake --preset ci -DRPG_TEST_GPU=ON
+      - run: cmake --build --preset ci
+      - run: ctest --preset ci
+      - name: Janela de verdade (X11 no Xvfb)
+        run: xvfb-run -a -s "-screen 0 1280x800x24" ./build/ci/apps/local/rpg_local --size 1100x700 --auto --frames 90 --screenshot shots/janela_jogo.png
+      - name: Capturas dos enquadramentos da demo
+        run: |
+          mkdir -p shots
+          for v in 01_title_screen 02_mercado 03_ponte_principal 04_passagem_garganta 05_bosque_forjas 06_mina \
+                   07_observatorio 08_entreposto_norte 09_campos 10_margens_rio 11_ermos 12_portal_turbulenta \
+                   12b_turbulenta_interior 13_vista_elevada_horizonte; do
+            frames=30; [ "$v" = 01_title_screen ] && frames=90
+            ./build/ci/apps/local/rpg_local --headless --size 1100x700 --view "$v" --frames "$frames" --screenshot "shots/$v.png"
+          done
+          # a interface em RmlUi: criação, HUD com as intenções, inventário, Livro e mapa
+          for v in 01b_create_screen 14_hud 15_inventario 16_livro 17_mapa; do
+            ./build/ci/apps/local/rpg_local --headless --size 1100x700 --view "$v" --frames 60 --screenshot "shots/$v.png"
+          done
+          # ferramentas de depuração (Dear ImGui) numa janela de verdade
+          xvfb-run -a -s "-screen 0 1280x800x24" ./build/ci/apps/local/rpg_local --size 1100x700 --auto --debug-ui --frames 60 --screenshot shots/depuracao.png
+          # o personagem de frente (modelo com pele, pose ociosa, arma na mão), como o retrato de capture-reference.mjs
+          ./build/ci/apps/local/rpg_local --headless --size 1100x700 --auto --dev --hide-hud --portrait --hour 12 --frames 64 --screenshot shots/portrait.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: capturas-cliente
+          path: cpp/shots/*.png
+
+  windows:
+    name: Windows (MSVC + vcpkg)
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: cpp
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: vcpkg
+        shell: pwsh
+        working-directory: ${{ runner.temp }}
+        run: |
+          # clone completo: a builtin-baseline do vcpkg.json precisa estar no histórico
+          git clone https://github.com/microsoft/vcpkg vcpkg
+          ./vcpkg/bootstrap-vcpkg.bat -disableMetrics
+          "VCPKG_ROOT=$env:RUNNER_TEMP\vcpkg" >> $env:GITHUB_ENV
+      - run: cmake --preset windows-msvc
+      - run: cmake --build --preset windows-msvc
+      - run: ctest --preset windows-msvc
