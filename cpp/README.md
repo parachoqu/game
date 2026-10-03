@@ -27,6 +27,15 @@ o mapa completo. Cada botão vira um `Request` que o servidor confere. Com `--de
 ferramentas de depuração (Dear ImGui): tempo de quadro, estado do jogador, câmera livre nos
 enquadramentos e os comandos de desenvolvimento.
 
+**Fase 6 concluída:** o progresso fica salvo. O servidor grava cada personagem (perfil, posição,
+moedas, treinos, bolsa, alforjes, armazém, equipamento, Livro, estatísticas, marcas) e o mundo (hora,
+evento, acampamento, céu, mercados) em JSON a cada 20 s, ao sair e ao encerrar — nunca dentro da
+Turbulenta, como na demo. O título mostra "Continuar trajetória"; "Nova trajetória" (pausa) apaga o
+save e volta ao título. Saves da demo entram com `--import-save` (a migração de `save.js` vale: layout
+antigo ou posição inválida voltam ao abrigo, com aviso). Os 23 sons e as duas ambiências de
+`audio.js` são sintetizados em C++ e tocam pela SDL3. Sensibilidade e inversão da câmera, qualidade
+e mudo ficam em `settings.json`.
+
 - `rpg_core` (compartilhado por servidor e cliente):
   - dados de design de `config.js`, validados na carga;
   - mundo estático com paridade exata com a demo: relevo escavado pelo rio, pontes, água, biomas,
@@ -40,14 +49,16 @@ enquadramentos e os comandos de desenvolvimento.
   mercados, fabricação, reparo, treinos, montaria, derrota por zona, cargas no chão, coleta,
   acampamento reativo, evento regional, estrelas, Região Turbulenta, NPCs, descobertas e o Livro.
 - `rpg_server`: sessões, pedidos validados, snapshots com raio de interesse, eventos por
-  destinatário e bots.
+  destinatário, bots e persistência (registros de personagem e mundo, migração e importação do save
+  da demo).
 - `rpg_client_core` + `rpg_client` (nunca linkam a simulação): sessão pelo protocolo, interpolação
   de snapshots, câmera em terceira pessoa (porte de `updateCamera`), mira, clique para atacar e usar,
   tecla F, a interface da demo em RmlUi (telas, HUD, painéis, menu, Livro, mapas), textos em pt-BR,
   telegrafias e partículas; o pacote visual da demo (cenário, céu, personagens animados) e, sem ele,
   o cenário grey-box da fase 3.
 - `rpg_local`: servidor numa thread + cliente, ligados por `LocalTransport`.
-- **Testes: 107** (104 sem GPU). Os de paridade repetem 19 roteiros jogados pela própria demo (do
+- **Testes: 123** (120 sem GPU), entre eles uma trajetória inteira pelo protocolo (comprar, coletar,
+  fabricar, cair na Fronteira, recuperar a carga, portal, extração, salvar e retomar). Os de paridade repetem 19 roteiros jogados pela própria demo (do
   boot completo a cada técnica das 18 armas) e exigem o mesmo resultado **bit a bit**, quadro a
   quadro; os da animação refazem os roteiros dos animadores da demo e conferem a pose nó a nó. Os desvios
   intencionais estão em [ARQUITETURA.md](ARQUITETURA.md), seção 8. Os do cliente rodam sem janela; os
@@ -118,6 +129,20 @@ Outros presets:
 ./build/dev/apps/local/rpg_local --auto          # entra direto com um personagem padrão
 ./build/dev/apps/local/rpg_local --net-sim latency:120,jitter:30,loss:2   # rede simulada
 ./build/dev/apps/local/rpg_local --size 1600x900 --fullscreen --no-vsync --dev
+./build/dev/apps/local/rpg_local --continue      # retoma o último personagem, sem passar pelo título
+```
+
+Saves e preferências ficam em `~/.local/share/projeto-game` (ou `$XDG_DATA_HOME/projeto-game`; no
+Windows `%APPDATA%\projeto-game`; no macOS `~/Library/Application Support/projeto-game`):
+`world.json`, `characters/<nome>.json` e `settings.json`. `--save-dir DIR` usa outro lugar e
+`--no-save` não lê nem grava nada (o padrão das execuções automáticas: `--view`, `--headless`,
+`--frames`).
+
+Para trazer um save da demo: no navegador, com a demo aberta, rode no console
+`copy(localStorage['projeto-game-demo-v1'])`, cole num arquivo e importe:
+
+```bash
+./build/dev/apps/local/rpg_local --import-save save-da-demo.json   # depois: "Continuar trajetória"
 ```
 
 Controles da demo: WASD anda (Shift corre, Ctrl agacha), Espaço pula (Shift+Espaço: salto
@@ -144,6 +169,7 @@ Capturas sem monitor, nos enquadramentos de `demo/captures/after`:
 ./build/dev/apps/server/rpg_server --ticks 300   # 10 s de jogo o mais rápido possível
 ./build/dev/apps/server/rpg_server --ticks 3600 --bots 8   # 2 min com 8 jogadores controlados pelo servidor
 # --data DIR e --sim DIR apontam para outros cpp/data e cpp/assets/sim; --dev aceita comandos de teste
+# saves em <diretório do usuário>/servidor (com --ticks, nenhum); --save-dir DIR e --no-save mudam isso
 ```
 
 ## Dados de design

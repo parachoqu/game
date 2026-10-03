@@ -21,6 +21,8 @@ class ClientSession {
   explicit ClientSession(std::unique_ptr<net::ITransport> transport);
 
   void join(const protocol::Hello& hello);
+  // Sai do mundo sem desconectar (ReqLeave): a sessão volta a Idle e aceita um novo join.
+  void leave(bool discard);
   void send(const protocol::Request& req);
   void send(const protocol::PlayerCommand& cmd);
 

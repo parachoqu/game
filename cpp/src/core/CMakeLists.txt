@@ -2,6 +2,7 @@
 # (conferido por tools/check_layering.py).
 add_library(rpg_core STATIC
   Log.cpp
+  Paths.cpp
   Rng.cpp
   JsMath.cpp
   Noise.cpp

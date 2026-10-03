@@ -264,10 +264,8 @@ cpp/
 - `sim/systems/Book.h/.cpp`: o Livro por personagem (`first`, `tally`, `log`, `note`, `grantTitle`). As entradas guardam `BookTemplateId` + parâmetros.   [book.js]
 - `sim/systems/WorldPopulation.h/.cpp`: coloca na instância o que o `GameplayLayout` descreve (interagíveis, NPCs, grupos, encontros, guarda do canteiro).   [world.js `buildWorld`, `initCanteiroGuard`]
 
-**Registros persistentes**
-- `sim/persist/CharacterRecord.h/.cpp`: perfil, posição, moedas, treinos, bolsa, alforjes, armazém, equipamento, bolsas no estábulo, Livro, stats, flags.
-- `sim/persist/WorldRecord.h/.cpp`: tempo, evento, acampamento, céu, demanda dos mercados.
-- `sim/persist/SaveMigration.h/.cpp`: `migrateSave`, `isValidPosition`, `safeSpawn`, importação do save JSON da demo.   [save.js]
+**Registros persistentes** (ficaram em `server/persist`, ver a seção 12: a simulação não lê nem grava arquivos)
+- `server/persist/SaveRecords.h/.cpp`: registro do personagem (perfil, posição, moedas, treinos, bolsa, alforjes, armazém, equipamento, bolsas no estábulo, Livro, stats, flags, estrelas observadas, parte no evento) e do mundo (tempo, evento, acampamento, céu, demanda e preço-base dos mercados); `migrateCharacter`, `isValidPosition`, `safeSpawn`; importação do save JSON da demo.   [save.js]
 
 ### 4.4 `src/server/` → biblioteca `rpg_server` (host; depende de `rpg_sim` + `rpg_net`)
 
@@ -278,8 +276,7 @@ cpp/
 - `server/RequestHandler.h/.cpp`: despacha `Request`s para os sistemas da sim.
 - `server/SnapshotBuilder.h/.cpp`: snapshot por sessão com gerência de interesse (raio e instância de mapa).
 - `server/EventRouter.h/.cpp`: filtra `GameEvent`s por destinatário.
-- `server/PersistenceStore.h`: `IPersistenceStore` (`load`/`save` de personagem e mundo).
-- `server/JsonFileStore.h/.cpp`: saves em arquivo no diretório do usuário (substitui o `localStorage`); autosave a cada 20 s e no encerramento; não salva dentro da Turbulenta.
+- `server/persist/SaveStore.h/.cpp`: saves em arquivo no diretório do usuário (substitui o `localStorage`); autosave a cada 20 s, ao sair e no encerramento; não salva dentro da Turbulenta.
 - `server/DevCommands.h/.cpp`: `tp`, `give`, `coins`, `hurt`, `portal`, `killNear`, `contribute`, `night`, `vanish`, `settle`, só em build de desenvolvimento.   [`window.__demo`]
 
 ### 4.5 `src/client/` → biblioteca `rpg_client` (**não** linka `rpg_sim`)
@@ -297,8 +294,8 @@ cpp/
 - `client/platform/Window.h/.cpp`: janela, tela cheia, high-DPI.
 - `client/platform/Input.h/.cpp`: teclas por scancode (independem do layout ABNT/US), mouse, modo relativo (mira), roda, arrasto; pressed/released por quadro.   [engine/input.js]
 - `client/platform/InputBindings.h/.cpp`: ações ↔ teclas remapeáveis, acorde Tab+1/2/3, atalhos I/B/J/M/R/V/F/Esc.   [main.js `handleKeys`]
-- `client/audio/AudioDevice.h/.cpp`: stream SDL3 + mixer.
-- `client/audio/SfxSynth.h/.cpp`: sons sintetizados e ambiência.   [engine/audio.js]
+- `client/audio/AudioDevice.h/.cpp`: stream SDL3 (float, 48 kHz) que pede amostras ao `Synth`.
+- `client/audio/Synth.h/.cpp`: sons sintetizados e ambiência, sem plataforma (testável).   [engine/audio.js]
 
 **Jogo (apresentação e input)**
 - `client/game/AimRaycaster.h/.cpp`: raio da câmera contra entidades replicadas e o terreno de `core`.   [`updateAim`]
@@ -612,4 +609,52 @@ mesma pose em cada nó (até 2·10⁻³ rad), o mesmo corpo e os mesmos vértice
 | rebites em `radial-gradient` repetido | — | decorador `rivets()` |
 | tela cheia com teclado protegido (pausa) | app nativo | removido (Ctrl+W não fecha nada) |
 | `Trilhas & Estilos` compara o objeto da arma com chaves (nunca acerta) | — | compara a chave do item: mostra a arma, a armadura e a afinidade de verdade |
+
+## 12. Persistência e áudio (fase 6)
+
+### Registros
+
+O save da demo era um objeto no `localStorage`. Aqui ele se divide em dois registros JSON, gravados
+pelo servidor (`server/persist`), porque num mundo com vários jogadores o que é de um personagem e o
+que é do mundo têm donos diferentes:
+
+| Registro | Conteúdo | Arquivo |
+|---|---|---|
+| personagem | `world` (layout, posição, giro), `profile`, `P` (moedas, treinos, bolsa, alforjes, armazém, equipamento, bolsas no estábulo), `stats`, `flags`, `sky.observed`, `evt` (contribuição, pontos, entregas), `book` | `characters/<nome>.json` |
+| mundo | `time`, `evt` (progresso, conclusão, outros participantes), `camp`, `sky` (estrelas sumidas, instrumento), `mkt` (demanda), `marketBase`, `uid` | `world.json` |
+
+- Os nomes de campo são os de `save.js`, então o save importado da demo passa pelo mesmo caminho: a
+  importação só separa personagem e mundo e transforma o Livro (que lá tinha título e texto prontos)
+  em entradas `literal`.
+- Itens, treinos e inimigos vão pela chave, nunca pelo índice. Ao carregar, cada equipamento ganha um
+  uid novo do mundo em que entra (o uid é do mundo); itens com chave desconhecida são descartados e
+  contados no log.
+- O Livro guarda o modelo e os argumentos tipados (`{"item": "minerio"}`, `{"place": "passagem"}`,
+  `{"msg": "cause.test"}`…), que o cliente escreve na língua dele.
+- A migração é a de `save.js`: layout diferente, posição ausente, fora do mundo, na Turbulenta, num
+  colisor ou na água volta ao abrigo. O `Welcome` leva o que mudou (`migration`, `fromLayout`,
+  `toLayout`) e o cliente escreve o aviso da demo ("Trajetória retomada. …").
+- `SaveStore` grava num temporário e troca de nome; o nome do arquivo é o do personagem em minúsculas
+  com o resto em `%XX` ("Ana" e "ana" são o mesmo personagem em qualquer sistema de arquivos).
+
+### Sessão
+
+- `Hello.resume` retoma o personagem salvo com aquele nome; sem save, começa um novo. Um personagem
+  novo substitui o save de mesmo nome (a demo chamava `clearSave` ao começar).
+- `ReqLeave{discard}` tira o personagem do mundo sem desconectar: com `discard` é a "Nova trajetória"
+  da pausa (o save some); sem, só salva. A sessão aceita outro `Hello` depois.
+- O mesmo nome não entra duas vezes no mundo ao mesmo tempo.
+- O cliente guarda o último personagem em `settings.json` para o "Continuar trajetória" do título; no
+  jogo local, o título só mostra o botão se o servidor do processo tem o save.
+
+### Áudio
+
+`client/audio/Synth` refaz o grafo do WebAudio de `audio.js` amostra a amostra: osciladores (seno,
+quadrada e dente de serra com PolyBLEP, triângulo), ruído branco de 2 s com o deslocamento aleatório
+de `s.start(t, Math.random())`, biquads com as fórmulas do `BiquadFilterNode` (Q em dB no passa-baixa e
+no passa-alta, linear no passa-banda), envelopes e deslizes exponenciais (`exponentialRampToValueAtTime`),
+mestre em 0,55 e a ambiência com a rampa de 1,5 s. `AudioDevice` abre um stream da SDL3 e chama o
+`Synth` na thread de áudio; sem dispositivo (CI, `--headless`) nada toca e nada falha. Os sons chegam
+como `EvSound` (`FxState::sounds`), a ambiência segue o mapa (vento na região, zumbido na Turbulenta)
+e o mudo da pausa vale para os dois.
 

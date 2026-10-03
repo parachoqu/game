@@ -24,12 +24,21 @@ struct Hello {
   template <class A> void io(A& a) { a(protocol); a(dataHash); a(name); a(origin); a(start); a(model); a(resume); }
 };
 
+// O que a migração do save mudou (save.js `migrated.notes`); o cliente escreve o aviso.
+enum MigrationFlag : std::uint8_t {
+  kMigrationNoPosition = 1,       // save do recorte anterior: sem posição gravada
+  kMigrationLayout = 2,           // layout do mundo mudou: posição reposicionada
+  kMigrationInvalidPosition = 4,  // posição gravada inválida no mundo atual
+};
+
 struct Welcome {
   std::uint32_t playerId = 0;
   double tickRate = 30;
   std::uint64_t tick = 0;
   bool resumed = false;
-  template <class A> void io(A& a) { a(playerId); a(tickRate); a(tick); a(resumed); }
+  std::uint8_t migration = 0;  // MigrationFlag
+  std::uint16_t fromLayout = 0, toLayout = 0;
+  template <class A> void io(A& a) { a(playerId); a(tickRate); a(tick); a(resumed); a(migration); a(fromLayout); a(toLayout); }
 };
 
 struct Reject {

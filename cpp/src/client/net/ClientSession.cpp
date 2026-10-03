@@ -21,6 +21,14 @@ void ClientSession::join(const proto::Hello& hello) {
   sendBytes(net::Channel::Requests, proto::encode(proto::ClientMessage{hello}));
 }
 
+void ClientSession::leave(bool discard) {
+  if (state_ == State::InGame) sendBytes(net::Channel::Requests, proto::encode(proto::ClientMessage{proto::Request{proto::ReqLeave{discard}}}));
+  state_ = State::Idle;
+  welcome_ = {};
+  snapshots_.clear();
+  events_.clear();
+}
+
 void ClientSession::send(const proto::Request& req) {
   if (state_ != State::InGame) return;
   sendBytes(net::Channel::Requests, proto::encode(proto::ClientMessage{req}));
@@ -66,7 +74,8 @@ void ClientSession::poll(double localTime) {
           } else if constexpr (std::is_same_v<T, proto::Reject>) {
             reject_ = v.reason;
             state_ = State::Rejected;
-          } else {
+          } else if (state_ == State::InGame) {
+            // o que ainda chega do personagem anterior (depois de leave) é descartado
             events_.push_back(std::move(v));
           }
         },

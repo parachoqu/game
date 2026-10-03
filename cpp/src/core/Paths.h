@@ -19,4 +19,11 @@ inline std::string pathToUtf8(const std::filesystem::path& p) {
   return std::string(s.begin(), s.end());
 }
 
+// Diretório do usuário para saves e configurações (não é criado aqui):
+//   Linux    $XDG_DATA_HOME/projeto-game, ou ~/.local/share/projeto-game
+//   Windows  %APPDATA%\projeto-game
+//   macOS    ~/Library/Application Support/projeto-game
+// Sem nenhuma dessas variáveis, `projeto-game` no diretório atual.
+std::filesystem::path userDataDir();
+
 }  // namespace rpg

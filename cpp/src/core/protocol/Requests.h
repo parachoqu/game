@@ -124,6 +124,13 @@ struct ReqPause {
   template <class A> void io(A& a) { a(paused); }
 };
 
+// Sair do mundo sem desconectar (pausa → "Nova trajetória"): o servidor salva o personagem e o tira do
+// mundo; a sessão fica livre para um novo Hello. `discard` apaga o save em vez de gravar (save.js clearSave).
+struct ReqLeave {
+  bool discard = false;
+  template <class A> void io(A& a) { a(discard); }
+};
+
 // Comandos de desenvolvimento (window.__demo): só aceitos com o servidor em modo de desenvolvimento.
 enum class DevCommand : std::uint8_t { Teleport, Give, Coins, Hurt, Portal, KillNear, Contribute, Night, Vanish };
 struct ReqDev {
@@ -137,6 +144,6 @@ using Request = std::variant<ReqClickAttack, ReqClickUse, ReqUsePotion, ReqMount
                              ReqRepair, ReqLearn, ReqRestartKit, ReqStore, ReqStoreMaterials, ReqWithdraw, ReqBuyMount,
                              ReqStableBagsToStorage, ReqDeliver, ReqGiveInstrument, ReqTakeLoot, ReqEnterPortal,
                              ReqRespawn, ReqEquip, ReqUnequip, ReqDrink, ReqToSaddle, ReqFromSaddle, ReqDrop,
-                             ReqEndObserve, ReqBookSetPublic, ReqBookNote, ReqShowTitle, ReqPause, ReqDev>;
+                             ReqEndObserve, ReqBookSetPublic, ReqBookNote, ReqShowTitle, ReqPause, ReqDev, ReqLeave>;
 
 }  // namespace rpg::protocol

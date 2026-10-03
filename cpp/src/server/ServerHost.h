@@ -8,9 +8,15 @@
 //   2. roda World::step;
 //   3. distribui os eventos pelo destinatário (EventRouter) e manda um snapshot por sessão, com as
 //      entidades no raio de interesse do jogador dela.
+//
+// Com `saveDir`, o mundo salvo é carregado ao criar o host; cada personagem é gravado a cada
+// `autosaveEvery` s, ao sair (ReqLeave), ao desconectar e no fim de run(). Hello com `resume` retoma o
+// personagem salvo com aquele nome.
 #include <atomic>
 #include <cstdint>
+#include <filesystem>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -23,6 +29,10 @@
 
 namespace rpg::server {
 
+namespace persist {
+class SaveStore;
+}
+
 struct ServerConfig {
   double tickRate = 30.0;       // passos por segundo (dt = 1/30, o mesmo dos testes da demo)
   std::uint64_t seed = 1;       // semente do mundo
@@ -32,6 +42,9 @@ struct ServerConfig {
   double interestRadius = 160;  // raio das entidades enviadas a cada cliente (m)
   std::string dataHash;         // resumo dos dados de design; vazio = não confere
   int bots = 0;                 // jogadores controlados pelo servidor (testes de carga)
+  // Persistência (game/save.js): diretório dos registros; vazio = nada é salvo nem carregado.
+  std::optional<std::filesystem::path> saveDir;
+  double autosaveEvery = 20;    // s de jogo entre saves (main.js: a cada 20 s e ao encerrar)
 };
 
 struct Session {
@@ -56,8 +69,12 @@ class ServerHost {
   // Devolve quantos passos rodaram.
   int update(Seconds elapsed);
 
-  // Laço de tempo real na thread chamadora, até `stop` virar true.
+  // Laço de tempo real na thread chamadora, até `stop` virar true. Salva tudo ao sair.
   void run(const std::atomic<bool>& stop);
+
+  // Grava o mundo e cada personagem em jogo (fora da Turbulenta). Sem `saveDir`, não faz nada.
+  void saveAll();
+  const persist::SaveStore* store() const { return store_.get(); }
 
   const sim::World& world() const { return world_; }
   sim::World& world() { return world_; }
@@ -76,6 +93,9 @@ class ServerHost {
   void stepBots();
   void send(net::ConnectionId to, net::Channel ch, const protocol::Bytes& bytes);
   Session* sessionOf(net::ConnectionId id);
+  void join(Session& s, const protocol::Hello& hello);
+  void leave(Session& s, bool discard);
+  void saveCharacter(const Session& s);
 
   ServerConfig config_;
   std::unique_ptr<net::ITransport> transport_;
@@ -83,6 +103,8 @@ class ServerHost {
   FixedTimestep timestep_;
   std::vector<Session> sessions_;
   std::vector<std::unique_ptr<Bot>> bots_;
+  std::unique_ptr<persist::SaveStore> store_;
+  double autosaveT_ = 0;
   std::uint64_t ignoredMessages_ = 0;
 };
 

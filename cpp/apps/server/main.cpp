@@ -7,6 +7,8 @@
 //   --sim DIR   pacote de mundo da simulação (cpp/assets/sim)
 //   --ticks N   roda N passos o mais rápido possível e sai (CI e testes de fumaça)
 //   sem --ticks roda em tempo real até Ctrl+C
+//   --save-dir DIR  mundo e personagens salvos (padrão: <diretório do usuário>/servidor; com --ticks, nenhum)
+//   --no-save       não carrega nem grava nada
 #include <atomic>
 #include <charconv>
 #include <csignal>
@@ -42,7 +44,8 @@ bool parseNumber(std::string_view s, T& out) {
 
 int usage() {
   std::fprintf(stderr,
-               "uso: rpg_server [--data DIR] [--sim DIR] [--ticks N] [--seed S] [--tick-rate HZ] [--bots N] [--dev]\n");
+               "uso: rpg_server [--data DIR] [--sim DIR] [--ticks N] [--seed S] [--tick-rate HZ] [--bots N] [--dev]\n"
+               "                 [--save-dir DIR] [--no-save]\n");
   return 2;
 }
 
@@ -53,19 +56,24 @@ int main(int argc, char** argv) {
   std::filesystem::path simDir = rpg::pathFromUtf8(RPG_DEFAULT_SIM_DIR);
   std::uint64_t ticks = 0;
   rpg::server::ServerConfig cfg;
+  std::optional<std::filesystem::path> saveDir;
+  bool noSave = false;
 
   for (int i = 1; i < argc; ++i) {
     const std::string_view arg = argv[i];
     const bool hasValue = i + 1 < argc;
-    if (arg == "--data" && hasValue) dataDir = argv[++i];
-    else if (arg == "--sim" && hasValue) simDir = argv[++i];
+    if (arg == "--data" && hasValue) dataDir = rpg::pathFromUtf8(argv[++i]);
+    else if (arg == "--sim" && hasValue) simDir = rpg::pathFromUtf8(argv[++i]);
     else if (arg == "--ticks" && hasValue && parseNumber(argv[++i], ticks)) {}
     else if (arg == "--seed" && hasValue && parseNumber(argv[++i], cfg.seed)) {}
     else if (arg == "--tick-rate" && hasValue && parseNumber(argv[++i], cfg.tickRate) && cfg.tickRate > 0) {}
     else if (arg == "--bots" && hasValue && parseNumber(argv[++i], cfg.bots) && cfg.bots >= 0) {}
     else if (arg == "--dev") cfg.devCommands = true;
+    else if (arg == "--save-dir" && hasValue) saveDir = rpg::pathFromUtf8(argv[++i]);
+    else if (arg == "--no-save") noSave = true;
     else return usage();
   }
+  if (!noSave && (saveDir || ticks == 0)) cfg.saveDir = saveDir ? *saveDir : rpg::userDataDir() / "servidor";
 
   rpg::GameData data;
   try {
@@ -98,8 +106,10 @@ int main(int argc, char** argv) {
   rpg::server::ServerHost host(data, *statics, cfg, nullptr);
   const auto& S = host.world().state();
   rpg::log::info("mundo povoado: {} inimigos, {} NPCs, {} bots", S.enemies.size(), S.npcs.size(), host.botCount());
+  if (cfg.saveDir) rpg::log::info("saves em {}", rpg::pathToUtf8(*cfg.saveDir));
   if (ticks > 0) {
     host.runTicks(ticks);
+    host.saveAll();
   } else {
     std::signal(SIGINT, onSignal);
     std::signal(SIGTERM, onSignal);

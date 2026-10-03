@@ -17,6 +17,8 @@ add_executable(rpg_tests
   parity/SimParityTests.cpp
   sim/WorldTests.cpp
   server/ServerHostTests.cpp
+  server/PersistenceTests.cpp
+  server/EndToEndTests.cpp
 )
 target_link_libraries(rpg_tests PRIVATE rpg_server Catch2::Catch2WithMain nlohmann_json::nlohmann_json)
 target_include_directories(rpg_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -24,6 +26,7 @@ target_compile_definitions(rpg_tests PRIVATE
   RPG_TEST_DATA_DIR="${RPG_DATA_DIR}"
   RPG_TEST_SIM_DIR="${RPG_SIM_DIR}"
   RPG_TEST_FIXTURES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/parity/fixtures"
+  RPG_TEST_SERVER_FIXTURES="${CMAKE_CURRENT_SOURCE_DIR}/server/fixtures"
 )
 rpg_set_warnings(rpg_tests)
 if(WIN32)
@@ -35,7 +38,8 @@ endif()
 
 # Cliente sem janela (lógica, sessão contra o servidor, textos, geometria): roda em qualquer CI.
 if(RPG_BUILD_CLIENT)
-  add_executable(rpg_client_tests client/ClientTests.cpp client/ScenePackTests.cpp client/PackSceneTests.cpp client/AnimTests.cpp)
+  add_executable(rpg_client_tests client/ClientTests.cpp client/ScenePackTests.cpp client/PackSceneTests.cpp client/AnimTests.cpp
+    client/AudioTests.cpp)
   target_link_libraries(rpg_client_tests PRIVATE rpg_client_core rpg_server Catch2::Catch2WithMain nlohmann_json::nlohmann_json)
   target_include_directories(rpg_client_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
   target_compile_definitions(rpg_client_tests PRIVATE

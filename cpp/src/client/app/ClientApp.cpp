@@ -18,6 +18,7 @@
 #include "client/app/DebugTools.h"
 #endif
 #include "client/assets/EnvironmentMap.h"
+#include "client/audio/AudioDevice.h"
 #include "client/assets/Image.h"
 #include "client/assets/ScenePack.h"
 #include "client/entities/CharacterViews.h"
@@ -25,6 +26,7 @@
 #include "client/game/Aim.h"
 #include "client/game/CommandBuilder.h"
 #include "client/game/Lighting.h"
+#include "client/game/Settings.h"
 #include "client/game/Targets.h"
 #include "client/game/ThirdPersonCamera.h"
 #include "client/geom/SceneBatch.h"
@@ -123,8 +125,12 @@ struct ClientApp::Impl {
   bool tabChord = false, paused = false, snapCamera = true, viewTeleported = false;
   int gameFrames = 0, totalFrames = 0;
   bool deathShown = false, eventShown = false, introShown = false, observing = false;
+  Settings settings;
+  std::unique_ptr<audio::AudioDevice> sound;
   std::string quality = "alta";
   bool muted = false;
+  bool resuming = false;  // o join em andamento é um "Continuar trajetória"
+  proto::Hello lastHello;
   std::string failure;
   InstanceLists dynamic;
   std::vector<ColorVertex> unlit;
@@ -164,6 +170,12 @@ struct ClientApp::Impl {
     log::info("GPU: {}", renderer.driver());
     rmlUi = std::make_unique<UiSystem>(UiSystem::Options{opt.assetsDir / "ui", opt.assetsDir / "fonts", opt.width, opt.height});
     gameUi = std::make_unique<GameUi>(*rmlUi, L, data, look);
+    settings = Settings::load(opt.settingsFile);
+    cam.prefs = settings.camera;
+    quality = settings.quality;
+    muted = settings.muted;
+    sound = std::make_unique<audio::AudioDevice>(!opt.headless && !opt.view);
+    sound->setMuted(muted);
     // main.js PHASES: as mesmas fases e pesos da barra
 #ifdef RPG_HAS_IMGUI
     if (opt.dev && !platform.headless()) {
@@ -263,8 +275,30 @@ struct ClientApp::Impl {
     return &packFrame;
   }
 
+  void saveSettings() {
+    settings.camera = cam.prefs;
+    settings.quality = quality;
+    settings.muted = muted;
+    settings.save(opt.settingsFile);
+    sound->setMuted(muted);
+  }
+
+  // "Continuar trajetória" aparece com um último personagem que ainda tem save.
+  bool canContinue() const {
+    if (!settings.last) return false;
+    return !opt.hasSave || opt.hasSave(settings.last->name);
+  }
+
   proto::Hello hello() const {
     proto::Hello h;
+    if (resuming && settings.last) {
+      h.name = settings.last->name;
+      h.origin = settings.last->origin;
+      h.start = settings.last->start;
+      h.model = settings.last->model;
+      h.resume = true;
+      return h;
+    }
     h.name = opt.autoStart && !opt.name.empty() ? opt.name : form.name;
     if (h.name.empty()) h.name = L.ui("create.defaultName");
     h.origin = opt.autoStart && !opt.origin.empty() ? opt.origin : data.origins.key(OriginId{static_cast<std::uint16_t>(form.origin)});
@@ -273,10 +307,56 @@ struct ClientApp::Impl {
     return h;
   }
 
-  void join() {
-    session.join(hello());
+  void join(bool resume = false) {
+    resuming = resume;
+    lastHello = hello();
+    session.join(lastHello);
     mode = Mode::Joining;
     snapCamera = true;
+  }
+
+  // Entrou no mundo (Welcome): guarda o personagem para o "Continuar" e avisa a retomada (main.js startGame).
+  void onWelcome() {
+    const proto::Welcome& w = session.welcome();
+    settings.last = Settings::Profile{lastHello.name, lastHello.origin, lastHello.start, lastHello.model};
+    saveSettings();
+    if (!w.resumed) return;
+    introShown = true;  // as intenções abrem só numa trajetória nova
+    std::vector<std::string> notes;
+    if (w.migration & proto::kMigrationNoPosition) notes.push_back(L.ui("resume.note.noPosition"));
+    if (w.migration & proto::kMigrationLayout)
+      notes.push_back(L.format(L.ui("resume.note.layout"), {proto::MsgArg::integer(w.fromLayout), proto::MsgArg::integer(w.toLayout)}));
+    if (w.migration & proto::kMigrationInvalidPosition) notes.push_back(L.ui("resume.note.invalid"));
+    if (notes.empty()) {
+      fx.toast(L.ui("resume.ok"), proto::ToastKind::Info);
+      return;
+    }
+    std::string joined;
+    for (const std::string& n : notes) joined += (joined.empty() ? "" : "; ") + n;
+    fx.toast(L.format(L.ui("resume.migrated"), {proto::MsgArg::str(joined)}), proto::ToastKind::Info, 9);
+  }
+
+  // Pausa → "Nova trajetória" (main.js: clearSave e recarregar): sai do mundo apagando o save e volta ao título.
+  void restart() {
+    if (paused) session.send(proto::Request{proto::ReqPause{false}});
+    paused = false;
+    session.leave(true);
+    settings.last.reset();
+    saveSettings();
+    world = ClientWorld{};
+    fx = FxState(L);
+    deathShown = eventShown = introShown = observing = false;
+    cam.setSkyDirection(std::nullopt);
+    gameUi->closeBook();
+    gameUi->closePanel();
+    gameUi->caption({});
+    gameUi->showHud(false);
+    gameUi->notice({});
+    platform.setRelativeMouse(false);
+    sound->setAmbience(audio::Ambience::None);
+    titleT = 0;
+    mode = Mode::Title;
+    gameUi->showTitle(false);
   }
 
   // ---------------------------------------------------------------- luz e uniformes
@@ -320,7 +400,8 @@ struct ClientApp::Impl {
     if (fx.camRecoilPitch != 0 || fx.camRecoilYaw != 0) cam.addRecoil(fx.camRecoilPitch, fx.camRecoilYaw);
     if (fx.camShake > 0) cam.addShake(fx.camShake);
     fx.camRecoilPitch = fx.camRecoilYaw = fx.camShake = 0;
-    fx.sounds.clear();  // áudio: fase 6
+    for (const proto::SoundId s : fx.sounds) sound->play(s);
+    fx.sounds.clear();
     if (fx.respawned || fx.turbEntered || fx.turbLeft) {
       cam.setYaw(0);
       snapCamera = true;
@@ -477,13 +558,18 @@ struct ClientApp::Impl {
       renderEmpty(capture);
       return;
     }
-    if (mode != Mode::Game) gameUi->notice({});
+    if (mode != Mode::Game) {
+      gameUi->notice({});
+      onWelcome();
+    }
     mode = Mode::Game;
     ++gameFrames;
     handleKeys();
 
     const ViewDef* view = opt.view ? findView(*opt.view) : nullptr;
     MapKind mapKind = static_cast<MapKind>(me->map);
+    // turbulent.js: zumbido dentro da Turbulenta, vento no resto do mundo
+    sound->setAmbience(mapKind == MapKind::Turbulent ? audio::Ambience::Turbulent : audio::Ambience::World);
     if (!introShown && !opt.hideHud) {
       // main.js: uma trajetória nova começa com as intenções
       introShown = true;
@@ -602,9 +688,15 @@ struct ClientApp::Impl {
         else if (l == "camsens:media") cam.prefs.sens = CamSensitivity::Media;
         else if (l == "camsens:alta") cam.prefs.sens = CamSensitivity::Alta;
         else if (l == "caminvert") cam.prefs.invert = !cam.prefs.invert;
-        else if (l.rfind("quality:", 0) == 0) quality = l.substr(8);
-        else if (l == "mute") muted = !muted;
-        else if (l == "restart") fx.toast("Nova trajetória: feche o jogo e abra de novo (o progresso é salvo na fase 6).", proto::ToastKind::Info);
+        else if (l.rfind("quality:", 0) == 0) {
+          quality = l.substr(8);
+          settings.qualityChosen = true;
+        } else if (l == "mute") muted = !muted;
+        else if (l == "restart") {
+          restart();
+          return;
+        }
+        saveSettings();
       }
       for (const Panel c : po.closed) {
         if (c == Panel::Pause && paused) {
@@ -772,15 +864,19 @@ struct ClientApp::Impl {
     GameUi::ScreenAction r = gameUi->screenInput(in, form);
     // captura da criação: abre direto (como o clique em "Nova trajetória")
     if (mode == Mode::Title && opt.view && *opt.view == "01b_create_screen") r = GameUi::ScreenAction::NewGame;
+    if (r != GameUi::ScreenAction::None) sound->play(proto::SoundId::Ui);
     if (mode == Mode::Title) {
       if (r == GameUi::ScreenAction::NewGame) {
         mode = Mode::Create;
         gameUi->showCreate(form);
         platform.setTextInput(true);
+      } else if (r == GameUi::ScreenAction::Continue && canContinue()) {
+        gameUi->hideScreens();
+        join(true);
       }
     } else if (r == GameUi::ScreenAction::Back) {
       mode = Mode::Title;
-      gameUi->showTitle(false);
+      gameUi->showTitle(canContinue());
       platform.setTextInput(false);
     } else if (r == GameUi::ScreenAction::Start) {
       platform.setTextInput(false);
@@ -838,12 +934,15 @@ struct ClientApp::Impl {
     if (loadStep >= static_cast<int>(std::size(steps))) {
       gameUi->bootDone();
       titleT = 0;
-      if (opt.autoStart) {
+      if (opt.autoContinue && canContinue()) {
+        gameUi->hideScreens();
+        join(true);
+      } else if (opt.autoStart) {
         gameUi->hideScreens();
         join();
       } else {
         mode = Mode::Title;
-        gameUi->showTitle(false);
+        gameUi->showTitle(canContinue());
       }
     }
   }

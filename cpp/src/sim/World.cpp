@@ -423,6 +423,8 @@ void World::handleRequest(EntityId player, const protocol::Request& req) {
           paused_ = r.paused;
         } else if constexpr (std::is_same_v<T, protocol::ReqDev>) {
           if (devCommands_) handleDev(p, r);
+        } else if constexpr (std::is_same_v<T, protocol::ReqLeave>) {
+          // a sessão é do servidor (ServerHost tira o personagem do mundo)
         }
       },
       req);

@@ -19,6 +19,7 @@ namespace rpg {
 // As chaves são as de ZONES (config.js) e de data/zones.json.
 enum class ZoneKind : std::uint8_t { Protegida, Fronteira, FullLoot, Turbulenta };
 std::string_view zoneKey(ZoneKind z);
+std::optional<ZoneKind> zoneFromKey(std::string_view key);
 
 // Na ordem de decisão de `placeAt`. As chaves são as de data/text/pt-BR/places.json.
 enum class PlaceId : std::uint8_t {

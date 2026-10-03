@@ -7,11 +7,15 @@
 //             [--view NOME] [--hour H] [--hide-hud] [--portrait] [--frames N] [--screenshot ARQ.png] [--headless]
 //
 //   --auto         pula título e criação (personagem padrão)
+//   --continue     pula o título e retoma o último personagem salvo
 //   --view NOME    enquadramento das capturas da demo (02_mercado … 13_vista_elevada_horizonte,
 //                  01_title_screen); liga --auto, --dev e esconde o HUD
 //   --frames N     sai depois de N quadros de jogo (com --screenshot, grava o último)
 //   --portrait     câmera de frente para o próprio personagem (conferir modelo e animação)
 //   --headless     sem janela: desenha fora da tela (captura e testes em CI)
+//   --save-dir DIR saves e preferências (padrão: o diretório do usuário, ver core/Paths.h)
+//   --no-save      não carrega nem grava nada (padrão nas execuções automáticas: --view, --headless, --frames)
+//   --import-save ARQ  importa o save da demo (o valor de localStorage["projeto-game-demo-v1"]) e sai
 #include <atomic>
 #include <charconv>
 #include <cstdio>
@@ -22,12 +26,14 @@
 #include <thread>
 
 #include "client/app/ClientApp.h"
+#include "client/game/Settings.h"
 #include "core/Log.h"
 #include "core/Paths.h"
 #include "core/data/GameData.h"
 #include "core/world/StaticWorld.h"
 #include "net/LocalTransport.h"
 #include "server/ServerHost.h"
+#include "server/persist/SaveStore.h"
 
 #ifndef RPG_DEFAULT_DATA_DIR
 #define RPG_DEFAULT_DATA_DIR "data"
@@ -69,10 +75,41 @@ bool parseNetSim(std::string_view s, rpg::net::NetSim& out) {
 int usage() {
   std::fprintf(stderr,
                "uso: rpg_local [--data DIR] [--sim DIR] [--assets DIR] [--size WxH] [--fullscreen] [--no-vsync] [--seed S]\n"
-               "                [--dev] [--debug-ui] [--net-sim latency:MS,jitter:MS,loss:PCT] [--auto] [--name N] [--origin O]\n"
+               "                [--dev] [--debug-ui] [--net-sim latency:MS,jitter:MS,loss:PCT] [--auto] [--continue] [--name N] [--origin O]\n"
                "                [--start S] [--model M] [--view NOME] [--hour H] [--hide-hud] [--portrait] [--frames N]\n"
-               "                [--screenshot ARQ.png] [--headless]\n");
+               "                [--screenshot ARQ.png] [--headless] [--save-dir DIR] [--no-save] [--import-save ARQ]\n");
   return 2;
+}
+
+// Save da demo → registros deste projeto no diretório de saves; o personagem vira o "Continuar".
+int importSave(const rpg::GameData& data, const std::filesystem::path& file, const std::filesystem::path& saveDir,
+               const std::filesystem::path& settingsFile) {
+  namespace persist = rpg::server::persist;
+  auto j = persist::readJsonFile(file);
+  // o valor copiado do localStorage às vezes vem como texto JSON dentro de uma string
+  if (j && j->is_string()) {
+    persist::Json inner = persist::Json::parse(j->get<std::string>(), nullptr, false);
+    if (inner.is_discarded()) j.reset();
+    else j = std::move(inner);
+  }
+  if (!j) {
+    rpg::log::error("{}: não é um save da demo legível", rpg::pathToUtf8(file));
+    return 1;
+  }
+  auto imported = persist::importDemoSave(*j);
+  if (!imported) {
+    rpg::log::error("{}: não parece um save da demo (faltam perfil e personagem)", rpg::pathToUtf8(file));
+    return 1;
+  }
+  const rpg::sim::PlayerProfile profile = persist::profileOf(data, imported->character);
+  const persist::SaveStore store(saveDir);
+  if (!store.saveCharacter(profile.name, imported->character) || !store.saveWorld(imported->world)) return 1;
+  rpg::client::Settings settings = rpg::client::Settings::load(settingsFile);
+  settings.last = rpg::client::Settings::Profile{profile.name, profile.origin, profile.start, profile.model};
+  settings.save(settingsFile);
+  rpg::log::info("save da demo importado: {} ({} entradas no Livro) em {}; use \"Continuar trajetória\"", profile.name,
+                 imported->character["book"]["entries"].size(), rpg::pathToUtf8(saveDir));
+  return 0;
 }
 
 }  // namespace
@@ -85,6 +122,8 @@ int main(int argc, char** argv) {
   rpg::server::ServerConfig cfg;
   cfg.allowPause = true;
   rpg::net::NetSim netSim;
+  std::optional<std::filesystem::path> saveDir, importFile;
+  bool noSave = false;
 
   for (int i = 1; i < argc; ++i) {
     const std::string_view a = argv[i];
@@ -104,6 +143,7 @@ int main(int argc, char** argv) {
     else if (a == "--net-sim" && v) {
       if (!parseNetSim(argv[++i], netSim)) return usage();
     } else if (a == "--auto") opt.autoStart = true;
+    else if (a == "--continue") opt.autoContinue = true;
     else if (a == "--name" && v) opt.name = argv[++i];
     else if (a == "--origin" && v) opt.origin = argv[++i];
     else if (a == "--start" && v) opt.start = argv[++i];
@@ -118,6 +158,9 @@ int main(int argc, char** argv) {
     else if (a == "--frames" && v && parseNumber(std::string_view(argv[++i]), opt.frames)) {}
     else if (a == "--screenshot" && v) opt.screenshot = rpg::pathFromUtf8(argv[++i]);
     else if (a == "--headless") opt.headless = true;
+    else if (a == "--save-dir" && v) saveDir = rpg::pathFromUtf8(argv[++i]);
+    else if (a == "--no-save") noSave = true;
+    else if (a == "--import-save" && v) importFile = rpg::pathFromUtf8(argv[++i]);
     else return usage();
   }
   if (opt.view) {
@@ -136,6 +179,16 @@ int main(int argc, char** argv) {
     opt.fixedDt = 1.0 / 30.0;
   }
   opt.dataDir = dataDir;
+  // saves e preferências: ligados ao jogar; desligados nas execuções automáticas (capturas, CI), que
+  // precisam começar sempre do mesmo estado, a menos que --save-dir seja dado
+  const bool automation = opt.view || opt.headless || opt.frames > 0;
+  if (!noSave && (saveDir || !automation || importFile)) cfg.saveDir = saveDir ? *saveDir : rpg::userDataDir();
+  if (cfg.saveDir) {
+    opt.settingsFile = *cfg.saveDir / "settings.json";
+    opt.hasSave = [store = rpg::server::persist::SaveStore(*cfg.saveDir)](const std::string& name) { return store.hasCharacter(name); };
+  } else {
+    opt.hasSave = [](const std::string&) { return false; };
+  }
 
   rpg::GameData data;
   std::optional<rpg::StaticWorld> statics;
@@ -146,6 +199,9 @@ int main(int argc, char** argv) {
     rpg::log::error("falha ao carregar o mundo: {}", e.what());
     return 1;
   }
+
+  if (importFile) return importSave(data, *importFile, *cfg.saveDir, opt.settingsFile);
+  if (cfg.saveDir) rpg::log::info("saves em {}", rpg::pathToUtf8(*cfg.saveDir));
 
   rpg::net::LocalHub hub(netSim);
   auto serverEnd = hub.serverEndpoint();

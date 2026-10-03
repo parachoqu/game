@@ -21,6 +21,12 @@ double dist(double x, double z, const PlaceArea& l) { return jsHypot(x - l.x, z 
 
 std::string_view zoneKey(ZoneKind z) { return kZoneKeys[static_cast<std::size_t>(z)]; }
 
+std::optional<ZoneKind> zoneFromKey(std::string_view key) {
+  for (std::size_t i = 0; i < kZoneKeys.size(); ++i)
+    if (kZoneKeys[i] == key) return static_cast<ZoneKind>(i);
+  return std::nullopt;
+}
+
 std::string_view placeKey(PlaceId p) { return kPlaceKeys[static_cast<std::size_t>(p)]; }
 
 std::optional<PlaceId> placeFromKey(std::string_view key) {

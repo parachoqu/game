@@ -6,7 +6,9 @@
 
 #include "core/Log.h"
 #include "core/Math.h"
+#include "core/Paths.h"
 #include "net/Bytes.h"
+#include "server/persist/SaveStore.h"
 
 namespace rpg::server {
 
@@ -34,6 +36,13 @@ ServerHost::ServerHost(const GameData& data, const StaticWorld& statics, ServerC
     bot->player = world_.addPlayer(profile, 0, true);
     bots_.push_back(std::move(bot));
   }
+  if (config_.saveDir) {
+    store_ = std::make_unique<persist::SaveStore>(*config_.saveDir);
+    if (auto w = store_->loadWorld()) {
+      persist::loadWorld(world_, *w);
+      log::info("mundo salvo carregado de {} (tempo de jogo {:.0f} s)", pathToUtf8(store_->dir()), world_.time());
+    }
+  }
 }
 
 ServerHost::~ServerHost() = default;
@@ -52,6 +61,19 @@ int ServerHost::update(Seconds elapsed) {
   return steps;
 }
 
+void ServerHost::saveAll() {
+  if (!store_) return;
+  store_->saveWorld(persist::exportWorld(world_.state()));
+  for (const Session& s : sessions_) saveCharacter(s);
+}
+
+void ServerHost::saveCharacter(const Session& s) {
+  if (!store_ || !s.player) return;
+  const sim::Player* p = world_.state().player(s.player);
+  if (!p || !persist::canSave(*p)) return;  // dentro da Turbulenta vale o save de antes da entrada
+  store_->saveCharacter(p->name, persist::exportCharacter(world_.state(), *p));
+}
+
 void ServerHost::run(const std::atomic<bool>& stop) {
   using clock = std::chrono::steady_clock;
   auto last = clock::now();
@@ -63,6 +85,7 @@ void ServerHost::run(const std::atomic<bool>& stop) {
     const double wait = (1.0 - timestep_.alpha()) * timestep_.step();
     std::this_thread::sleep_for(std::chrono::duration<double>(std::max(0.0005, wait)));
   }
+  saveAll();
 }
 
 void ServerHost::tickOnce() {
@@ -70,6 +93,13 @@ void ServerHost::tickOnce() {
   world_.step(timestep_.step());
   routeEvents();
   if (config_.snapshotEvery <= 1 || world_.tick() % static_cast<std::uint64_t>(config_.snapshotEvery) == 0) sendSnapshots();
+  if (store_ && !world_.paused()) {
+    autosaveT_ += timestep_.step();
+    if (autosaveT_ >= config_.autosaveEvery) {
+      autosaveT_ = 0;
+      saveAll();
+    }
+  }
 }
 
 Session* ServerHost::sessionOf(net::ConnectionId id) {
@@ -92,7 +122,10 @@ void ServerHost::pumpNetwork() {
         log::info("cliente {} conectado (tick {})", msg.peer.value, world_.tick());
         break;
       case net::Message::Kind::Disconnected: {
-        if (Session* s = sessionOf(msg.peer); s && s->player) world_.removePlayer(s->player);
+        if (Session* s = sessionOf(msg.peer); s && s->player) {
+          saveCharacter(*s);
+          world_.removePlayer(s->player);
+        }
         std::erase_if(sessions_, [&](const Session& s) { return s.connection == msg.peer; });
         log::info("cliente {} desconectado", msg.peer.value);
         break;
@@ -129,34 +162,80 @@ void ServerHost::pumpNetwork() {
   }
 }
 
+void ServerHost::join(Session& s, const proto::Hello& hello) {
+  const auto reject = [&](std::string why) {
+    send(s.connection, net::Channel::Events, proto::encode(proto::ServerMessage{proto::Reject{std::move(why)}}));
+  };
+  if (hello.protocol != proto::kProtocolVersion) return reject("versão de protocolo diferente");
+  if (!config_.dataHash.empty() && !hello.dataHash.empty() && hello.dataHash != config_.dataHash)
+    return reject("dados de design diferentes dos do servidor");
+  std::string name = hello.name.substr(0, 32);
+  if (name.empty()) name = "Viajante";
+  // um personagem (um nome, um arquivo) só pode estar no mundo uma vez
+  const std::string file = persist::SaveStore::fileNameFor(name);
+  for (const Session& o : sessions_)
+    if (&o != &s && o.player && persist::SaveStore::fileNameFor(o.name) == file) return reject("este personagem já está no mundo");
+
+  proto::Welcome w;
+  if (hello.resume && store_) {
+    if (auto rec = store_->loadCharacter(name)) {
+      persist::Migration m;
+      if (auto migrated = persist::migrateCharacter(world_.statics(), std::move(*rec), &m)) {
+        int dropped = 0;
+        s.player = persist::loadCharacter(world_, *migrated, s.connection.value, &dropped);
+        w.resumed = true;
+        w.migration = static_cast<std::uint8_t>((m.noPosition ? proto::kMigrationNoPosition : 0) |
+                                                (m.layoutChanged ? proto::kMigrationLayout : 0) |
+                                                (m.invalidPosition ? proto::kMigrationInvalidPosition : 0));
+        w.fromLayout = static_cast<std::uint16_t>(m.fromLayout);
+        w.toLayout = static_cast<std::uint16_t>(m.toLayout);
+        for (const std::string& n : m.notes) log::info("save de {}: {}", name, n);
+        if (dropped) log::warn("save de {}: {} itens com chave desconhecida descartados", name, dropped);
+      } else {
+        log::warn("save de {} não reconhecido; começa um personagem novo", name);
+      }
+    }
+  }
+  if (!s.player) {
+    const auto& data = world_.data();
+    const std::string origin = data.origins.find(hello.origin) ? hello.origin : "humano";
+    const std::string start = data.starts.find(hello.start) ? hello.start : "espadachim";
+    s.player = world_.addPlayer({name, origin, start, hello.model}, s.connection.value, true);
+  }
+  s.name = world_.state().player(s.player)->name;
+  s.lastCommandSeq = 0;
+  // um personagem novo substitui o save de mesmo nome (main.js: clearSave ao começar)
+  if (!w.resumed) saveCharacter(s);
+  w.playerId = s.player;
+  w.tickRate = config_.tickRate;
+  w.tick = world_.tick();
+  send(s.connection, net::Channel::Events, proto::encode(proto::ServerMessage{w}));
+  send(s.connection, net::Channel::Events, proto::encode(proto::ServerMessage{proto::GameEvent{world_.bookSync(s.player)}}));
+  log::info("{} {} (jogador {})", s.name, w.resumed ? "voltou ao mundo" : "entrou no mundo", s.player);
+}
+
+void ServerHost::leave(Session& s, bool discard) {
+  if (!s.player) return;
+  if (discard) {
+    if (store_) store_->removeCharacter(s.name);
+  } else {
+    saveCharacter(s);
+  }
+  world_.removePlayer(s.player);
+  log::info("{} saiu do mundo{}", s.name, discard ? " (save apagado)" : "");
+  s.player = 0;
+  s.lastCommandSeq = 0;
+  s.name.clear();
+}
+
 void ServerHost::onClientMessage(Session& s, proto::ClientMessage&& msg) {
   if (auto* hello = std::get_if<proto::Hello>(&msg)) {
-    if (s.player) return;  // um personagem por sessão
-    const auto reject = [&](std::string why) {
-      send(s.connection, net::Channel::Events, proto::encode(proto::ServerMessage{proto::Reject{std::move(why)}}));
-    };
-    if (hello->protocol != proto::kProtocolVersion) return reject("versão de protocolo diferente");
-    if (!config_.dataHash.empty() && !hello->dataHash.empty() && hello->dataHash != config_.dataHash)
-      return reject("dados de design diferentes dos do servidor");
-    std::string name = hello->name.substr(0, 32);
-    if (name.empty()) name = "Viajante";
-    const auto& data = world_.data();
-    const std::string origin = data.origins.find(hello->origin) ? hello->origin : "humano";
-    const std::string start = data.starts.find(hello->start) ? hello->start : "espadachim";
-    s.player = world_.addPlayer({name, origin, start, hello->model}, s.connection.value, true);
-    s.name = name;
-    proto::Welcome w;
-    w.playerId = s.player;
-    w.tickRate = config_.tickRate;
-    w.tick = world_.tick();
-    send(s.connection, net::Channel::Events, proto::encode(proto::ServerMessage{w}));
-    send(s.connection, net::Channel::Events,
-         proto::encode(proto::ServerMessage{proto::GameEvent{world_.bookSync(s.player)}}));
-    log::info("{} entrou no mundo (jogador {})", name, s.player);
+    if (!s.player) join(s, *hello);  // um personagem por sessão
     return;
   }
   auto& req = std::get<proto::Request>(msg);
   if (!s.player) return;
+  if (const auto* lv = std::get_if<proto::ReqLeave>(&req)) return leave(s, lv->discard);
   if (std::holds_alternative<proto::ReqPause>(req) && (!config_.allowPause || sessions_.size() > 1)) return;
   world_.handleRequest(s.player, req);
 }

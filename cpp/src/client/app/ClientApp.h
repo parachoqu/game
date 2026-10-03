@@ -3,6 +3,7 @@
 // Só fala com o servidor pela ClientSession; nunca toca a simulação.
 #include <cstdint>
 #include <filesystem>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
@@ -28,12 +29,18 @@ struct AppOptions {
   std::optional<std::string> view;  // enquadramento das capturas da demo (02_mercado…)
   std::optional<double> hour;       // força a hora da luz (capturas)
   bool autoStart = false;           // pula título e criação (personagem padrão)
+  bool autoContinue = false;        // pula o título e retoma o último personagem ("Continuar trajetória")
   bool hideHud = false;
   bool portrait = false;            // câmera de frente para o próprio personagem (capturas da animação)
   bool dev = false;                 // comandos de desenvolvimento (tp, give…)
   bool debugUi = false;             // abre as ferramentas de depuração (F3) já no começo
   double fixedDt = 0;               // passo fixo do cliente (capturas reproduzíveis); 0 = relógio real
   std::string name, origin, start, model;  // personagem do autoStart
+  // Preferências e último personagem (Settings); vazio = só na memória (capturas e testes).
+  std::filesystem::path settingsFile;
+  // Há save para este nome? (jogo local: o servidor do mesmo processo). Sem a função, o título confia
+  // no último personagem das preferências e o servidor decide.
+  std::function<bool(const std::string& name)> hasSave;
 };
 
 class ClientApp {

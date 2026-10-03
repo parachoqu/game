@@ -13,7 +13,9 @@ add_library(rpg_client_core STATIC
   game/Aim.cpp
   game/CommandBuilder.cpp
   game/Lighting.cpp
+  game/Settings.cpp
   fx/FxState.cpp
+  audio/Synth.cpp
   ui/Localization.cpp
   ui/FontAtlas.cpp
   ui/UiBatch.cpp
@@ -52,6 +54,7 @@ rpg_set_warnings(rpg_client_core)
 
 add_library(rpg_client STATIC
   platform/Platform.cpp
+  audio/AudioDevice.cpp
   render/Renderer.cpp
   render/RendererPack.cpp
   render/RendererRml.cpp
