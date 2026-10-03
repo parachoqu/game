@@ -14,6 +14,7 @@
 #include "client/assets/EnvironmentMap.h"
 #include "client/assets/Image.h"
 #include "client/assets/ScenePack.h"
+#include "client/entities/CharacterViews.h"
 #include "client/fx/FxState.h"
 #include "client/game/Aim.h"
 #include "client/game/CommandBuilder.h"
@@ -114,6 +115,8 @@ struct ClientApp::Impl {
   std::optional<ScenePack> pack;
   PackMeshes packMeshes;
   std::unique_ptr<WorldView> worldView;
+  std::unique_ptr<CharacterLibrary> characters;
+  std::unique_ptr<CharacterViews> characterViews;
   PackFrame packFrame;
   DynamicSceneState dynScene;
   EnvironmentSelector env;
@@ -162,15 +165,20 @@ struct ClientApp::Impl {
     try {
       ScenePack sp = ScenePack::load(dir);
       pack.emplace(std::move(sp));
+      // moldes dos personagens e as variantes de material (entram no pacote antes da GPU)
+      if (!pack->rigs.empty()) characters = std::make_unique<CharacterLibrary>(*pack);
       packMeshes = buildPackMeshes(*pack, statics);
       worldView = std::make_unique<WorldView>(*pack, packMeshes);
       renderer.loadPack(*pack, packMeshes, worldView->staticInstances());
+      if (characters) characterViews = std::make_unique<CharacterViews>(*pack, *characters);
       if (pack->environment.present) {
         env.setKit(decodeRgbe(loadWebp(pack->dir / pathFromUtf8(pack->environment.file))));
         palette.calibrate(pack->environment.zenith, pack->environment.horizon, pack->environment.ground);
       }
     } catch (const std::exception& e) {
       log::warn("pacote visual indisponível ({}); usando o cenário grey-box", e.what());
+      characterViews.reset();
+      characters.reset();
       pack.reset();
       worldView.reset();
     }
@@ -357,6 +365,11 @@ struct ClientApp::Impl {
       const glm::dvec3 lk(view->look.x, std::max(view->look.y, vm.groundHeight(view->look.x, view->look.z) + 1.8), view->look.z);
       cam.setFreeCam(std::make_pair(pos, lk));
     }
+    if (opt.portrait && !view) {
+      // de frente para o personagem, a 3,4 m, na altura do peito
+      const glm::dvec3 at(me->x, me->y + 1.0, me->z), dir(std::sin(me->yaw), 0, std::cos(me->yaw));
+      cam.setFreeCam(std::make_pair(at + dir * 3.4 + glm::dvec3(0, 0.5, 0), at));
+    }
     const StaticMap& map = mapOf(mapKind);
     cam.view().aspect = static_cast<double>(std::max(1, in.width)) / std::max(1, in.height);
     cam.update(dt, snapCamera, subj, in, uiOpen, map);
@@ -435,7 +448,8 @@ struct ClientApp::Impl {
     const double gameTime = W ? W->time : 0.0;
     dynamic.clear();
     unlit.clear();
-    const SceneContext sc{&statics, &data, &look, renderer.packLoaded()};
+    const bool packCharacters = characterViews && renderer.packLoaded();
+    const SceneContext sc{&statics, &data, &look, renderer.packLoaded(), packCharacters};
     buildEntityInstances(sc, world, gameTime, dynamic);
     buildFxGeometry(fx, map, static_cast<std::uint8_t>(mapKind), ring, now, unlit);
     const double hour = opt.hour ? *opt.hour : clockAt(gameTime, ClockConfig{}).hour;
@@ -450,6 +464,9 @@ struct ClientApp::Impl {
     for (std::size_t i = 0; i < P->turb.shrinesTaken.size(); ++i) dynScene.shrineTaken[i] = P->turb.shrinesTaken[i] != 0;
     dynScene.models.clear();
     if (pack && renderer.packLoaded()) collectEntityModels(*pack, world, statics, dynScene.models);
+    dynScene.skinned.clear();
+    dynScene.bones.clear();
+    if (packCharacters) characterViews->update(world, CharacterContext{&data, &statics, glm::vec3(vc.position), dt}, dynScene);
     f.pack = packFor(vc, gameTime);
     {
       std::vector<SkyInput::Gone> gone;

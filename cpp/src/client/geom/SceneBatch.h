@@ -29,6 +29,8 @@ struct SceneContext {
   const Presentation* look = nullptr;
   // Com o pacote visual, pontos de coleta, santuários, saídas, portal, sacos e projéteis vêm dele.
   bool packModels = false;
+  // Com os moldes do pacote, jogadores, inimigos, NPCs e montarias vêm de CharacterViews.
+  bool packCharacters = false;
 };
 
 enum class Prim : std::uint8_t { Box, Cylinder, Cone, Sphere, Capsule, Ring, Count };

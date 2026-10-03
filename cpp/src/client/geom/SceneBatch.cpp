@@ -164,6 +164,9 @@ void buildEntityInstances(const SceneContext& ctx, const ClientWorld& world, dou
 
   for (const proto::EntityState& e : world.entities()) {
     if (static_cast<MapKind>(e.map) != myMap) continue;
+    if (ctx.packCharacters && (e.kind == proto::EntityKind::Player || e.kind == proto::EntityKind::Enemy ||
+                               e.kind == proto::EntityKind::Npc || e.kind == proto::EntityKind::Mount))
+      continue;
     const bool down = (e.flags & proto::kFlagDown) != 0;
     switch (e.kind) {
       case proto::EntityKind::Player: {

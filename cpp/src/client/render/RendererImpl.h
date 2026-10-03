@@ -87,10 +87,10 @@ struct PackGpu {
     std::array<SDL_GPUTextureSamplerBinding, 7> bindings{};
     Uint32 bindingCount = 0;
   };
-  using PipelineKey = std::tuple<bool, int, int, bool, bool, bool, float, float, bool>;
+  using PipelineKey = std::tuple<bool, int, int, bool, bool, bool, float, float, bool, bool>;
 
   bool loaded = false;
-  SDL_GPUBuffer *vb = nullptr, *ib = nullptr, *staticInst = nullptr;
+  SDL_GPUBuffer *vb = nullptr, *ib = nullptr, *staticInst = nullptr, *skinVB = nullptr;
   std::vector<MeshSlice> geometries;
   std::vector<TerrainSlice> terrain;
   std::vector<Tex> textures;
@@ -99,8 +99,8 @@ struct PackGpu {
   SDL_GPUSampler *clampLinear = nullptr, *envSampler = nullptr;
   std::map<std::tuple<int, int, bool, bool, int>, SDL_GPUSampler*> samplers;
   std::map<PipelineKey, SDL_GPUGraphicsPipeline*> pipelines;
-  SDL_GPUShader *meshV = nullptr, *surfaceF = nullptr, *terrainF = nullptr;
-  DynBuffer frameInst;
+  SDL_GPUShader *meshV = nullptr, *skinnedV = nullptr, *surfaceF = nullptr, *terrainF = nullptr;
+  DynBuffer frameInst, bones;
 };
 
 struct Renderer::Impl {
@@ -136,10 +136,10 @@ struct Renderer::Impl {
   SDL_GPUSampler* packSampler(Wrap s, Wrap t, bool nearest, bool mips, int anisotropy);
   SDL_GPUTexture* uploadTexture(SDL_GPUTextureType type, SDL_GPUTextureFormat fmt, int w, int h, int layers, int levels,
                                 const std::vector<std::vector<const std::uint8_t*>>& data, int bytesPerPixel, bool generateMips);
-  SDL_GPUGraphicsPipeline* packPipeline(const MaterialSetup& m, bool mirrored);
+  SDL_GPUGraphicsPipeline* packPipeline(const MaterialSetup& m, bool mirrored, bool skinned);
   void drawPack(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* rp, const PackFrame& f, bool transparent, FrameStats& stats);
 
-  SDL_GPUShader* shader(const char* name, SDL_GPUShaderStage stage, Uint32 samplers, Uint32 uniforms) {
+  SDL_GPUShader* shader(const char* name, SDL_GPUShaderStage stage, Uint32 samplers, Uint32 uniforms, Uint32 storageBuffers = 0) {
     const auto code = shaderBlob(name);
     if (code.empty()) throw std::runtime_error(std::string("shader não embutido: ") + name);
     SDL_GPUShaderCreateInfo ci{};
@@ -150,6 +150,7 @@ struct Renderer::Impl {
     ci.stage = stage;
     ci.num_samplers = samplers;
     ci.num_uniform_buffers = uniforms;
+    ci.num_storage_buffers = storageBuffers;
     SDL_GPUShader* s = SDL_CreateGPUShader(dev, &ci);
     if (!s) gpuFail(std::string("SDL_CreateGPUShader(") + name + ")");
     return s;

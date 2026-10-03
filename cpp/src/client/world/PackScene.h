@@ -12,6 +12,7 @@
 //                           paliçada extra do acampamento.
 #include <array>
 #include <cstdint>
+#include <optional>
 #include <vector>
 
 #include <glm/glm.hpp>
@@ -36,9 +37,17 @@ struct PackVertex {
 };
 static_assert(sizeof(PackVertex) == 56);
 
+// Pele de um vértice (skinIndex/skinWeight), num fluxo à parte só com as geometrias dos personagens.
+struct SkinVertex {
+  std::uint16_t joints[4];
+  float weights[4];
+};
+static_assert(sizeof(SkinVertex) == 24);
+
 struct MeshSlice {
   std::uint32_t firstIndex = 0, indexCount = 0;
   std::int32_t baseVertex = 0;
+  std::int32_t skinBase = -1;  // primeiro vértice em PackMeshes::skin (-1 = sem pele)
   glm::vec3 boundsMin{0.0f}, boundsMax{0.0f};
 };
 
@@ -55,6 +64,7 @@ struct PackMeshes {
   std::vector<std::uint32_t> indices;
   std::vector<MeshSlice> geometries;  // por geometria do pacote
   std::vector<TerrainSlice> terrain;  // por bloco de relevo do pacote
+  std::vector<SkinVertex> skin;       // pele das geometrias com skinIndex/skinWeight
 };
 PackMeshes buildPackMeshes(const ScenePack& pack, const StaticWorld& world);
 
@@ -71,12 +81,14 @@ struct PackDrawCmd {
   Tint tint = Tint::None;
   int renderOrder = 0;
   float viewDepth = 0;          // para ordenar os transparentes
+  std::int32_t boneBase = -1;   // malha com pele: primeira matriz da paleta em PackFrame::bones
 };
 
 struct PackFrame {
   std::vector<std::pair<int, int>> terrain;  // (bloco, nível)
   std::vector<PackDrawCmd> draws;
   std::vector<Instance> instances;           // instâncias deste quadro
+  std::vector<glm::mat4> bones;              // paletas das malhas com pele (no mundo)
   std::uint32_t lodInstances = 0;            // vegetação ativa (relatórios)
 };
 
@@ -93,6 +105,20 @@ struct ModelInstance {
   const std::vector<PackDraw>* parts = nullptr;
   glm::mat4 root{1.0f};
   bool portal = false;  // turbulent.js: disco pulsando e estilhaços em órbita
+  // sem `parts`: uma geometria só (malha rígida de personagem), com `root` como matriz de mundo
+  int geometry = -1, material = -1;
+  std::optional<glm::vec4> color;  // matiz livre (multiplica a cor; alfa = opacidade)
+};
+
+// Malha com pele de um personagem neste quadro. A paleta (osso_mundo · inversa · bindMatrix) fica em
+// DynamicSceneState::bones a partir de `boneBase`.
+struct SkinnedInstance {
+  int geometry = -1, material = -1;
+  glm::mat4 mesh{1.0f};  // matriz de mundo da malha (as normais seguem a do three)
+  std::uint32_t boneBase = 0;
+  glm::vec3 center{0.0f};  // esfera para o recorte
+  float radius = 2.0f;
+  std::optional<glm::vec4> color;
 };
 
 struct DynamicSceneState {
@@ -101,6 +127,8 @@ struct DynamicSceneState {
   bool campPalisade = false;  // camp.js: só com o acampamento "pressionado"
   double time = 0;            // G.time (o cristal dos santuários gira e flutua)
   std::vector<ModelInstance> models;
+  std::vector<SkinnedInstance> skinned;
+  std::vector<glm::mat4> bones;
 };
 
 class WorldView {

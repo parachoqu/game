@@ -35,13 +35,14 @@ endif()
 
 # Cliente sem janela (lógica, sessão contra o servidor, textos, geometria): roda em qualquer CI.
 if(RPG_BUILD_CLIENT)
-  add_executable(rpg_client_tests client/ClientTests.cpp client/ScenePackTests.cpp client/PackSceneTests.cpp)
-  target_link_libraries(rpg_client_tests PRIVATE rpg_client_core rpg_server Catch2::Catch2WithMain)
+  add_executable(rpg_client_tests client/ClientTests.cpp client/ScenePackTests.cpp client/PackSceneTests.cpp client/AnimTests.cpp)
+  target_link_libraries(rpg_client_tests PRIVATE rpg_client_core rpg_server Catch2::Catch2WithMain nlohmann_json::nlohmann_json)
   target_include_directories(rpg_client_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
   target_compile_definitions(rpg_client_tests PRIVATE
     RPG_TEST_DATA_DIR="${RPG_DATA_DIR}"
     RPG_TEST_SIM_DIR="${RPG_SIM_DIR}"
     RPG_TEST_ASSETS_DIR="${RPG_ASSETS_DIR}"
+    RPG_TEST_FIXTURES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/parity/fixtures"
   )
   rpg_set_warnings(rpg_client_tests)
   if(WIN32)
@@ -56,6 +57,9 @@ if(RPG_BUILD_CLIENT)
       COMMAND rpg_local --headless --auto --size 640x360 --frames 60 --screenshot "${CMAKE_BINARY_DIR}/smoke_client.png")
     add_test(NAME smoke.client_view_title
       COMMAND rpg_local --headless --size 640x360 --view 01_title_screen --frames 10 --screenshot "${CMAKE_BINARY_DIR}/smoke_title.png")
+    # personagem de perto: malhas com pele (skinned.vert), arma na mão e NPCs
+    add_test(NAME smoke.client_portrait
+      COMMAND rpg_local --headless --auto --dev --hide-hud --portrait --size 640x360 --frames 40 --screenshot "${CMAKE_BINARY_DIR}/smoke_portrait.png")
   endif()
 endif()
 

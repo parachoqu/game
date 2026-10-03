@@ -15,6 +15,9 @@
 //   tex/*.webp   — uma imagem por textura (RGBA cru vira WebP de qualidade 95 com alfa sem perdas;
 //                  imagens embutidas mantêm os bytes originais)
 //
+// E, em cpp/tests/parity/fixtures/anim-parity.json, poses de referência dos animadores da demo
+// (roteiros de entrada rodados em characters.js) para os testes de paridade da animação.
+//
 // A demo não muda: um plugin do esbuild só acrescenta, neste pacote, onde `patchMaterial` guarda os
 // recursos e uniforms de cada material e onde o GLTFLoader guarda os bytes de cada imagem.
 //
@@ -204,7 +207,7 @@ const istream = (off, count) => {
 const geometries = json.geometries.map((g) => ({
   ...g,
   attributes: Object.fromEntries(Object.entries(g.attributes).map(([k, a]) => {
-    const stride = a.size * (a.type === 'u8n' ? 1 : 4);
+    const stride = a.size * (a.type === 'u8n' ? 1 : a.type === 'u16' ? 2 : 4);
     return [k, { type: a.type, size: a.size, ...vstream(a.offset, g.count, stride) }];
   })),
   index: g.index ? istream(g.index.offset, g.index.count) : null,
@@ -220,6 +223,16 @@ const terrain = json.terrain.map((t) => ({
   near: { ...t.near, splat: vstream(t.near.splat, t.near.n * t.near.n, 12) },
   far: { ...t.far, splat: vstream(t.far.splat, t.far.n * t.far.n, 12) },
 }));
+// personagens: pose de repouso (10 floats por nó), bindMatrix, inversas dos ossos e trilhas dos clipes
+const rigs = Object.fromEntries(Object.entries(json.rigs || {}).map(([id, r]) => [id, {
+  ...r,
+  rest: vstream(r.rest, r.nodes.length, 40),
+  meshes: r.meshes.map((m) => (m.skinned ? { ...m, bindMatrix: vstream(m.bindMatrix, 1, 64), boneInverses: vstream(m.boneInverses, m.bones.length, 64) } : m)),
+  clips: Object.fromEntries(Object.entries(r.clips).map(([k, c]) => [k, {
+    ...c,
+    tracks: c.tracks.map((t) => ({ ...t, times: vstream(t.times, t.count, 4), values: vstream(t.values, t.count, t.size * 4) })),
+  }])),
+}]));
 const sceneBin = Buffer.concat(parts);
 
 // Luz de ambiente do dia: o HDRI reduzido do kit (RGBE em WebP sem perdas) vai como está, com as
@@ -235,11 +248,14 @@ const scene = {
   lodBands: json.lodBands,
   sources, textures, materials: json.materials, geometries,
   terrain, static: json.static, instanced, lodFields,
-  dynamic: json.dynamic, templates: json.templates, environment,
+  dynamic: json.dynamic, templates: json.templates, environment, rigs, clipMeta: json.clipMeta,
   bin: { file: 'scene.bin', bytes: sceneBin.length, sha256: createHash('sha256').update(sceneBin).digest('hex') },
 };
 files.set('scene.bin', sceneBin);
 files.set('scene.json', Buffer.from(JSON.stringify(scene) + '\n'));
+// paridade da animação (tests/client/AnimTests.cpp): fica com as outras fixtures de paridade
+const FIXTURES = join(ROOT, 'cpp', 'tests', 'parity', 'fixtures');
+const animParity = Buffer.from(JSON.stringify(json.animParity) + '\n');
 
 // ---------------------------------------------------------------- gravar ou conferir
 const summary = `${geometries.length} geometrias, ${json.materials.length} materiais, ${textures.length} texturas `
@@ -251,6 +267,8 @@ if (check) {
     const p = join(OUT, name);
     if (!existsSync(p) || !readFileSync(p).equals(data)) bad.push(name);
   }
+  const ap = join(FIXTURES, 'anim-parity.json');
+  if (!existsSync(ap) || !readFileSync(ap).equals(animParity)) bad.push('../../tests/parity/fixtures/anim-parity.json');
   if (bad.length) {
     console.error(`cpp/assets/client desatualizado (${bad.length} arquivos): ${bad.slice(0, 8).join(', ')}…\nRode: node demo/tools/bake-client-scene.mjs`);
     process.exit(1);
@@ -260,6 +278,7 @@ if (check) {
   rmSync(join(OUT, 'tex'), { recursive: true, force: true });
   mkdirSync(join(OUT, 'tex'), { recursive: true });
   for (const [name, data] of files) writeFileSync(join(OUT, name), data);
+  writeFileSync(join(FIXTURES, 'anim-parity.json'), animParity);
   const texBytes = readdirSync(join(OUT, 'tex')).reduce((s, f) => s + readFileSync(join(OUT, 'tex', f)).length, 0);
   console.log(`gravado em cpp/assets/client: ${summary}; texturas ${(texBytes / 1048576).toFixed(1)} MB`);
 }

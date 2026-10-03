@@ -94,6 +94,22 @@ PackMeshes buildPackMeshes(const ScenePack& pack, const StaticWorld& world) {
       v.depth = dep.empty() ? 0.0f : dep[i];
       M.vertices.push_back(v);
     }
+    // pele (personagens): índices dos ossos e pesos, num fluxo à parte
+    if (g.attributes.contains("skinIndex") && g.attributes.contains("skinWeight")) {
+      const std::vector<float> ji = pack.attributeFloats(g, "skinIndex");
+      const std::vector<float> jw = pack.attributeFloats(g, "skinWeight");
+      if (ji.size() >= g.count * 4 && jw.size() >= g.count * 4) {
+        s.skinBase = static_cast<std::int32_t>(M.skin.size());
+        for (std::size_t i = 0; i < g.count; ++i) {
+          SkinVertex sv{};
+          for (std::size_t k = 0; k < 4; ++k) {
+            sv.joints[k] = static_cast<std::uint16_t>(ji[i * 4 + k]);
+            sv.weights[k] = jw[i * 4 + k];
+          }
+          M.skin.push_back(sv);
+        }
+      }
+    }
     if (g.index) {
       const std::vector<std::uint32_t> idx = pack.decodeIndices(*g.index);
       M.indices.insert(M.indices.end(), idx.begin(), idx.end());
@@ -306,6 +322,7 @@ void WorldView::update(glm::vec3 cam, const glm::mat4& viewProj, const glm::vec3
   out.terrain.clear();
   out.draws.clear();
   out.instances.clear();
+  out.bones.clear();
   out.lodInstances = 0;
   const Frustum fr(viewProj);
   const glm::vec2 c2(cam.x, cam.z);
@@ -431,7 +448,31 @@ void WorldView::update(glm::vec3 cam, const glm::mat4& viewProj, const glm::vec3
 
   // modelos das entidades (portal, sacos, projéteis, armas)
   for (const ModelInstance& mi : dyn.models) {
-    if (!mi.parts) continue;
+    if (!mi.parts) {
+      if (mi.geometry < 0) continue;
+      glm::vec3 c;
+      float r = 0;
+      boundsOf(meshes_.geometries[static_cast<std::size_t>(mi.geometry)], mi.root, c, r);
+      if (!fr.sphere(c, r)) continue;
+      PackDrawCmd d;
+      d.geometry = mi.geometry;
+      d.material = mi.material;
+      d.firstInstance = static_cast<std::uint32_t>(out.instances.size());
+      d.frameInstances = true;
+      d.mirrored = glm::determinant(glm::mat3(mi.root)) < 0.0f;
+      d.viewDepth = depthOf(c);
+      Instance inst = makeInstance(mi.root);
+      if (mi.color) {
+        inst.tint[0] = mi.color->r;
+        inst.tint[1] = mi.color->g;
+        inst.tint[2] = mi.color->b;
+        inst.tint[3] = mi.color->a;
+        d.tint = Tint::Color;
+      }
+      out.instances.push_back(inst);
+      out.draws.push_back(d);
+      continue;
+    }
     int shard = 0;
     for (const PackDraw& part : *mi.parts) {
       glm::mat4 local = part.matrix;
@@ -467,6 +508,31 @@ void WorldView::update(glm::vec3 cam, const glm::mat4& viewProj, const glm::vec3
       Instance inst = makeInstance(w);
       if (tinted) {
         std::copy(std::begin(tint.tint), std::end(tint.tint), std::begin(inst.tint));
+        d.tint = Tint::Color;
+      }
+      out.instances.push_back(inst);
+      out.draws.push_back(d);
+    }
+  }
+
+  // personagens: malhas com pele (a paleta do quadro vai junto)
+  if (!dyn.skinned.empty()) {
+    out.bones = dyn.bones;
+    for (const SkinnedInstance& si : dyn.skinned) {
+      if (!fr.sphere(si.center, si.radius)) continue;
+      PackDrawCmd d;
+      d.geometry = si.geometry;
+      d.material = si.material;
+      d.firstInstance = static_cast<std::uint32_t>(out.instances.size());
+      d.frameInstances = true;
+      d.viewDepth = depthOf(si.center);
+      d.boneBase = static_cast<std::int32_t>(si.boneBase);
+      Instance inst = makeInstance(si.mesh);
+      if (si.color) {
+        inst.tint[0] = si.color->r;
+        inst.tint[1] = si.color->g;
+        inst.tint[2] = si.color->b;
+        inst.tint[3] = si.color->a;
         d.tint = Tint::Color;
       }
       out.instances.push_back(inst);

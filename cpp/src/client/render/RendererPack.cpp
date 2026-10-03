@@ -35,7 +35,7 @@ int mipCount(int w, int h) {
 void Renderer::Impl::releasePack() {
   PackGpu& P = pack;
   if (!dev) return;
-  for (SDL_GPUBuffer* b : {P.vb, P.ib, P.staticInst, P.frameInst.buf})
+  for (SDL_GPUBuffer* b : {P.vb, P.ib, P.staticInst, P.skinVB, P.frameInst.buf, P.bones.buf})
     if (b) SDL_ReleaseGPUBuffer(dev, b);
   for (const auto& t : P.textures)
     if (t.tex) SDL_ReleaseGPUTexture(dev, t.tex);
@@ -45,7 +45,7 @@ void Renderer::Impl::releasePack() {
   for (SDL_GPUSampler* s : {P.clampLinear, P.envSampler})
     if (s) SDL_ReleaseGPUSampler(dev, s);
   for (const auto& [k, p] : P.pipelines) SDL_ReleaseGPUGraphicsPipeline(dev, p);
-  for (SDL_GPUShader* s : {P.meshV, P.surfaceF, P.terrainF})
+  for (SDL_GPUShader* s : {P.meshV, P.skinnedV, P.surfaceF, P.terrainF})
     if (s) SDL_ReleaseGPUShader(dev, s);
   P = PackGpu{};
 }
@@ -127,15 +127,17 @@ SDL_GPUTexture* Renderer::Impl::uploadTexture(SDL_GPUTextureType type, SDL_GPUTe
   return tex;
 }
 
-SDL_GPUGraphicsPipeline* Renderer::Impl::packPipeline(const MaterialSetup& m, bool mirrored) {
+SDL_GPUGraphicsPipeline* Renderer::Impl::packPipeline(const MaterialSetup& m, bool mirrored, bool skinned) {
   const PackGpu::PipelineKey key{m.terrain, static_cast<int>(m.cull), static_cast<int>(m.blend), m.depthWrite, m.depthTest,
-                                 m.depthBias, m.biasFactor, m.biasUnits, mirrored};
+                                 m.depthBias, m.biasFactor, m.biasUnits, mirrored, skinned};
   if (const auto it = pack.pipelines.find(key); it != pack.pipelines.end()) return it->second;
-  const SDL_GPUVertexBufferDescription bufs[2] = {
+  // pele (skinned.vert): o terceiro fluxo traz os índices dos ossos e os pesos
+  const SDL_GPUVertexBufferDescription bufs[3] = {
       {0, sizeof(PackVertex), SDL_GPU_VERTEXINPUTRATE_VERTEX, 0},
       {1, sizeof(Instance), SDL_GPU_VERTEXINPUTRATE_INSTANCE, 0},
+      {2, sizeof(SkinVertex), SDL_GPU_VERTEXINPUTRATE_VERTEX, 0},
   };
-  const SDL_GPUVertexAttribute attrs[13] = {
+  const SDL_GPUVertexAttribute attrs[15] = {
       {0, 0, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3, 0},        {1, 0, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3, 12},
       {2, 0, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2, 24},       {3, 0, SDL_GPU_VERTEXELEMENTFORMAT_HALF4, 32},
       {4, 0, SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4_NORM, 40},  {5, 0, SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4_NORM, 44},
@@ -143,6 +145,7 @@ SDL_GPUGraphicsPipeline* Renderer::Impl::packPipeline(const MaterialSetup& m, bo
       {8, 1, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4, 0},        {9, 1, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4, 16},
       {10, 1, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4, 32},      {11, 1, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4, 48},
       {12, 1, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4, 64},
+      {13, 2, SDL_GPU_VERTEXELEMENTFORMAT_USHORT4, 0},      {14, 2, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4, 8},
   };
   SDL_GPUColorTargetDescription ct{};
   ct.format = kHdrFmt;
@@ -157,9 +160,9 @@ SDL_GPUGraphicsPipeline* Renderer::Impl::packPipeline(const MaterialSetup& m, bo
     ct.blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
   }
   SDL_GPUGraphicsPipelineCreateInfo pi{};
-  pi.vertex_shader = pack.meshV;
+  pi.vertex_shader = skinned ? pack.skinnedV : pack.meshV;
   pi.fragment_shader = m.terrain ? pack.terrainF : pack.surfaceF;
-  pi.vertex_input_state = {bufs, 2, attrs, 13};
+  pi.vertex_input_state = {bufs, skinned ? 3u : 2u, attrs, skinned ? 15u : 13u};
   pi.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
   pi.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
   pi.rasterizer_state.cull_mode = m.cull == Cull::None ? SDL_GPU_CULLMODE_NONE : m.cull == Cull::Back ? SDL_GPU_CULLMODE_BACK : SDL_GPU_CULLMODE_FRONT;
@@ -191,11 +194,13 @@ void Renderer::loadPack(const ScenePack& sp, const PackMeshes& meshes, const std
   I.releasePack();
   PackGpu& P = I.pack;
   P.meshV = I.shader("mesh.vert", SDL_GPU_SHADERSTAGE_VERTEX, 0, 2);
+  P.skinnedV = I.shader("skinned.vert", SDL_GPU_SHADERSTAGE_VERTEX, 0, 2, 1);
   P.surfaceF = I.shader("surface.frag", SDL_GPU_SHADERSTAGE_FRAGMENT, 7, 2);
   P.terrainF = I.shader("terrain.frag", SDL_GPU_SHADERSTAGE_FRAGMENT, 5, 2);
 
   P.vb = I.staticBuffer(SDL_GPU_BUFFERUSAGE_VERTEX, meshes.vertices.data(), static_cast<Uint32>(meshes.vertices.size() * sizeof(PackVertex)));
   P.ib = I.staticBuffer(SDL_GPU_BUFFERUSAGE_INDEX, meshes.indices.data(), static_cast<Uint32>(meshes.indices.size() * sizeof(std::uint32_t)));
+  P.skinVB = I.staticBuffer(SDL_GPU_BUFFERUSAGE_VERTEX, meshes.skin.data(), static_cast<Uint32>(meshes.skin.size() * sizeof(SkinVertex)));
   P.staticInst = I.staticBuffer(SDL_GPU_BUFFERUSAGE_VERTEX, staticInstances.data(), static_cast<Uint32>(staticInstances.size() * sizeof(Instance)));
   P.geometries = meshes.geometries;
   P.terrain = meshes.terrain;
@@ -312,18 +317,27 @@ void Renderer::Impl::drawPack(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* rp, 
   Uint32 boundInstOffset = ~0u;
   const SDL_GPUBufferBinding ib{P.ib, 0};
   SDL_BindGPUIndexBuffer(rp, &ib, SDL_GPU_INDEXELEMENTSIZE_32BIT);
-  const auto useMaterial = [&](int mi, bool mirrored, bool instanced, Tint tint) {
+  bool bonesBound = false;
+  const auto useMaterial = [&](int mi, bool mirrored, bool instanced, Tint tint, std::int32_t boneBase = -1) {
     const PackGpu::Mat& m = P.materials[static_cast<std::size_t>(mi)];
-    SDL_GPUGraphicsPipeline* p = packPipeline(m.setup, mirrored);
+    SDL_GPUGraphicsPipeline* p = packPipeline(m.setup, mirrored, boneBase >= 0);
     if (p != bound) {
       SDL_BindGPUGraphicsPipeline(rp, p);
       bound = p;
       boundMat = -1;
       boundInst = nullptr;
     }
+    if (boneBase >= 0 && !bonesBound) {
+      SDL_BindGPUVertexStorageBuffers(rp, 0, &P.bones.buf, 1);
+      bonesBound = true;
+    }
     DrawBlock d = m.setup.draw;
     d.wind[2] = instanced ? 1.0f : 0.0f;
     d.wind[3] = static_cast<float>(tint);
+    if (boneBase >= 0) {
+      d.wind[1] = 0.0f;  // sem vento nem grama
+      d.flags[1] = static_cast<float>(boneBase);
+    }
     SDL_PushGPUVertexUniformData(cmd, 1, &d, sizeof d);
     if (mi != boundMat) {
       SDL_PushGPUFragmentUniformData(cmd, 1, &m.setup.block, sizeof m.setup.block);
@@ -358,6 +372,23 @@ void Renderer::Impl::drawPack(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* rp, 
     const PackGpu::Mat& m = P.materials[static_cast<std::size_t>(d.material)];
     if (m.setup.transparent != transparent) continue;
     const MeshSlice& s = P.geometries[static_cast<std::size_t>(d.geometry)];
+    if (d.boneBase >= 0) {
+      if (s.skinBase < 0 || !P.bones.buf) continue;
+      useMaterial(d.material, d.mirrored, false, d.tint, d.boneBase);
+      // pele: cada fluxo começa no primeiro vértice da geometria (índices locais, sem baseVertex)
+      const SDL_GPUBufferBinding vb[3] = {
+          {P.vb, static_cast<Uint32>(s.baseVertex) * static_cast<Uint32>(sizeof(PackVertex))},
+          {P.frameInst.buf, static_cast<Uint32>(d.firstInstance * sizeof(Instance))},
+          {P.skinVB, static_cast<Uint32>(s.skinBase) * static_cast<Uint32>(sizeof(SkinVertex))},
+      };
+      SDL_BindGPUVertexBuffers(rp, 0, vb, 3);
+      boundInst = nullptr;
+      SDL_DrawGPUIndexedPrimitives(rp, s.indexCount, 1, s.firstIndex, 0, 0);
+      ++st.drawCalls;
+      ++st.instances;
+      st.triangles += s.indexCount / 3;
+      continue;
+    }
     useMaterial(d.material, d.mirrored, d.instanced, d.tint);
     bindVertex(d.frameInstances ? P.frameInst.buf : P.staticInst, static_cast<Uint32>(d.firstInstance * sizeof(Instance)));
     SDL_DrawGPUIndexedPrimitives(rp, s.indexCount, d.instanceCount, s.firstIndex, s.baseVertex, 0);

@@ -95,6 +95,8 @@ jobs:
             frames=30; [ "$v" = 01_title_screen ] && frames=90
             ./build/ci/apps/local/rpg_local --headless --size 1100x700 --view "$v" --frames "$frames" --screenshot "shots/$v.png"
           done
+          # o personagem de frente (modelo com pele, pose ociosa, arma na mão), como o retrato de capture-reference.mjs
+          ./build/ci/apps/local/rpg_local --headless --size 1100x700 --auto --dev --hide-hud --portrait --hour 12 --frames 64 --screenshot shots/portrait.png
       - uses: actions/upload-artifact@v4
         with:
           name: capturas-cliente

@@ -30,6 +30,11 @@ add_library(rpg_client_core STATIC
   world/PackMaterials.cpp
   world/SkyView.cpp
   world/EntityModels.cpp
+  anim/Rig.cpp
+  anim/Mixer.cpp
+  anim/HumanoidAnimator.cpp
+  anim/QuadrupedAnimator.cpp
+  entities/CharacterViews.cpp
 )
 target_link_libraries(rpg_client_core
   PUBLIC rpg_core rpg_net Freetype::Freetype

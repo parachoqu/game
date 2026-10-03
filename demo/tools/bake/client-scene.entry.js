@@ -12,7 +12,9 @@ import { G } from '../../src/state.js';
 import { WEAPONS } from '../../src/config.js';
 import { generateTextures } from '../../src/engine/textures.js';
 import { loadModels } from '../../src/engine/models.js';
-import { weaponMesh } from '../../src/engine/characters.js';
+import { weaponMesh, makeHumanoid, animateHumanoid, makeBeast, animateBeast, makeMount, animateMount } from '../../src/engine/characters.js';
+import { groundHeight } from '../../src/engine/terrain.js';
+import { MODELS, instantiate } from '../../src/engine/models.js';
 import { portalMesh, mat } from '../../src/engine/props.js';
 import { LOD_FIELDS, LOD_BANDS } from '../../src/engine/lod-field.js';
 import { loadWorldScene } from '../../src/world/index.js';
@@ -75,9 +77,11 @@ class Exporter {
     if (this.geoIds.has(g.uuid)) return this.geoIds.get(g.uuid);
     const attributes = {};
     for (const [name, a] of Object.entries(g.attributes)) {
-      if (!['position', 'normal', 'uv', 'color', 'splatA', 'splatB', 'splatC', 'aDepth'].includes(name)) continue;
+      if (!['position', 'normal', 'uv', 'color', 'splatA', 'splatB', 'splatC', 'aDepth', 'skinIndex', 'skinWeight'].includes(name)) continue;
       const raw = a.isInterleavedBufferAttribute ? null : a.array;
-      if (raw instanceof Uint8Array && a.normalized) {
+      if (name === 'skinIndex') {
+        attributes[name] = { type: 'u16', size: a.itemSize, offset: this.bin.push(Uint16Array.from(toFloat32(a))) };
+      } else if (raw instanceof Uint8Array && a.normalized) {
         attributes[name] = { type: 'u8n', size: a.itemSize, offset: this.bin.push(raw) };
       } else {
         attributes[name] = { type: 'f32', size: a.itemSize, offset: this.bin.push(raw instanceof Float32Array && !a.normalized ? raw : toFloat32(a)) };
@@ -267,6 +271,204 @@ function hasSkin(o) {
   return s;
 }
 
+// Esqueleto de um molde: nós da subárvore do pivot (ordem de traverse) com a pose de repouso (a que o
+// mixer do three guarda como estado original), malhas (com pele: bindMatrix, ossos e inversas) e os
+// clipes já adaptados ao modelo (retarget + contato), cada trilha apontando para o índice do nó.
+async function exportRig(ex, pivot, clips, extra = {}) {
+  const nodes = [], idx = new Map(), byName = new Map();
+  pivot.traverse((o) => { idx.set(o, nodes.length); if (!byName.has(o.name)) byName.set(o.name, nodes.length); nodes.push(o); });
+  const rest = new Float32Array(nodes.length * 10);
+  nodes.forEach((o, i) => { o.position.toArray(rest, i * 10); o.quaternion.toArray(rest, i * 10 + 3); o.scale.toArray(rest, i * 10 + 7); });
+  const meshes = [];
+  for (const o of nodes) {
+    if (!o.isMesh) continue;
+    const mats = Array.isArray(o.material) ? o.material : [o.material];
+    const rec = { node: idx.get(o), geometry: ex.geometry(o.geometry), material: await ex.material(mats[0]), skinned: !!o.isSkinnedMesh };
+    if (o.isSkinnedMesh) {
+      rec.bindMatrix = ex.bin.push(new Float32Array(o.bindMatrix.elements));
+      rec.bones = o.skeleton.bones.map((b) => idx.get(b));
+      const inv = new Float32Array(o.skeleton.boneInverses.length * 16);
+      o.skeleton.boneInverses.forEach((m, i) => inv.set(m.elements, i * 16));
+      rec.boneInverses = ex.bin.push(inv);
+    }
+    meshes.push(rec);
+  }
+  const outClips = {};
+  for (const [key, clip] of Object.entries(clips)) {
+    if (!clip) continue;
+    outClips[key] = {
+      duration: clip.duration,
+      tracks: clip.tracks.map((t) => {
+        const dot = t.name.lastIndexOf('.');
+        return {
+          node: byName.has(t.name.slice(0, dot)) ? byName.get(t.name.slice(0, dot)) : -1, path: t.name.slice(dot + 1),
+          count: t.times.length, size: t.getValueSize(),
+          interp: t.getInterpolation() === THREE.InterpolateDiscrete ? 'step' : 'linear',
+          times: ex.bin.push(Float32Array.from(t.times)), values: ex.bin.push(Float32Array.from(t.values)),
+        };
+      }),
+    };
+  }
+  return {
+    nodes: nodes.map((o) => ({ name: o.name, parent: o.parent && idx.has(o.parent) && o !== pivot ? idx.get(o.parent) : -1, bone: !!o.isBone })),
+    rest: ex.bin.push(rest), meshes, clips: outClips, ...extra,
+  };
+}
+
+async function exportRigs(ex) {
+  const rigs = {};
+  const q = (v) => v.toArray().map(round);
+  for (const id of ['kachujin', 'eve', 'paladina']) {
+    const M = MODELS[id];
+    if (!M) continue;
+    // makeHumanoid prepara o molde (pose ociosa, contato, ciclos) e calibra as empunhaduras
+    const h = makeHumanoid({ model: id });
+    const fresh = instantiate(M);
+    const names = new Map();
+    fresh.traverse((o) => { if (!names.has(o.name)) names.set(o.name, o); });
+    const grip = (g) => ({ bone: g.parent.name, t: q(g.position), r: q(g.quaternion), s: q(g.scale) });
+    rigs[id] = await exportRig(ex, fresh, M.anims, {
+      kind: 'humanoid', clipOrder: Object.keys(M.anims).filter((k) => M.anims[k]),
+      hipsY: M.hipsY, hipsBase: M.hipsBase, height: M.height,
+      idleRef: Object.fromEntries(Object.entries(M.idleRef || {}).map(([k, v]) => [k, q(v)])),
+      cycle: M.cycle || {}, contact: M.contact || {},
+      grips: { R: grip(h.gripR), L: grip(h.gripL) },
+    });
+    // a pele do molde já serve a qualquer clone: o nome dos ossos é o mesmo
+    void names;
+  }
+  const quad = async (M, kind, extra = {}) => exportRig(ex, instantiate(M), { idle: M.idle, walk: M.walkClip }, { kind, ...extra });
+  if (MODELS.lioness) rigs.lioness = await quad(MODELS.lioness, 'quadruped');
+  if (MODELS.horse) rigs.horse = await quad(MODELS.horse, 'quadruped', { seatY: MODELS.horse.seatY, seatZ: MODELS.horse.seatZ });
+  if (MODELS.hound) rigs.hound = await exportRig(ex, instantiate(MODELS.hound), {}, { kind: 'hound' });
+  return rigs;
+}
+
+// ---------------------------------------------------------------- paridade da animação
+// Roteiros de entrada (o `s` que player.js, enemies.js, npcs.js e mount.js entregam) rodados nos
+// próprios animadores da demo, com Math.random fixo em 0,5 e sem câmera (todo quadro anima). Grava a
+// pose de cada nó no fim de cada roteiro e, num dos humanoides, posições de vértices com pele, para o
+// C++ (tests/client/AnimTests.cpp) refazer o mesmo caminho e comparar.
+const DT = 1 / 30;
+const ramp = (n, f) => Array.from({ length: n }, (_, i) => f(i, n));
+function humanScenarios() {
+  const walk = (mps, n, extra = {}) => ramp(n, () => ({ mps, fwd: 1, strafe: 0, ...extra }));
+  return [
+    { name: 'idle_guard', family: 'espada', frames: ramp(45, () => ({ mps: 0 })) },
+    { name: 'idle_fists', family: null, frames: ramp(80, () => ({ mps: 0 })) },
+    { name: 'walk_run', family: 'espada', frames: [...walk(1.8, 30), ...walk(5.6, 30)], yaw: (i) => 0.6 + i * 0.01 },
+    { name: 'strafe_back', family: 'arco', frames: [...ramp(20, () => ({ mps: 2.2, fwd: 0.2, strafe: 0.9 })), ...ramp(20, () => ({ mps: 2.0, fwd: -0.9, strafe: -0.3 }))] },
+    { name: 'slash', family: 'espada', frames: ramp(20, (i, n) => ({ mps: 0, attack: i / (n - 1), kind: 'slash', aimPitch: 0.2 })) },
+    { name: 'swing_walk', family: 'martelo', frames: [...walk(2, 10), ...ramp(16, (i, n) => ({ mps: 2, fwd: 1, attack: i / (n - 1), kind: 'swing' }))] },
+    { name: 'heavy_cast', family: 'tomo_fogo', frames: [...ramp(12, (i, n) => ({ mps: 0, attack: i / (n - 1), kind: 'heavy' })), ...ramp(12, (i, n) => ({ mps: 0, attack: i / (n - 1), kind: 'cast' }))] },
+    { name: 'bow_shot', family: 'arco', frames: ramp(18, (i, n) => ({ mps: 0, attack: i / (n - 1), kind: 'bow' })) },
+    { name: 'dodge_left', family: 'arco', frames: [...ramp(13, (i) => ({ mps: 0, dodge: Math.min(1, (i * DT) / 0.42), dodgeKey: 'dodgeLeft' })), ...ramp(8, () => ({ mps: 0 }))] },
+    { name: 'roll', family: 'espada', frames: [...walk(3, 6), ...ramp(13, (i) => ({ mps: 0, dodge: Math.min(1, (i * DT) / 0.42), dodgeKey: 'roll' }))] },
+    { name: 'hit_walk', family: 'espada', frames: [...walk(2, 12), ...ramp(14, (i) => ({ mps: 2, fwd: 1, hit: { side: 'left', t: i * DT } }))] },
+    { name: 'hit_idle', family: 'espada', frames: ramp(14, (i) => ({ mps: 0, hit: { side: 'back', t: i * DT } })) },
+    { name: 'death_forward', family: 'espada', frames: ramp(40, (i) => ({ mps: 0, death: { fall: 'forward', t: i * DT } })) },
+    { name: 'down', family: 'espada', frames: ramp(30, () => ({ mps: 0, down: true })) },
+    { name: 'crouch_jump', family: 'espada', frames: [...ramp(20, () => ({ mps: 0, crouch: 1 })), ...ramp(10, () => ({ mps: 1.2, fwd: 1, crouch: 1 })), ...ramp(16, (i, n) => ({ mps: 3, fwd: 1, air: { phase: i / (n - 1), boosted: i > 8 } }))] },
+    { name: 'mounted', family: 'lanca', frames: ramp(20, () => ({ mps: 0, mounted: true })) },
+    { name: 'channel_meta', family: null, frames: [...ramp(15, () => ({ mps: 0, channel: true })), ...ramp(15, () => ({ mps: 0, metamorph: true }))] },
+    { name: 'craft', family: 'martelo', frames: ramp(20, () => ({ mps: 0, craft: true })) },
+  ];
+}
+function poseOf(pivot, body, skip = []) {
+  // os nós do molde, na ordem de traverse (sem os suportes das armas que makeHumanoid pendura nas mãos)
+  const nodes = [];
+  const visit = (o) => {
+    if (skip.includes(o)) return;
+    nodes.push([...o.quaternion.toArray(), ...o.position.toArray(), ...o.scale.toArray()].map((v) => +v.toFixed(7)));
+    for (const c of o.children) visit(c);
+  };
+  visit(pivot);
+  const b = [body.rotation.x, body.rotation.y, body.rotation.z, ...body.position.toArray(), ...body.scale.toArray()].map((v) => +v.toFixed(7));
+  return { nodes, body: b };
+}
+function skinSamples(root, pivot, n = 24, skip = []) {
+  root.updateMatrixWorld(true);
+  // a primeira malha com pele do molde e o índice dela entre as malhas do molde (Rig::meshes)
+  let mesh = null, meshIndex = -1, k = 0;
+  const visit = (o) => {
+    if (skip.includes(o)) return;
+    if (o.isMesh) {
+      if (!mesh && o.isSkinnedMesh) { mesh = o; meshIndex = k; }
+      k++;
+    }
+    for (const c of o.children) visit(c);
+  };
+  visit(pivot);
+  if (!mesh) return null;
+  const count = mesh.geometry.attributes.position.count, v = new THREE.Vector3(), out = [];
+  for (let i = 0; i < n; i++) {
+    const idx = Math.floor((i + 0.5) / n * count);
+    mesh.getVertexPosition(idx, v);
+    v.applyMatrix4(mesh.matrixWorld);
+    out.push([idx, +v.x.toFixed(6), +v.y.toFixed(6), +v.z.toFixed(6)]);
+  }
+  return { mesh: meshIndex, vertices: out };
+}
+function exportAnimParity() {
+  const savedRandom = Math.random, savedCam = G.camera;
+  Math.random = () => 0.5;
+  G.camera = null;
+  const X = 40, Z = 375, Y = groundHeight(X, Z);
+  const out = { dt: DT, x: X, y: Y, z: Z, humanoids: [], quadrupeds: [] };
+  try {
+    for (const model of ['kachujin', 'eve', 'paladina']) {
+      if (!MODELS[model]) continue;
+      for (const sc of humanScenarios()) {
+        const race = model === 'eve' ? 'elfo' : model === 'paladina' && sc.name === 'walk_run' ? 'anao' : 'humano';
+        const h = makeHumanoid({ model, race });
+        h.setWeapon(sc.family);
+        h.root.position.set(X, Y, Z);
+        const frames = [];
+        sc.frames.forEach((f, i) => {
+          const yaw = sc.yaw ? sc.yaw(i) : 0.6;
+          h.root.rotation.y = yaw;
+          const s = { dt: DT, attack: -1, dodge: -1, ...f };
+          animateHumanoid(h, s);
+          frames.push({ yaw, s: f });
+        });
+        const rec = { model, race, scenario: sc.name, family: sc.family, frames, pose: poseOf(h.pivot, h.body, [h.gripR, h.gripL]) };
+        if (sc.name === 'walk_run' || sc.name === 'slash') rec.skin = skinSamples(h.root, h.pivot, 24, [h.gripR, h.gripL]);
+        out.humanoids.push(rec);
+      }
+    }
+    const beastScenario = [
+      ...ramp(20, () => ({ mps: 0 })), ...ramp(30, () => ({ mps: 5 })),
+      ...ramp(10, (i, n) => ({ mps: 0, windup: i / (n - 1) })), ...ramp(10, (i, n) => ({ mps: 0, attack: i / (n - 1) })),
+      ...ramp(8, () => ({ mps: 0, stun: true })), ...ramp(12, () => ({ mps: 0, down: true })),
+    ];
+    const quads = [];
+    if (MODELS.lioness) {
+      const saved = MODELS.hound;
+      MODELS.hound = null;
+      quads.push(['lioness', 'beast', makeBeast({ scale: 1.1 })]);
+      MODELS.hound = saved;
+    }
+    if (MODELS.hound) quads.push(['hound', 'beast', makeBeast({ scale: 0.9 })]);
+    if (MODELS.horse) quads.push(['horse', 'mount', makeMount()]);
+    for (const [rig, kind, r] of quads) {
+      r.root.position.set(X, Y, Z);
+      const frames = [];
+      beastScenario.forEach((f, i) => {
+        const yaw = 0.6 + i * 0.02;
+        r.root.rotation.y = yaw;
+        if (kind === 'mount') animateMount(r, { dt: DT, speed: f.mps / 12.5 });
+        else animateBeast(r, { dt: DT, windup: -1, attack: -1, ...f });
+        frames.push({ yaw, s: f });
+      });
+      out.quadrupeds.push({ rig, kind, scale: r.scale, frames, pose: poseOf(r.pivot, r.body), skin: kind === 'mount' ? skinSamples(r.root, r.pivot) : null });
+    }
+  } finally {
+    Math.random = savedRandom;
+    G.camera = savedCam;
+  }
+  return out;
+}
+
 export async function bake(log = () => {}) {
   globalThis.__visRand = mulberry(99);
   Math.random = mulberry(424242);
@@ -438,6 +640,12 @@ export async function bake(log = () => {}) {
   };
   for (const [k, [geo, color]] of Object.entries(variants)) out.templates.projectiles[k] = await template(ex, shot(geo, color));
   log('modelos dinâmicos');
+
+  // ------------------------------------------------ personagens (models.js + characters.js)
+  out.rigs = await exportRigs(ex);
+  out.clipMeta = MODELS.clipMeta;
+  out.animParity = exportAnimParity();
+  log(`personagens: ${Object.keys(out.rigs).join(', ')}`);
 
   out.geometries = ex.geometries;
   out.materials = ex.materials;

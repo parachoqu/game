@@ -153,10 +153,11 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
   const Uint32 atlasBytes = atlasUpload ? static_cast<Uint32>(f.atlas->pixels().size()) : 0;
   const bool packOn = I.pack.loaded && f.pack;
   const Uint32 packInstBytes = packOn ? static_cast<Uint32>(f.pack->instances.size() * sizeof(Instance)) : 0;
+  const Uint32 boneBytes = packOn ? static_cast<Uint32>(f.pack->bones.size() * sizeof(glm::mat4)) : 0;
   const Uint32 starBytes = f.sky ? static_cast<Uint32>(f.sky->stars.size() * sizeof(StarInstance)) : 0;
   const Uint32 lineBytes = f.sky ? static_cast<Uint32>(f.sky->lines.size() * sizeof(ColorVertex)) : 0;
   const Uint32 overlayBytes = f.sky ? static_cast<Uint32>(f.sky->overlay.size() * sizeof(ColorVertex)) : 0;
-  const Uint32 total = instBytes + unlitBytes + uiBytes + atlasBytes + packInstBytes + starBytes + lineBytes + overlayBytes;
+  const Uint32 total = instBytes + unlitBytes + uiBytes + atlasBytes + packInstBytes + boneBytes + starBytes + lineBytes + overlayBytes;
   if (f.atlas && (!I.atlas || I.atlasSize != f.atlas->size())) {
     if (I.atlas) SDL_ReleaseGPUTexture(I.dev, I.atlas);
     I.atlas = I.texture(SDL_GPU_TEXTUREFORMAT_R8_UNORM, SDL_GPU_TEXTUREUSAGE_SAMPLER, f.atlas->size(), f.atlas->size());
@@ -176,6 +177,7 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
     I.ensureDyn(I.unlitVerts, SDL_GPU_BUFFERUSAGE_VERTEX, unlitBytes);
     I.ensureDyn(I.uiVerts, SDL_GPU_BUFFERUSAGE_VERTEX, uiBytes);
     I.ensureDyn(I.pack.frameInst, SDL_GPU_BUFFERUSAGE_VERTEX, packInstBytes);
+    I.ensureDyn(I.pack.bones, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, boneBytes);
     I.ensureDyn(I.skyStars, SDL_GPU_BUFFERUSAGE_VERTEX, starBytes);
     I.ensureDyn(I.skyLines, SDL_GPU_BUFFERUSAGE_VERTEX, lineBytes);
     I.ensureDyn(I.skyOverlay, SDL_GPU_BUFFERUSAGE_VERTEX, overlayBytes);
@@ -191,6 +193,8 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
     off += atlasBytes;
     if (packInstBytes) std::memcpy(dst + off, f.pack->instances.data(), packInstBytes);
     off += packInstBytes;
+    if (boneBytes) std::memcpy(dst + off, f.pack->bones.data(), boneBytes);
+    off += boneBytes;
     if (starBytes) std::memcpy(dst + off, f.sky->stars.data(), starBytes);
     off += starBytes;
     if (lineBytes) std::memcpy(dst + off, f.sky->lines.data(), lineBytes);
@@ -220,6 +224,7 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
     }
     off += atlasBytes;
     up(I.pack.frameInst.buf, packInstBytes);
+    up(I.pack.bones.buf, boneBytes);
     up(I.skyStars.buf, starBytes);
     up(I.skyLines.buf, lineBytes);
     up(I.skyOverlay.buf, overlayBytes);

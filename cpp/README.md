@@ -9,10 +9,13 @@ plano de fases estão em [ARQUITETURA.md](ARQUITETURA.md).
 **Fases 0 a 3 concluídas:** o jogo inteiro da demo roda no servidor, e o cliente (SDL3 + SDL_GPU/Vulkan)
 joga contra ele: andar, correr, pular, mirar, lutar, coletar, morrer e reaparecer.
 
-**Fase 4 em andamento:** o cenário da demo já é o da demo — relevo com as 10 camadas, construções,
-props, vegetação com LOD por instância, água, céu de Preetham com nuvens, estrelas, lua, luz de
-ambiente do HDRI do kit, portal, sacos e projéteis. Faltam os personagens (ainda cápsulas); sombras,
-cobertura do chão e pós-processamento são da fase 7.
+**Fase 4 concluída:** o mundo é o da demo — relevo com as 10 camadas, construções, props, vegetação
+com LOD por instância, água, céu de Preetham com nuvens, estrelas, lua, luz de ambiente do HDRI do
+kit, portal, sacos e projéteis — e os personagens também: os modelos Mixamo (paladina, kachujin, eve),
+a leoa, o cão do vazio e o cavalo, com pele na GPU, os clipes já adaptados pela demo, o mixer do three
+e as camadas procedurais de `characters.js` (inércia, idle vivo, inclinação no declive, esquivas,
+golpes, morte direcional, montado), os tons por facção, as sombras em silhueta e as armas na mão.
+Sombras, cobertura do chão e pós-processamento são da fase 7.
 
 - `rpg_core` (compartilhado por servidor e cliente):
   - dados de design de `config.js`, validados na carga;
@@ -31,10 +34,12 @@ cobertura do chão e pós-processamento são da fase 7.
 - `rpg_client_core` + `rpg_client` (nunca linkam a simulação): sessão pelo protocolo, interpolação
   de snapshots, câmera em terceira pessoa (porte de `updateCamera`), mira, clique para atacar e usar,
   tecla F, HUD (vitais, zona, avisos, ações, carga, mira, derrubado, relatório de derrota), telas de
-  título e criação, textos em pt-BR, relevo e cenário grey-box, telegrafias e partículas.
+  título e criação, textos em pt-BR, telegrafias e partículas; o pacote visual da demo (cenário,
+  céu, personagens animados) e, sem ele, o cenário grey-box da fase 3.
 - `rpg_local`: servidor numa thread + cliente, ligados por `LocalTransport`.
-- **Testes: 92.** Os de paridade repetem 19 roteiros jogados pela própria demo (do boot completo a
-  cada técnica das 18 armas) e exigem o mesmo resultado **bit a bit**, quadro a quadro. Os desvios
+- **Testes: 107** (104 sem GPU). Os de paridade repetem 19 roteiros jogados pela própria demo (do
+  boot completo a cada técnica das 18 armas) e exigem o mesmo resultado **bit a bit**, quadro a
+  quadro; os da animação refazem os roteiros dos animadores da demo e conferem a pose nó a nó. Os desvios
   intencionais estão em [ARQUITETURA.md](ARQUITETURA.md), seção 8. Os do cliente rodam sem janela; os
   que precisam de GPU (`-DRPG_TEST_GPU=ON`) sobem o jogo inteiro fora da tela.
 
@@ -53,7 +58,7 @@ Pré-requisitos:
 - Node ≥ 18, opcional: sem ele, o teste que confere `cpp/data` com a demo não é registrado.
 
 O C++ não precisa dos arquivos do Git LFS: o pacote de mundo da simulação (`assets/sim`, ~4 MB) e o
-pacote visual do cliente (`assets/client`, ~31 MB) já vêm prontos no repositório.
+pacote visual do cliente (`assets/client`, ~41 MB) já vêm prontos no repositório.
 
 ### Linux, com as bibliotecas do sistema
 
@@ -115,6 +120,8 @@ Capturas sem monitor, nos enquadramentos de `demo/captures/after`:
 ```bash
 ./build/dev/apps/local/rpg_local --headless --size 1100x700 --view 02_mercado --screenshot mercado.png
 # vistas: 01_title_screen 02_mercado 03_ponte_principal … 12b_turbulenta_interior 13_vista_elevada_horizonte
+./build/dev/apps/local/rpg_local --headless --size 1100x700 --auto --dev --hide-hud --portrait --frames 64 \
+  --model kachujin --screenshot retrato.png   # o personagem de frente (modelo, pose e arma)
 ```
 
 ### O servidor dedicado
@@ -177,7 +184,15 @@ inteiro, a Turbulenta, os modelos de jogo) e exporta a cena pronta:
   shore), texturas, blocos de relevo, malhas, instâncias, campos de LOD, modelos dinâmicos e o HDRI do kit;
 - `scene.bin`: fluxos comprimidos com o codec do meshoptimizer (sem perdas). O relevo leva só os pesos
   das camadas; a malha é refeita do heightfield e confere por hash com a da demo;
-- `tex/*.webp`: texturas em WebP q95 com alfa sem perdas (`--lossless` grava tudo sem perdas, ~54 MB).
+- `tex/*.webp`: texturas em WebP q95 com alfa sem perdas (`--lossless` grava tudo sem perdas, ~54 MB);
+- os personagens como a demo os deixa prontos (`models.js` + `makeHumanoid`): nós e pose de repouso,
+  malhas com pele (bindMatrix, ossos, inversas), os clipes já adaptados a cada modelo (retarget e
+  contato), a pose ociosa de referência, os ciclos laterais e as empunhaduras das armas. Por isso o C++
+  não lê os GLB (o plano previa fastgltf): o que a demo calcula na carga já vem calculado.
+
+O mesmo script grava `tests/parity/fixtures/anim-parity.json`: roteiros de entrada rodados nos
+animadores da própria demo (`animateHumanoid`, `animateBeast`, `animateMount`), com a pose de cada nó e
+vértices com pele no mundo. `AnimTests` refaz os roteiros em C++ e confere nó a nó.
 
 ```sh
 git lfs pull --include="demo/assets/**"
@@ -187,8 +202,9 @@ node demo/tools/bake-client-scene.mjs --check   # só confere
 ```
 
 Capturas para comparar com a demo: `node demo/tools/capture-reference.mjs DIR` grava os 14
-enquadramentos da demo atual (Chromium com SwiftShader, alguns minutos por enquadramento), e
-`python3 cpp/tools/compare_captures.py DIR shots --out relatorio` compara com as do `rpg_local`.
+enquadramentos da demo atual (Chromium com SwiftShader, alguns minutos por enquadramento; `--only
+portrait` grava o retrato do personagem), e `python3 cpp/tools/compare_captures.py DIR shots --out
+relatorio` compara com as do `rpg_local`.
 
 ## Regras de camada
 

@@ -29,6 +29,7 @@ struct AppOptions {
   std::optional<double> hour;       // força a hora da luz (capturas)
   bool autoStart = false;           // pula título e criação (personagem padrão)
   bool hideHud = false;
+  bool portrait = false;            // câmera de frente para o próprio personagem (capturas da animação)
   bool dev = false;                 // comandos de desenvolvimento (tp, give…)
   double fixedDt = 0;               // passo fixo do cliente (capturas reproduzíveis); 0 = relógio real
   std::string name, origin, start, model;  // personagem do autoStart

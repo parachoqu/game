@@ -175,6 +175,7 @@ ScenePack ScenePack::load(const std::filesystem::path& dir) {
     for (const auto& [k, a] : g.at("attributes").items()) {
       PackAttribute att;
       att.normalizedU8 = a.at("type").get<std::string>() == "u8n";
+      att.u16 = a.at("type").get<std::string>() == "u16";
       att.size = a.at("size").get<int>();
       att.stream = stream(a);
       geo.attributes[k] = att;
@@ -261,6 +262,78 @@ ScenePack ScenePack::load(const std::filesystem::path& dir) {
       P.templates[k] = draws(v);
     }
   }
+  if (J.contains("rigs")) {
+    const auto vec3 = [](const json& j) { return glm::vec3(j.at(0).get<float>(), j.at(1).get<float>(), j.at(2).get<float>()); };
+    const auto vec4 = [](const json& j) { return glm::vec4(j.at(0).get<float>(), j.at(1).get<float>(), j.at(2).get<float>(), j.at(3).get<float>()); };
+    for (const auto& [id, r] : J.at("rigs").items()) {
+      PackRig rig;
+      rig.kind = r.at("kind").get<std::string>();
+      for (const auto& n : r.at("nodes")) {
+        rig.names.push_back(n.at("name").get<std::string>());
+        rig.parent.push_back(n.at("parent").get<int>());
+        rig.bone.push_back(n.at("bone").get<bool>());
+      }
+      rig.rest = stream(r.at("rest"));
+      for (const auto& m : r.at("meshes")) {
+        PackRigMesh mesh;
+        mesh.node = m.at("node").get<int>();
+        mesh.geometry = m.at("geometry").get<int>();
+        mesh.material = m.at("material").get<int>();
+        mesh.skinned = m.at("skinned").get<bool>();
+        if (mesh.skinned) {
+          mesh.bindMatrix = stream(m.at("bindMatrix"));
+          mesh.boneInverses = stream(m.at("boneInverses"));
+          mesh.bones = m.at("bones").get<std::vector<int>>();
+        }
+        rig.meshes.push_back(std::move(mesh));
+      }
+      for (const auto& [key, c] : r.at("clips").items()) {
+        PackClip clip;
+        clip.duration = c.at("duration").get<double>();
+        for (const auto& t : c.at("tracks")) {
+          PackTrack tr;
+          tr.node = t.at("node").get<int>();
+          const std::string path = t.at("path").get<std::string>();
+          tr.path = path == "position" ? PackTrack::Path::Position : path == "quaternion" ? PackTrack::Path::Quaternion
+                  : path == "scale" ? PackTrack::Path::Scale : PackTrack::Path::Other;
+          tr.count = t.at("count").get<std::uint32_t>();
+          tr.size = t.at("size").get<std::uint32_t>();
+          tr.step = t.at("interp").get<std::string>() == "step";
+          tr.times = stream(t.at("times"));
+          tr.values = stream(t.at("values"));
+          clip.tracks.push_back(tr);
+        }
+        rig.clips[key] = std::move(clip);
+      }
+      if (r.contains("clipOrder")) rig.clipOrder = r.at("clipOrder").get<std::vector<std::string>>();
+      else for (const auto& [key, c] : rig.clips) rig.clipOrder.push_back(key);
+      rig.hipsY = r.value("hipsY", 0.0);
+      rig.hipsBase = r.value("hipsBase", 0.0);
+      rig.height = r.value("height", 0.0);
+      rig.seatY = r.value("seatY", 0.0);
+      rig.seatZ = r.value("seatZ", 0.0);
+      if (r.contains("idleRef"))
+        for (const auto& [k, q] : r.at("idleRef").items()) rig.idleRef[k] = vec4(q);
+      if (r.contains("cycle"))
+        for (const auto& [k, c] : r.at("cycle").items()) rig.cycle[k] = {c.at("dur").get<double>(), c.at("off").get<double>(), c.at("speed").get<double>()};
+      if (r.contains("grips")) {
+        const auto grip = [&](const json& g) { return PackGrip{g.at("bone").get<std::string>(), vec3(g.at("t")), vec3(g.at("s")), vec4(g.at("r"))}; };
+        rig.gripR = grip(r.at("grips").at("R"));
+        rig.gripL = grip(r.at("grips").at("L"));
+      }
+      P.rigs[id] = std::move(rig);
+    }
+  }
+  if (J.contains("clipMeta") && J.at("clipMeta").is_object()) {
+    for (const auto& [key, m] : J.at("clipMeta").items()) {
+      PackClipMeta meta;
+      meta.contactMode = m.value("contactMode", std::string{"none"});
+      meta.locomotionMode = m.value("locomotionMode", std::string{"oneshot"});
+      meta.group = m.value("group", std::string{});
+      if (m.contains("motion") && m.at("motion").is_array()) meta.motion = std::array<double, 2>{m.at("motion").at(0).get<double>(), m.at("motion").at(1).get<double>()};
+      P.clipMeta[key] = meta;
+    }
+  }
   return P;
 }
 
@@ -290,6 +363,13 @@ std::vector<std::uint32_t> ScenePack::decodeIndices(const PackStream& s) const {
   return out;
 }
 
+std::vector<float> ScenePack::floats(const PackStream& s) const {
+  const std::vector<std::uint8_t> raw = decodeVertices(s);
+  std::vector<float> out(raw.size() / sizeof(float));
+  std::memcpy(out.data(), raw.data(), out.size() * sizeof(float));
+  return out;
+}
+
 std::vector<float> ScenePack::attributeFloats(const PackGeometry& g, std::string_view name) const {
   const auto it = g.attributes.find(name);
   if (it == g.attributes.end()) return {};
@@ -298,6 +378,12 @@ std::vector<float> ScenePack::attributeFloats(const PackGeometry& g, std::string
   std::vector<float> out(static_cast<std::size_t>(g.count) * static_cast<std::size_t>(a.size));
   if (a.normalizedU8) {
     for (std::size_t i = 0; i < out.size(); ++i) out[i] = static_cast<float>(raw[i]) / 255.0f;
+  } else if (a.u16) {
+    for (std::size_t i = 0; i < out.size(); ++i) {
+      std::uint16_t v = 0;
+      std::memcpy(&v, &raw[i * 2], 2);
+      out[i] = static_cast<float>(v);
+    }
   } else {
     std::memcpy(out.data(), raw.data(), out.size() * sizeof(float));
   }

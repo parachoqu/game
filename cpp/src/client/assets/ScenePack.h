@@ -41,7 +41,8 @@ struct PackStream {
 };
 
 struct PackAttribute {
-  bool normalizedU8 = false;  // u8 normalizado; senão float32
+  bool normalizedU8 = false;  // u8 normalizado
+  bool u16 = false;           // inteiro de 16 bits (skinIndex); senão float32
   int size = 3;               // componentes
   PackStream stream;
 };
@@ -151,6 +152,52 @@ struct PackModel {
   std::vector<PackDraw> parts;     // matrizes relativas à raiz do modelo
 };
 
+// ---------------------------------------------------------------- personagens (models.js)
+// Trilha de um clipe já adaptado ao modelo: nó do esqueleto, propriedade e quadros-chave.
+struct PackTrack {
+  int node = -1;
+  enum class Path : std::uint8_t { Position, Quaternion, Scale, Other } path = Path::Other;
+  std::uint32_t count = 0, size = 0;
+  bool step = false;
+  PackStream times, values;
+};
+struct PackClip {
+  double duration = 0;
+  std::vector<PackTrack> tracks;
+};
+struct PackRigMesh {
+  int node = -1, geometry = -1, material = -1;
+  bool skinned = false;
+  PackStream bindMatrix, boneInverses;
+  std::vector<int> bones;  // nós dos ossos, na ordem do esqueleto
+};
+struct PackGrip {  // suporte da arma preso ao osso da mão (characters.js `grip`)
+  std::string bone;
+  glm::vec3 t{0.0f}, s{1.0f};
+  glm::vec4 r{0, 0, 0, 1};  // x, y, z, w (ordem do three)
+};
+struct PackCycle {
+  double dur = 0, off = 0, speed = 0;
+};
+struct PackRig {
+  std::string kind;  // humanoid, quadruped, hound
+  std::vector<std::string> names;
+  std::vector<int> parent;
+  std::vector<bool> bone;
+  PackStream rest;  // por nó: posição (3), quaternion xyzw (4), escala (3)
+  std::vector<PackRigMesh> meshes;
+  std::map<std::string, PackClip, std::less<>> clips;
+  std::vector<std::string> clipOrder;  // ordem em que o mixer da demo ativa as ações
+  double hipsY = 0, hipsBase = 0, height = 0, seatY = 0, seatZ = 0;
+  std::map<std::string, glm::vec4, std::less<>> idleRef;  // pose ociosa dos ossos ampliados
+  std::map<std::string, PackCycle, std::less<>> cycle;
+  std::optional<PackGrip> gripR, gripL;
+};
+struct PackClipMeta {
+  std::string contactMode, locomotionMode, group;
+  std::optional<std::array<double, 2>> motion;  // janela de deslocamento do quadril (esquivas)
+};
+
 // HDRI reduzido do kit de natureza (RGBE em WebP) e as cores dominantes dele (kit-manifest.json).
 struct PackEnvironment {
   bool present = false;
@@ -178,6 +225,8 @@ struct ScenePack {
   std::map<std::string, std::vector<PackDraw>, std::less<>> weapons;    // família (":sombra" = brilho das sombras)
   std::map<std::string, std::vector<PackDraw>, std::less<>> projectiles;  // "arrow:player", "bolt", "spell:ice"…
   PackEnvironment environment;
+  std::map<std::string, PackRig, std::less<>> rigs;
+  std::map<std::string, PackClipMeta, std::less<>> clipMeta;
 
   // Lê scene.json + scene.bin (confere o tamanho). Lança std::runtime_error com o motivo.
   static ScenePack load(const std::filesystem::path& dir);
@@ -187,6 +236,7 @@ struct ScenePack {
   std::vector<std::uint32_t> decodeIndices(const PackStream& s) const;
   // Atributo como floats (u8 normalizado vira [0, 1]).
   std::vector<float> attributeFloats(const PackGeometry& g, std::string_view name) const;
+  std::vector<float> floats(const PackStream& s) const;  // fluxo de floats (trilhas, pose de repouso)
 };
 
 // Malha de um bloco de relevo refeita do heightfield (scene-world.js `tileGeometry`): posições,

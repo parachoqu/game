@@ -522,3 +522,51 @@ a vegetação de verdade entram na fase 4.
 | a UI pausa a simulação (`G.uiOpen`) | o painel manda `kHeldUiOpen` no comando; só o jogo local pausa (`ReqPause`) | servidor autoritativo |
 | o cursor sai da mira pelo Pointer Lock do navegador (e o Esc solta) | modo relativo da SDL enquanto o botão direito está apertado | mesmo efeito, sem o navegador |
 | Ctrl+W fecha a aba (keyguard.js) | não existe | app nativo |
+
+## 10. O cliente com o pacote visual da demo (fase 4)
+
+### Pacote visual em vez de carregadores próprios
+
+Em vez de portar as ~4.000 linhas que montam a cena (`world/*`, `engine/props.js`,
+`engine/textures.js`, `engine/models.js`), `demo/tools/bake-client-scene.mjs` roda essa montagem no
+Chromium e grava `cpp/assets/client`: geometrias, materiais com os recursos de `patchMaterial`,
+texturas, relevo (só os pesos das camadas; a malha sai do heightfield e confere por hash), cenário,
+instâncias, campos de LOD, modelos de jogo e os personagens prontos (pose de repouso, pele, clipes já
+adaptados a cada modelo, empunhaduras). O C++ não lê GLB nem gera texturas procedurais.
+
+### Render
+
+- `world/PackScene`: um buffer de vértices para tudo; `WorldView` porta `updateWorldDetail` e
+  `updateLODFields` (nível por instância com histerese de 3 m).
+- `surface.frag`/`terrain.frag`/`pbr.glsl`: o `MeshStandardMaterial` do three r185 (GGX
+  multiespalhamento com a tabela DFG copiada do three), Lambert e Basic, os recursos tri, occ, splat,
+  wind, grass, water e shore, e névoa exponencial.
+- Céu: Preetham com nuvens, a cúpula da Turbulenta, estrelas, constelações, lua e o anel do portal.
+- Personagens (`client/anim`, `client/entities`): `Rig` (nós, pele, clipes), `Mixer` (o
+  `AnimationMixer` do three: ações na ordem de ativação, LoopRepeat, acúmulo por peso e o resto até 1
+  completado com a pose original), `HumanoidAnimator` e `QuadrupedAnimator` (portes linha a linha de
+  `animateHumanoid`, `postura`, `animateBeast`, `animateHound`, `animateMount`), `CharacterViews`
+  (uma vista por entidade replicada: monta o `s` de player.js, enemies.js, npcs.js e mount.js,
+  escolhe molde, tom e arma) e `skinned.vert` (paleta de ossos num storage buffer por quadro, normais
+  como o `skinnormal_vertex` do three).
+
+### Paridade
+
+`tests/parity/fixtures/anim-parity.json` sai do mesmo bake: roteiros de entrada (parado com e sem
+arma, andar e correr, de lado e para trás, golpes, arco, esquiva, rolamento, impacto, morte, derrubado,
+agachar e pular, montado, canalização, metamorfose, fabricação) rodados nos animadores da demo com
+`Math.random` fixo. `AnimTests` refaz cada roteiro nos três humanoides e nos três quadrúpedes e exige a
+mesma pose em cada nó (até 2·10⁻³ rad), o mesmo corpo e os mesmos vértices com pele no mundo (até
+2 mm).
+
+### Desvios e particularidades
+
+| Demo | Cliente C++ | Por quê |
+|---|---|---|
+| GLB carregados e preparados na hora (`models.js`) | o bake grava o resultado; o plano previa fastgltf | o que a demo calcula na carga já vem pronto, e igual |
+| texturas procedurais em canvas, PNG/JPEG embutidos | WebP q95 com alfa sem perdas (imagens embutidas: os bytes originais) | ~20 MB em vez de ~54 MB; `--lossless` grava sem perdas |
+| PMREM do three para o reflexo do ambiente | harmônicos esféricos (difusa) + equirretangular com mip por rugosidade | aproximação mais simples do PMREM: a difusa é a mesma, o reflexo fica um pouco diferente |
+| o equirretangular do IBL sobe com `flipY = false` (de cabeça para baixo) | reproduzido | paridade |
+| `P.aimT` nunca sai de 0 (a pose de mira com arco não aparece) | reproduzido (`aim = 0`) | paridade |
+| `quadruped()` guarda só a rotação da pose base, e o primeiro `mixerStep` zera a posição de Spine1, Spine2, Head e Jaw da leoa | reproduzido | paridade (a leoa só aparece sem o modelo do cão do vazio) |
+| sombras, GTAO, bloom e cobertura do chão | fase 7 | |

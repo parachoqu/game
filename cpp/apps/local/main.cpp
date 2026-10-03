@@ -4,12 +4,13 @@
 //   rpg_local [--data DIR] [--sim DIR] [--assets DIR] [--size WxH] [--fullscreen] [--no-vsync]
 //             [--seed S] [--dev] [--net-sim latency:MS,jitter:MS,loss:PCT]
 //             [--auto] [--name N] [--origin O] [--start S] [--model M]
-//             [--view NOME] [--hour H] [--hide-hud] [--frames N] [--screenshot ARQ.png] [--headless]
+//             [--view NOME] [--hour H] [--hide-hud] [--portrait] [--frames N] [--screenshot ARQ.png] [--headless]
 //
 //   --auto         pula título e criação (personagem padrão)
 //   --view NOME    enquadramento das capturas da demo (02_mercado … 13_vista_elevada_horizonte,
 //                  01_title_screen); liga --auto, --dev e esconde o HUD
 //   --frames N     sai depois de N quadros de jogo (com --screenshot, grava o último)
+//   --portrait     câmera de frente para o próprio personagem (conferir modelo e animação)
 //   --headless     sem janela: desenha fora da tela (captura e testes em CI)
 #include <atomic>
 #include <charconv>
@@ -69,7 +70,7 @@ int usage() {
   std::fprintf(stderr,
                "uso: rpg_local [--data DIR] [--sim DIR] [--assets DIR] [--size WxH] [--fullscreen] [--no-vsync] [--seed S]\n"
                "                [--dev] [--net-sim latency:MS,jitter:MS,loss:PCT] [--auto] [--name N] [--origin O]\n"
-               "                [--start S] [--model M] [--view NOME] [--hour H] [--hide-hud] [--frames N]\n"
+               "                [--start S] [--model M] [--view NOME] [--hour H] [--hide-hud] [--portrait] [--frames N]\n"
                "                [--screenshot ARQ.png] [--headless]\n");
   return 2;
 }
@@ -112,6 +113,7 @@ int main(int argc, char** argv) {
       if (!parseNumber(std::string_view(argv[++i]), h)) return usage();
       opt.hour = h;
     } else if (a == "--hide-hud") opt.hideHud = true;
+    else if (a == "--portrait") opt.portrait = true;
     else if (a == "--frames" && v && parseNumber(std::string_view(argv[++i]), opt.frames)) {}
     else if (a == "--screenshot" && v) opt.screenshot = rpg::pathFromUtf8(argv[++i]);
     else if (a == "--headless") opt.headless = true;
