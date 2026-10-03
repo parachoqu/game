@@ -31,6 +31,7 @@ struct AppOptions {
   bool hideHud = false;
   bool portrait = false;            // câmera de frente para o próprio personagem (capturas da animação)
   bool dev = false;                 // comandos de desenvolvimento (tp, give…)
+  bool debugUi = false;             // abre as ferramentas de depuração (F3) já no começo
   double fixedDt = 0;               // passo fixo do cliente (capturas reproduzíveis); 0 = relógio real
   std::string name, origin, start, model;  // personagem do autoStart
 };

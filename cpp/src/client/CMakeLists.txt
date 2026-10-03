@@ -57,5 +57,8 @@ add_library(rpg_client STATIC
   render/RendererRml.cpp
   app/ClientApp.cpp
 )
-target_link_libraries(rpg_client PUBLIC rpg_client_core rpg_shaders SDL3::SDL3)
+if(TARGET rpg_imgui AND RPG_FETCH_DEPS)
+  target_sources(rpg_client PRIVATE app/DebugTools.cpp)
+endif()
+target_link_libraries(rpg_client PUBLIC rpg_client_core rpg_shaders SDL3::SDL3 rpg_imgui)
 rpg_set_warnings(rpg_client)

@@ -69,7 +69,7 @@ bool parseNetSim(std::string_view s, rpg::net::NetSim& out) {
 int usage() {
   std::fprintf(stderr,
                "uso: rpg_local [--data DIR] [--sim DIR] [--assets DIR] [--size WxH] [--fullscreen] [--no-vsync] [--seed S]\n"
-               "                [--dev] [--net-sim latency:MS,jitter:MS,loss:PCT] [--auto] [--name N] [--origin O]\n"
+               "                [--dev] [--debug-ui] [--net-sim latency:MS,jitter:MS,loss:PCT] [--auto] [--name N] [--origin O]\n"
                "                [--start S] [--model M] [--view NOME] [--hour H] [--hide-hud] [--portrait] [--frames N]\n"
                "                [--screenshot ARQ.png] [--headless]\n");
   return 2;
@@ -100,6 +100,7 @@ int main(int argc, char** argv) {
     else if (a == "--no-vsync") opt.vsync = false;
     else if (a == "--seed" && v && parseNumber(std::string_view(argv[++i]), cfg.seed)) {}
     else if (a == "--dev") opt.dev = cfg.devCommands = true;
+    else if (a == "--debug-ui") opt.dev = cfg.devCommands = opt.debugUi = true;
     else if (a == "--net-sim" && v) {
       if (!parseNetSim(argv[++i], netSim)) return usage();
     } else if (a == "--auto") opt.autoStart = true;

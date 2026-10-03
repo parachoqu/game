@@ -17,6 +17,16 @@ e as camadas procedurais de `characters.js` (inércia, idle vivo, inclinação n
 golpes, morte direcional, montado), os tons por facção, as sombras em silhueta e as armas na mão.
 Sombras, cobertura do chão e pós-processamento são da fase 7.
 
+**Fase 5 concluída:** a interface é a da demo, em RmlUi desenhado pelo próprio renderizador
+(SDL_GPU): `index.html` + `styles.css` viraram `assets/ui/game.rml` + `game.rcss` com os mesmos ids
+e classes, e `ui/*.js` virou `GameUi` — carregamento com as fases de `main.js`, título, criação, o
+HUD inteiro (minimapa rasterizado do mundo, avisos, barra de ações, mira…), os 16 painéis de
+serviço (mercado, bancada, instrutor, armazém, estábulo, quadro, canteiro, astrônoma, viajante,
+carga, portal, derrota, as quatro perguntas, inventário, intenções, pausa), o menu (Tab), o Livro e
+o mapa completo. Cada botão vira um `Request` que o servidor confere. Com `--dev`, F3 abre as
+ferramentas de depuração (Dear ImGui): tempo de quadro, estado do jogador, câmera livre nos
+enquadramentos e os comandos de desenvolvimento.
+
 - `rpg_core` (compartilhado por servidor e cliente):
   - dados de design de `config.js`, validados na carga;
   - mundo estático com paridade exata com a demo: relevo escavado pelo rio, pontes, água, biomas,
@@ -33,9 +43,9 @@ Sombras, cobertura do chão e pós-processamento são da fase 7.
   destinatário e bots.
 - `rpg_client_core` + `rpg_client` (nunca linkam a simulação): sessão pelo protocolo, interpolação
   de snapshots, câmera em terceira pessoa (porte de `updateCamera`), mira, clique para atacar e usar,
-  tecla F, HUD (vitais, zona, avisos, ações, carga, mira, derrubado, relatório de derrota), telas de
-  título e criação, textos em pt-BR, telegrafias e partículas; o pacote visual da demo (cenário,
-  céu, personagens animados) e, sem ele, o cenário grey-box da fase 3.
+  tecla F, a interface da demo em RmlUi (telas, HUD, painéis, menu, Livro, mapas), textos em pt-BR,
+  telegrafias e partículas; o pacote visual da demo (cenário, céu, personagens animados) e, sem ele,
+  o cenário grey-box da fase 3.
 - `rpg_local`: servidor numa thread + cliente, ligados por `LocalTransport`.
 - **Testes: 107** (104 sem GPU). Os de paridade repetem 19 roteiros jogados pela própria demo (do
   boot completo a cada técnica das 18 armas) e exigem o mesmo resultado **bit a bit**, quadro a
@@ -113,13 +123,16 @@ Outros presets:
 Controles da demo: WASD anda (Shift corre, Ctrl agacha), Espaço pula (Shift+Espaço: salto
 impulsionado), botão direito mira (o clique dispara), clique esquerdo ataca ou usa o que está sob o
 cursor e arrastar o chão gira a câmera, Q/E técnicas, C esquiva, 1 poção, F interage, R montaria,
-V troca o ombro, Tab+1/2/3 a distância da câmera, Esc pausa.
+V troca o ombro, Tab+1/2/3 a distância da câmera, Tab (ao soltar) abre o menu, I inventário, B o
+Livro, J intenções, M amplia o minimapa, Esc fecha o painel aberto ou pausa. Com `--dev`, F3 abre as
+ferramentas de depuração (`--debug-ui` já as abre no começo).
 
 Capturas sem monitor, nos enquadramentos de `demo/captures/after`:
 
 ```bash
 ./build/dev/apps/local/rpg_local --headless --size 1100x700 --view 02_mercado --screenshot mercado.png
 # vistas: 01_title_screen 02_mercado 03_ponte_principal … 12b_turbulenta_interior 13_vista_elevada_horizonte
+# interface: 01b_create_screen, 14_hud (intenções), 15_inventario, 16_livro, 17_mapa
 ./build/dev/apps/local/rpg_local --headless --size 1100x700 --auto --dev --hide-hud --portrait --frames 64 \
   --model kachujin --screenshot retrato.png   # o personagem de frente (modelo, pose e arma)
 ```

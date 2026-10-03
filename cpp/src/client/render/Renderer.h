@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <SDL3/SDL_gpu.h>
 #include <glm/glm.hpp>
 
 #include "client/assets/EnvironmentMap.h"
@@ -72,6 +73,9 @@ class Renderer {
     const UiBatch* ui = nullptr;
     FontAtlas* atlas = nullptr;
     const RmlRender* rml = nullptr;  // interface RmlUi (por cima de tudo)
+    // Desenho extra por cima de tudo (ferramentas de depuração): recebe o buffer de comandos e a
+    // textura de saída, fora de qualquer passe.
+    std::function<void(SDL_GPUCommandBuffer*, SDL_GPUTexture*)> overlay;
     float exposure = 1.0f;
   };
   // Desenha um quadro. `capture`: grava a saída em PNG (espera a GPU terminar).
@@ -81,6 +85,8 @@ class Renderer {
   int height() const { return outH_; }
   const FrameStats& stats() const { return stats_; }
   const char* driver() const;
+  SDL_GPUDevice* device() const;
+  static SDL_GPUTextureFormat outputFormat();  // formato da textura de saída (o que o overlay desenha)
 
  private:
   struct Impl;

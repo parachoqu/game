@@ -95,6 +95,12 @@ jobs:
             frames=30; [ "$v" = 01_title_screen ] && frames=90
             ./build/ci/apps/local/rpg_local --headless --size 1100x700 --view "$v" --frames "$frames" --screenshot "shots/$v.png"
           done
+          # a interface em RmlUi: criação, HUD com as intenções, inventário, Livro e mapa
+          for v in 01b_create_screen 14_hud 15_inventario 16_livro 17_mapa; do
+            ./build/ci/apps/local/rpg_local --headless --size 1100x700 --view "$v" --frames 60 --screenshot "shots/$v.png"
+          done
+          # ferramentas de depuração (Dear ImGui) numa janela de verdade
+          xvfb-run -a -s "-screen 0 1280x800x24" ./build/ci/apps/local/rpg_local --size 1100x700 --auto --debug-ui --frames 60 --screenshot shots/depuracao.png
           # o personagem de frente (modelo com pele, pose ociosa, arma na mão), como o retrato de capture-reference.mjs
           ./build/ci/apps/local/rpg_local --headless --size 1100x700 --auto --dev --hide-hud --portrait --hour 12 --frames 64 --screenshot shots/portrait.png
       - uses: actions/upload-artifact@v4

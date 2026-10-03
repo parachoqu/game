@@ -105,6 +105,7 @@ void Platform::pump(InputState& in) {
   }
   SDL_Event e;
   while (SDL_PollEvent(&e)) {
+    if (hook_) hook_(e);
     switch (e.type) {
       case SDL_EVENT_QUIT:
       case SDL_EVENT_WINDOW_CLOSE_REQUESTED: in.quit = true; break;

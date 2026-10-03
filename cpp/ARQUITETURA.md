@@ -570,3 +570,46 @@ mesma pose em cada nó (até 2·10⁻³ rad), o mesmo corpo e os mesmos vértice
 | `P.aimT` nunca sai de 0 (a pose de mira com arco não aparece) | reproduzido (`aim = 0`) | paridade |
 | `quadruped()` guarda só a rotação da pose base, e o primeiro `mixerStep` zera a posição de Spine1, Spine2, Head e Jaw da leoa | reproduzido | paridade (a leoa só aparece sem o modelo do cão do vazio) |
 | sombras, GTAO, bloom e cobertura do chão | fase 7 | |
+
+## 11. A interface (fase 5)
+
+### RmlUi gravado, desenhado pelo renderizador
+
+- O RmlUi 6.3 faz o layout e o estilo; nada dele desenha direto. `ui/RmlRender` implementa a
+  `RenderInterface` inteira gravando comandos (geometria, texturas, gradientes, filtros, camadas,
+  máscaras de recorte). `render/RendererRml.cpp` reproduz a gravação depois da cena, sobre a mesma
+  textura de saída: pilha de camadas, recorte por stencil, opacidade, blur, sombra, matriz de cor,
+  máscara, gradientes linear/radial/cônico e `SaveLayerAsTexture` (o box-shadow do RmlUi).
+- `ui/` continua sem SDL: o RmlUi, o documento e a lógica da interface ficam em `rpg_client_core`.
+- `assets/ui/game.rml` e `game.rcss` são o porte de `index.html` e `styles.css`, com os mesmos ids e
+  classes; `GameUi` (telas, `GameHud`, `GamePanels`, `GameBook`) mexe no documento como os módulos
+  `ui/*.js` mexem no DOM, e os botões viram `Request`s (o servidor confere distância, moedas,
+  capacidade e combate). Os textos fixos dos painéis ficam no código da interface, como em
+  `panels.js`; os de regra e dados continuam em `data/text`, e os do Livro em `book.json` (modelos)
+  com `BookText` montando as partes que `book.js` montava em código.
+- `ui/WorldMap` rasteriza `map.js` em C++ (relevo, água, biomas, tinta das zonas, estradas pelo
+  risco, marcadores) em texturas dinâmicas (`dyn:minimap`, `dyn:fullmap`); os nomes dos lugares são
+  texto do documento por cima da imagem.
+- `core/rules/Economy.h`: preço de venda, reparo e pagamento do canteiro, compartilhados pelo
+  servidor e pelos painéis. O conteúdo do saco aberto chega por `EvLootView`.
+- Ferramentas de depuração: Dear ImGui com os backends SDL3 e SDL_GPU (`app/DebugTools`), desenhadas
+  como overlay do renderizador.
+
+### Desvios do HTML/CSS para RML/RCSS
+
+| Demo (navegador) | RmlUi | Como ficou |
+|---|---|---|
+| `grid`, `var()`, `calc()`, `clamp()`, `::before`/`::after`, `clip-path`, `ch` | não existem | flex, valores resolvidos, elementos reais (cantos, fitas), retângulos, px |
+| `rgba()` com alfa 0–1 | alfa 0–255 | convertido |
+| `text-shadow` | `font-effect: shadow/glow/outline` | equivalente aproximado |
+| `display: none !important` em `[hidden]` | sem `!important` | o atributo vira propriedade local (`UiSystem::setHidden`) |
+| `text-transform: uppercase` sobe letras acentuadas | só ASCII | `UiSystem` sobe o Latin-1 depois do estilo |
+| texto solto num contêiner flex vira item anônimo | é descartado | `UiSystem` o embrulha num elemento |
+| `max-width: %` num item flex | resolvido contra tamanho indefinido | removido onde quebrava (avisos) |
+| sombras externas grandes (`0 30px 80px`) | a camada da sombra é do tamanho da janela | sombras menores nos painéis altos e nenhuma no formulário de criação |
+| canvas 2D do minimapa e do mapa | — | rasterizador próprio (`WorldMap`) |
+| ruído SVG (`feTurbulence`) do grão | — | textura `dyn:grain` gerada |
+| rebites em `radial-gradient` repetido | — | decorador `rivets()` |
+| tela cheia com teclado protegido (pausa) | app nativo | removido (Ctrl+W não fecha nada) |
+| `Trilhas & Estilos` compara o objeto da arma com chaves (nunca acerta) | — | compara a chave do item: mostra a arma, a armadura e a afinidade de verdade |
+

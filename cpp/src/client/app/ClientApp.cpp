@@ -1,8 +1,11 @@
 #include "client/app/ClientApp.h"
 
+#include <SDL3/SDL_events.h>
+
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <format>
 #include <map>
 #include <random>
 
@@ -11,6 +14,9 @@
 #include "client/ClientWorld.h"
 #include "client/Input.h"
 #include "client/Presentation.h"
+#ifdef RPG_HAS_IMGUI
+#include "client/app/DebugTools.h"
+#endif
 #include "client/assets/EnvironmentMap.h"
 #include "client/assets/Image.h"
 #include "client/assets/ScenePack.h"
@@ -102,6 +108,11 @@ struct ClientApp::Impl {
   ThirdPersonCamera cam;
   CommandBuilder commands;
   Hud hud;
+#ifdef RPG_HAS_IMGUI
+  std::unique_ptr<DebugTools> debug;  // F3 com --dev
+#endif
+  std::optional<std::pair<glm::dvec3, glm::dvec3>> debugView;
+  double frameMs = 16, fps = 60;
   std::unique_ptr<UiSystem> rmlUi;  // index.html da demo em RmlUi (assets/ui)
   std::unique_ptr<GameUi> gameUi;
   CreationForm form;
@@ -154,6 +165,13 @@ struct ClientApp::Impl {
     rmlUi = std::make_unique<UiSystem>(UiSystem::Options{opt.assetsDir / "ui", opt.assetsDir / "fonts", opt.width, opt.height});
     gameUi = std::make_unique<GameUi>(*rmlUi, L, data, look);
     // main.js PHASES: as mesmas fases e pesos da barra
+#ifdef RPG_HAS_IMGUI
+    if (opt.dev && !platform.headless()) {
+      debug = std::make_unique<DebugTools>(platform.window(), renderer.device(), Renderer::outputFormat());
+      platform.setEventHook([this](const SDL_Event& e) { debug->event(e); });
+      if (opt.debugUi) debug->toggle();
+    }
+#endif
     gameUi->setBootPhases({{"texturas", 0.28}, {"modelos", 0.18}, {"mundo", 0.26}, {"construções e floresta", 0.14}, {"sombreadores", 0.14}});
   }
 
@@ -392,6 +410,9 @@ struct ClientApp::Impl {
       fx.toast(L.ui(cam.shoulder() > 0 ? "hud.camera.right" : "hud.camera.left"), proto::ToastKind::Info, 1.6);
     }
     if (in.hit(Key::M) && !uiOpen()) gameUi->toggleMinimap();
+#ifdef RPG_HAS_IMGUI
+    if (debug && in.hit(Key::F3)) debug->toggle();
+#endif
     if (opt.dev && in.hit(Key::F12)) session.send(proto::Request{proto::ReqDev{proto::DevCommand::Night, 0, 0, 0}});
   }
 
@@ -502,6 +523,7 @@ struct ClientApp::Impl {
       const glm::dvec3 at(me->x, me->y + 1.0, me->z), dir(std::sin(me->yaw), 0, std::cos(me->yaw));
       cam.setFreeCam(std::make_pair(at + dir * 3.4 + glm::dvec3(0, 0.5, 0), at));
     }
+    if (debugView && !view) cam.setFreeCam(debugView);
     const StaticMap& map = mapOf(mapKind);
     cam.view().aspect = static_cast<double>(std::max(1, in.width)) / std::max(1, in.height);
     cam.update(dt, snapCamera, subj, in, uiOpen, map);
@@ -606,7 +628,45 @@ struct ClientApp::Impl {
       cam.setSkyDirection(std::nullopt);
       gameUi->caption({});
     }
-    const bool clickOnUi = act != Hud::Action::None || hud.blocks(in.mouseX, in.mouseY) || rmlUi->wantsMouse();
+    bool debugMouse = false;
+#ifdef RPG_HAS_IMGUI
+    if (debug) {
+      DebugTools::Info di;
+      di.frameMs = frameMs;
+      di.fps = fps;
+      di.drawCalls = renderer.stats().drawCalls;
+      di.instances = renderer.stats().instances;
+      di.x = me->x, di.y = me->y, di.z = me->z, di.yaw = me->yaw;
+      di.map = mapKind == MapKind::Turbulent ? "Turbulenta" : "Região";
+      static const char* states[] = {"livre", "ataque", "técnica", "esquiva", "atordoado", "canalizando", "derrubado", "morto"};
+      di.state = P->state < 8 ? states[P->state] : "?";
+      di.zone = L.zone(static_cast<ZoneKind>(P->zone));
+      di.place = L.place(static_cast<PlaceId>(P->place));
+      if (const auto* Wd = world.world()) {
+        const ClockTime c = clockAt(Wd->time, ClockConfig{});
+        di.clock = std::format("Dia {} · {:.1f}h", c.day, c.hour);
+      }
+      di.hp = P->hp, di.maxHp = P->maxHp, di.vigor = P->vigor, di.coins = P->coins;
+      di.entities = static_cast<int>(world.entities().size());
+      di.freeCam = debugView.has_value();
+      std::vector<std::string> names;
+      for (const ViewDef& v : kViews) names.emplace_back(v.name);
+      const DebugTools::Output o = debug->frame(di, names);
+      for (const proto::Request& r : o.requests) session.send(r);
+      if (o.toggleFreeCam) {
+        if (debugView) debugView.reset(), cam.setFreeCam(std::nullopt), snapCamera = true;
+        else debugView = std::make_pair(vc.position, vc.target);
+      }
+      if (!o.view.empty())
+        if (const ViewDef* dv = findView(o.view)) {
+          const glm::dvec3 d = glm::normalize(glm::dvec3(dv->look.x - dv->pos.x, 0, dv->look.z - dv->pos.z));
+          if (!dv->turbulent) session.send(proto::Request{proto::ReqDev{proto::DevCommand::Teleport, dv->pos.x - d.x * 8, dv->pos.z - d.z * 8, 0}});
+          debugView = std::make_pair(dv->pos, dv->look);
+        }
+      debugMouse = debug->wantsMouse();
+    }
+#endif
+    const bool clickOnUi = act != Hud::Action::None || hud.blocks(in.mouseX, in.mouseY) || rmlUi->wantsMouse() || debugMouse;
     switch (act) {
       case Hud::Action::Potion: session.send(proto::Request{proto::ReqUsePotion{}}); break;
       case Hud::Action::Mount: session.send(proto::Request{proto::ReqMountAction{}}); break;
@@ -679,6 +739,9 @@ struct ClientApp::Impl {
     f.unlit = &unlit;
     f.ui = &ui;
     f.atlas = &atlas;
+#ifdef RPG_HAS_IMGUI
+    if (debug && debug->open()) f.overlay = [this](SDL_GPUCommandBuffer* c, SDL_GPUTexture* t) { debug->render(c, t); };
+#endif
     render(f, capture);
   }
 
@@ -789,6 +852,11 @@ struct ClientApp::Impl {
     double last = platform.now();
     while (true) {
       const double now = platform.now();
+      // tempo de quadro suavizado (ferramentas de depuração)
+      if (now > last) {
+        frameMs = frameMs * 0.9 + (now - last) * 1000 * 0.1;
+        fps = frameMs > 0 ? 1000 / frameMs : 0;
+      }
       double dt = opt.fixedDt > 0 ? opt.fixedDt : std::min(0.05, now - last);
       last = now;
       platform.pump(in);

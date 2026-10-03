@@ -132,6 +132,24 @@ else()
   return()
 endif()
 
+# ---------------------------------------------------------------- Dear ImGui (ferramentas de depuração)
+# Sempre por git (tag fixa): o pacote precisa dos backends SDL3 e SDL_GPU, que nem toda distro empacota.
+# Sem ele (RPG_FETCH_DEPS=OFF) o cliente compila sem as ferramentas.
+if(RPG_FETCH_DEPS)
+  FetchContent_Declare(imgui GIT_REPOSITORY https://github.com/ocornut/imgui.git GIT_TAG v1.92.9b GIT_SHALLOW TRUE)
+  FetchContent_MakeAvailable(imgui)
+  add_library(rpg_imgui STATIC
+    ${imgui_SOURCE_DIR}/imgui.cpp ${imgui_SOURCE_DIR}/imgui_draw.cpp ${imgui_SOURCE_DIR}/imgui_tables.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp ${imgui_SOURCE_DIR}/imgui_demo.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlgpu3.cpp)
+  target_include_directories(rpg_imgui SYSTEM PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
+  target_link_libraries(rpg_imgui PUBLIC SDL3::SDL3)
+  target_compile_definitions(rpg_imgui PUBLIC RPG_HAS_IMGUI=1)
+  set_target_properties(rpg_imgui PROPERTIES POSITION_INDEPENDENT_CODE ON)
+else()
+  add_library(rpg_imgui INTERFACE)
+endif()
+
 # ---------------------------------------------------------------- shaders (GLSL → SPIR-V)
 # Com glslangValidator instalado, os shaders são compilados no build; sem ele, valem os .spv
 # versionados em shaders/spv (atualize-os com `cmake --build <dir> --target rpg_update_shaders`).

@@ -2,11 +2,13 @@
 // Plataforma SDL3: janela, eventos e relógio. Converte eventos em InputState (engine/input.js):
 // teclas por scancode, mouse com arrasto, rodinha e modo relativo (mira com ponteiro preso).
 #include <cstdint>
+#include <functional>
 #include <string>
 
 #include "client/Input.h"
 
 struct SDL_Window;
+union SDL_Event;
 
 namespace rpg::client {
 
@@ -32,6 +34,8 @@ class Platform {
   void setRelativeMouse(bool on);
   void setTextInput(bool on);
   void setTitle(const std::string& t);
+  // Cada evento SDL também vai para `hook` antes de virar InputState (ferramentas de depuração).
+  void setEventHook(std::function<void(const SDL_Event&)> hook) { hook_ = std::move(hook); }
 
   double now() const;  // s desde o início
   void sleepMs(int ms) const;
@@ -40,6 +44,7 @@ class Platform {
   SDL_Window* window_ = nullptr;
   bool relative_ = false, textInput_ = false;
   int w_ = 1280, h_ = 720;
+  std::function<void(const SDL_Event&)> hook_;
 };
 
 }  // namespace rpg::client

@@ -78,6 +78,8 @@ Renderer::~Renderer() {
 }
 
 const char* Renderer::driver() const { return SDL_GetGPUDeviceDriver(impl_->dev); }
+SDL_GPUDevice* Renderer::device() const { return impl_->dev; }
+SDL_GPUTextureFormat Renderer::outputFormat() { return Impl::kOutFmt; }
 
 void Renderer::uploadMap(int mapIndex, const TerrainBuild& terrain, const InstanceLists& props) {
   Impl& I = *impl_;
@@ -382,6 +384,7 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
   }
   SDL_EndGPURenderPass(rp);
   if (rmlOn) I.drawRml(cmd, *f.rml, stats_);
+  if (f.overlay) f.overlay(cmd, I.out);
 
   // ---------------------------------------------------------------- janela e captura
   if (swap) {
