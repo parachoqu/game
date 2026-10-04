@@ -46,6 +46,10 @@ class ITransport {
 
   // Próxima mensagem já entregue, se houver. Não bloqueia.
   virtual bool poll(Message& out) = 0;
+
+  // Manda já o que estiver na fila (a rede junta os envios de um passo num datagrama). O
+  // LocalTransport entrega na hora e não precisa.
+  virtual void flush() {}
 };
 
 }  // namespace rpg::net

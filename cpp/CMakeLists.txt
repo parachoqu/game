@@ -37,6 +37,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(Warnings)
 include(Sanitizers)
 include(ClientDeps)
+include(NetDeps)
 
 find_package(glm CONFIG REQUIRED)
 find_package(nlohmann_json 3.11 CONFIG REQUIRED)

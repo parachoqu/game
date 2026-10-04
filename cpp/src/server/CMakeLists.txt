@@ -1,6 +1,7 @@
 # rpg_server: host da simulação (tick fixo, sessões) e persistência (registros em JSON).
 add_library(rpg_server STATIC
   ServerHost.cpp
+  CommandValidator.cpp
   persist/SaveRecords.cpp
   persist/SaveStore.cpp
 )

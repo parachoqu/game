@@ -1,11 +1,14 @@
-// O jogo local de hoje: o servidor numa thread e o cliente na principal, ligados por LocalTransport
-// (bytes em filas, exatamente como numa rede). É o único executável que linka cliente e servidor.
+// O jogo: o servidor numa thread e o cliente na principal, ligados por LocalTransport (bytes em filas,
+// exatamente como numa rede), ou só o cliente, ligado a um rpg_server pela rede (--connect). É o único
+// executável que linka cliente e servidor.
 //
 //   rpg_local [--data DIR] [--sim DIR] [--assets DIR] [--size WxH] [--fullscreen] [--no-vsync]
 //             [--seed S] [--dev] [--net-sim latency:MS,jitter:MS,loss:PCT]
 //             [--auto] [--name N] [--origin O] [--start S] [--model M]
 //             [--view NOME] [--hour H] [--hide-hud] [--portrait] [--frames N] [--screenshot ARQ.png] [--headless]
 //
+//   --connect HOST[:PORTA]  joga num rpg_server --listen (porta padrão 27450), sem servidor local;
+//                  liga a predição do próprio personagem (também ligada com --net-sim com latência)
 //   --auto         pula título e criação (personagem padrão)
 //   --continue     pula o título e retoma o último personagem salvo
 //   --quality Q    nível gráfico (alta, media, baixa) sem ajuste automático
@@ -23,6 +26,7 @@
 #include <charconv>
 #include <cstdio>
 #include <filesystem>
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -32,8 +36,10 @@
 #include "client/game/Settings.h"
 #include "core/Log.h"
 #include "core/Paths.h"
+#include "core/data/DataHash.h"
 #include "core/data/GameData.h"
 #include "core/world/StaticWorld.h"
+#include "net/EnetTransport.h"
 #include "net/LocalTransport.h"
 #include "server/ServerHost.h"
 #include "server/persist/SaveStore.h"
@@ -81,7 +87,7 @@ int usage() {
                "                [--dev] [--debug-ui] [--net-sim latency:MS,jitter:MS,loss:PCT] [--auto] [--continue] [--quality Q] [--name N] [--origin O]\n"
                "                [--start S] [--model M] [--view NOME] [--hour H] [--hide-hud] [--portrait] [--frames N]\n"
                "                [--screenshot ARQ.png] [--headless] [--save-dir DIR] [--no-save] [--import-save ARQ]\n"
-               "                [--benchmark] [--bench-frames N] [--bench-out ARQ]\n");
+               "                [--benchmark] [--bench-frames N] [--bench-out ARQ] [--connect HOST[:PORTA]]\n");
   return 2;
 }
 
@@ -116,6 +122,33 @@ int importSave(const rpg::GameData& data, const std::filesystem::path& file, con
   return 0;
 }
 
+// --connect: só o cliente, pela rede (ENet), contra um rpg_server --listen.
+int connect(const std::filesystem::path& dataDir, const std::filesystem::path& simDir, rpg::client::AppOptions opt,
+            const std::string& address) {
+  std::string host;
+  std::uint16_t port = 0;
+  if (!rpg::net::parseAddress(address, host, port, rpg::net::kDefaultPort)) return usage();
+  rpg::GameData data;
+  std::optional<rpg::StaticWorld> statics;
+  try {
+    data = rpg::GameData::load(dataDir);
+    statics.emplace(rpg::StaticWorld::load(simDir, data.balance.collision));
+  } catch (const std::exception& e) {
+    rpg::log::error("falha ao carregar o mundo: {}", e.what());
+    return 1;
+  }
+  opt.dataHash = rpg::dataHash(dataDir);
+  opt.predict = true;
+  try {
+    rpg::log::info("conectando a {}:{}", host, port);
+    rpg::client::ClientApp app(data, *statics, std::move(opt), std::make_unique<rpg::net::EnetClient>(host, port));
+    return app.run();
+  } catch (const std::exception& e) {
+    rpg::log::error("cliente: {}", e.what());
+    return 1;
+  }
+}
+
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -127,6 +160,7 @@ int main(int argc, char** argv) {
   cfg.allowPause = true;
   rpg::net::NetSim netSim;
   std::optional<std::filesystem::path> saveDir, importFile;
+  std::optional<std::string> connectTo;
   bool noSave = false;
 
   for (int i = 1; i < argc; ++i) {
@@ -169,6 +203,7 @@ int main(int argc, char** argv) {
     else if (a == "--save-dir" && v) saveDir = rpg::pathFromUtf8(argv[++i]);
     else if (a == "--no-save") noSave = true;
     else if (a == "--import-save" && v) importFile = rpg::pathFromUtf8(argv[++i]);
+    else if (a == "--connect" && v) connectTo = argv[++i];
     else return usage();
   }
   if (opt.view) {
@@ -198,6 +233,11 @@ int main(int argc, char** argv) {
   // saves e preferências: ligados ao jogar; desligados nas execuções automáticas (capturas, CI), que
   // precisam começar sempre do mesmo estado, a menos que --save-dir seja dado
   const bool automation = opt.view || opt.headless || opt.frames > 0 || opt.benchmark;
+  if (connectTo) {
+    // só o cliente: os saves ficam no servidor; aqui, as preferências
+    if (!noSave && (saveDir || !automation)) opt.settingsFile = (saveDir ? *saveDir : rpg::userDataDir()) / "settings.json";
+    return connect(dataDir, simDir, std::move(opt), *connectTo);
+  }
   if (!noSave && (saveDir || !automation || importFile)) cfg.saveDir = saveDir ? *saveDir : rpg::userDataDir();
   if (cfg.saveDir) {
     opt.settingsFile = *cfg.saveDir / "settings.json";
@@ -219,6 +259,9 @@ int main(int argc, char** argv) {
   if (importFile) return importSave(data, *importFile, *cfg.saveDir, opt.settingsFile);
   if (cfg.saveDir) rpg::log::info("saves em {}", rpg::pathToUtf8(*cfg.saveDir));
 
+  // fase 8: o servidor local confere o mesmo resumo dos dados; com latência simulada, a predição liga
+  cfg.dataHash = opt.dataHash = rpg::dataHash(dataDir);
+  opt.predict = netSim.latencyMs > 0 || netSim.jitterMs > 0;
   rpg::net::LocalHub hub(netSim);
   auto serverEnd = hub.serverEndpoint();
   auto clientEnd = hub.connectClient();

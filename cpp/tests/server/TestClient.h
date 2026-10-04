@@ -1,5 +1,6 @@
 #pragma once
-// Cliente de teste: fala com o ServerHost pelo LocalTransport, só com bytes do protocolo (como o jogo).
+// Cliente de teste: fala com o ServerHost pelo LocalTransport (ou pela rede), só com bytes do protocolo,
+// como o jogo: refaz os snapshots a partir dos deltas e confirma o último em cada comando.
 #include <filesystem>
 #include <memory>
 #include <optional>
@@ -10,6 +11,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "core/protocol/Session.h"
+#include "core/protocol/SnapshotDelta.h"
 #include "net/Bytes.h"
 #include "net/LocalTransport.h"
 
@@ -22,6 +24,8 @@ struct TestClient {
   std::optional<protocol::Snapshot> snapshot;
   std::optional<protocol::Welcome> welcome;
   std::optional<std::string> rejected;
+  protocol::DeltaDecoder decoder;
+  int deltas = 0, fullSnapshots = 0;
 
   explicit TestClient(std::unique_ptr<net::ITransport> transport) : t(std::move(transport)) {}
 
@@ -44,6 +48,7 @@ struct TestClient {
   }
   void command() {
     cmd.seq++;
+    cmd.ackSnapshot = decoder.lastSeq();
     sendBytes(net::Channel::Commands, protocol::encode(cmd));
   }
   void press(protocol::Press p) {
@@ -62,9 +67,13 @@ struct TestClient {
         if (auto* r = std::get_if<protocol::Reject>(&*e)) rejected = r->reason;
         events.push_back(std::move(*e));
       } else if (m.channel == net::Channel::Snapshots) {
-        auto s = protocol::decode<protocol::Snapshot>(net::asU8(m.bytes));
-        REQUIRE(s);
-        snapshot = std::move(*s);
+        auto d = protocol::decode<protocol::SnapshotDelta>(net::asU8(m.bytes));
+        REQUIRE(d);
+        // sem a base (perdida na rede) ou atrasado: o próximo substitui
+        if (auto s = decoder.decode(*d)) {
+          ++(d->base == 0 ? fullSnapshots : deltas);
+          snapshot = std::move(*s);
+        }
       }
     }
   }

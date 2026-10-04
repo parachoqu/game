@@ -1,8 +1,9 @@
-// Servidor dedicado, sem janela. Nesta fase ele carrega e valida os dados de design e roda a
-// simulação em passo fixo — o esqueleto que as próximas fases vão preenchendo.
+// Servidor dedicado, sem janela: carrega os dados de design e o mundo, roda a simulação em passo fixo
+// e, com --listen, recebe jogadores pela rede (ENet).
 //
-//   rpg_server [--data DIR] [--sim DIR] [--ticks N] [--seed S] [--tick-rate HZ]
+//   rpg_server [--data DIR] [--sim DIR] [--ticks N] [--seed S] [--tick-rate HZ] [--listen [PORTA]]
 //
+//   --listen [PORTA]  aceita jogadores pela rede (UDP, porta padrão 27450): rpg_local --connect HOST:PORTA
 //   --data DIR  dados de design (cpp/data)
 //   --sim DIR   pacote de mundo da simulação (cpp/assets/sim)
 //   --ticks N   roda N passos o mais rápido possível e sai (CI e testes de fumaça)
@@ -15,13 +16,16 @@
 #include <cstdio>
 #include <cstring>
 #include <filesystem>
+#include <memory>
 #include <optional>
 #include <string_view>
 
 #include "core/Log.h"
 #include "core/Paths.h"
+#include "core/data/DataHash.h"
 #include "core/data/GameData.h"
 #include "core/world/StaticWorld.h"
+#include "net/EnetTransport.h"
 #include "server/ServerHost.h"
 
 #ifndef RPG_DEFAULT_DATA_DIR
@@ -45,7 +49,7 @@ bool parseNumber(std::string_view s, T& out) {
 int usage() {
   std::fprintf(stderr,
                "uso: rpg_server [--data DIR] [--sim DIR] [--ticks N] [--seed S] [--tick-rate HZ] [--bots N] [--dev]\n"
-               "                 [--save-dir DIR] [--no-save]\n");
+               "                 [--save-dir DIR] [--no-save] [--listen [PORTA]] [--max-players N]\n");
   return 2;
 }
 
@@ -58,6 +62,8 @@ int main(int argc, char** argv) {
   rpg::server::ServerConfig cfg;
   std::optional<std::filesystem::path> saveDir;
   bool noSave = false;
+  std::optional<std::uint16_t> listen;
+  std::size_t maxPlayers = 64;
 
   for (int i = 1; i < argc; ++i) {
     const std::string_view arg = argv[i];
@@ -71,6 +77,13 @@ int main(int argc, char** argv) {
     else if (arg == "--dev") cfg.devCommands = true;
     else if (arg == "--save-dir" && hasValue) saveDir = rpg::pathFromUtf8(argv[++i]);
     else if (arg == "--no-save") noSave = true;
+    else if (arg == "--listen") {
+      std::uint16_t port = rpg::net::kDefaultPort;
+      if (hasValue && argv[i + 1][0] != '-') {
+        if (!parseNumber(argv[++i], port)) return usage();
+      }
+      listen = port;
+    } else if (arg == "--max-players" && hasValue && parseNumber(argv[++i], maxPlayers) && maxPlayers > 0) {}
     else return usage();
   }
   if (!noSave && (saveDir || ticks == 0)) cfg.saveDir = saveDir ? *saveDir : rpg::userDataDir() / "servidor";
@@ -103,7 +116,20 @@ int main(int argc, char** argv) {
   rpg::log::info("camada de jogo: {} interagíveis, {} pontos de coleta, {} NPCs, {} grupos de inimigos",
                  layout.interactables.size(), layout.nodes.size(), layout.npcs.size(), layout.groups.size());
 
-  rpg::server::ServerHost host(data, *statics, cfg, nullptr);
+  // o Hello de cada cliente leva o resumo dos dados: com outros dados, o servidor recusa a entrada
+  cfg.dataHash = rpg::dataHash(dataDir);
+  std::unique_ptr<rpg::net::ITransport> transport;
+  if (listen) {
+    try {
+      auto server = std::make_unique<rpg::net::EnetServer>(*listen, maxPlayers);
+      rpg::log::info("escutando na porta UDP {} (até {} jogadores); dados {}", server->port(), maxPlayers, cfg.dataHash.substr(0, 12));
+      transport = std::move(server);
+    } catch (const std::exception& e) {
+      rpg::log::error("{}", e.what());
+      return 1;
+    }
+  }
+  rpg::server::ServerHost host(data, *statics, cfg, std::move(transport));
   const auto& S = host.world().state();
   rpg::log::info("mundo povoado: {} inimigos, {} NPCs, {} bots", S.enemies.size(), S.npcs.size(), host.botCount());
   if (cfg.saveDir) rpg::log::info("saves em {}", rpg::pathToUtf8(*cfg.saveDir));

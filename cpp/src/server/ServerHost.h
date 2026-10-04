@@ -4,16 +4,19 @@
 //
 // A cada passo:
 //   1. lê a rede: Hello cria o personagem da sessão; Requests vão para World::handleRequest;
-//      PlayerCommand substitui o comando da sessão (o mais novo vale);
-//   2. roda World::step;
+//      PlayerCommand entra na fila da sessão, depois do CommandValidator (taxa e limites);
+//   2. aplica um comando da fila de cada sessão (sem comando novo, vale o último: é o passo que a
+//      predição do cliente refaz) e roda World::step;
 //   3. distribui os eventos pelo destinatário (EventRouter) e manda um snapshot por sessão, com as
-//      entidades no raio de interesse do jogador dela.
+//      entidades no raio de interesse do jogador dela, em delta contra o último que o cliente
+//      confirmou (SnapshotDelta).
 //
 // Com `saveDir`, o mundo salvo é carregado ao criar o host; cada personagem é gravado a cada
 // `autosaveEvery` s, ao sair (ReqLeave), ao desconectar e no fim de run(). Hello com `resume` retoma o
 // personagem salvo com aquele nome.
 #include <atomic>
 #include <cstdint>
+#include <deque>
 #include <filesystem>
 #include <memory>
 #include <optional>
@@ -24,7 +27,9 @@
 #include "core/Rng.h"
 #include "core/data/GameData.h"
 #include "core/protocol/Session.h"
+#include "core/protocol/SnapshotDelta.h"
 #include "net/Transport.h"
+#include "server/CommandValidator.h"
 #include "sim/World.h"
 
 namespace rpg::server {
@@ -51,8 +56,13 @@ struct Session {
   net::ConnectionId connection;
   Tick connectedAt = 0;
   sim::EntityId player = 0;  // 0 até o Hello
-  std::uint32_t lastCommandSeq = 0;
+  std::uint32_t lastCommandSeq = 0;  // último comando aplicado
+  std::uint32_t lastQueuedSeq = 0;   // último comando aceito na fila
   std::string name;
+  std::deque<protocol::PlayerCommand> commands;  // um por passo
+  std::uint32_t ackSnapshot = 0;                 // base dos deltas
+  protocol::DeltaEncoder delta;
+  CommandValidator validator;
 };
 
 class ServerHost {
@@ -80,6 +90,8 @@ class ServerHost {
   sim::World& world() { return world_; }
   const std::vector<Session>& sessions() const { return sessions_; }
   std::uint64_t ignoredMessages() const { return ignoredMessages_; }
+  // Comandos e pedidos descartados pelo CommandValidator (taxa).
+  std::uint64_t droppedMessages() const { return droppedMessages_; }
   std::size_t botCount() const { return bots_.size(); }
 
  private:
@@ -87,6 +99,8 @@ class ServerHost {
 
   void tickOnce();
   void pumpNetwork();
+  void applyCommands();
+  void resetSession(Session& s);
   void onClientMessage(Session& s, protocol::ClientMessage&& msg);
   void routeEvents();
   void sendSnapshots();
@@ -105,7 +119,8 @@ class ServerHost {
   std::vector<std::unique_ptr<Bot>> bots_;
   std::unique_ptr<persist::SaveStore> store_;
   double autosaveT_ = 0;
-  std::uint64_t ignoredMessages_ = 0;
+  double clock_ = 0;  // s desde a criação (relógio do validador; anda mesmo com a simulação pausada)
+  std::uint64_t ignoredMessages_ = 0, droppedMessages_ = 0;
 };
 
 }  // namespace rpg::server

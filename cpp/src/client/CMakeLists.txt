@@ -7,6 +7,7 @@ add_library(rpg_client_core STATIC
   Presentation.cpp
   net/SnapshotInterpolator.cpp
   net/ClientSession.cpp
+  net/Predictor.cpp
   game/ViewCamera.cpp
   game/ThirdPersonCamera.cpp
   game/Targets.cpp

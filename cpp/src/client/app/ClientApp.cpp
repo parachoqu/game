@@ -12,6 +12,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "client/ClientWorld.h"
+#include "client/net/Predictor.h"
 #include "client/Input.h"
 #include "client/Presentation.h"
 #ifdef RPG_HAS_IMGUI
@@ -138,6 +139,10 @@ struct ClientApp::Impl {
   FxState fx;
   ThirdPersonCamera cam;
   CommandBuilder commands;
+  // um comando por passo do servidor (a fila de lá aplica um por passo; a predição anda um por comando)
+  double commandClock = 0;
+  Predictor predictor;
+  std::uint32_t predictedSnapshot = 0;
   Hud hud;
 #ifdef RPG_HAS_IMGUI
   std::unique_ptr<DebugTools> debug;  // F3 com --dev
@@ -196,7 +201,8 @@ struct ClientApp::Impl {
         L(Localization::load(opt.dataDir / "text" / "pt-BR", d)),
         look(Presentation::load(opt.dataDir / "presentation")),
         session(std::move(t)),
-        fx(L) {
+        fx(L),
+        predictor(d) {
     fonts.display = atlas.addFace(opt.assetsDir / "fonts" / "Fraunces-SemiBold.ttf");
     fonts.body = atlas.addFace(opt.assetsDir / "fonts" / "DejaVuSans.ttf");
     fonts.bold = atlas.addFace(opt.assetsDir / "fonts" / "DejaVuSans-Bold.ttf");
@@ -366,6 +372,7 @@ struct ClientApp::Impl {
     }
     h.name = opt.autoStart && !opt.name.empty() ? opt.name : form.name;
     if (h.name.empty()) h.name = L.ui("create.defaultName");
+    h.dataHash = opt.dataHash;
     h.origin = opt.autoStart && !opt.origin.empty() ? opt.origin : data.origins.key(OriginId{static_cast<std::uint16_t>(form.origin)});
     h.start = opt.autoStart && !opt.start.empty() ? opt.start : data.starts.key(StartId{static_cast<std::uint16_t>(form.start)});
     h.model = opt.autoStart && !opt.model.empty() ? opt.model : kCharacterModels[form.model];
@@ -383,6 +390,8 @@ struct ClientApp::Impl {
   // Entrou no mundo (Welcome): guarda o personagem para o "Continuar" e avisa a retomada (main.js startGame).
   void onWelcome() {
     const proto::Welcome& w = session.welcome();
+    predictor.reset();
+    predictedSnapshot = 0;
     settings.last = Settings::Profile{lastHello.name, lastHello.origin, lastHello.start, lastHello.model};
     saveSettings();
     if (!w.resumed) return;
@@ -409,6 +418,7 @@ struct ClientApp::Impl {
     settings.last.reset();
     saveSettings();
     world = ClientWorld{};
+    predictor.reset();
     fx = FxState(L);
     deathShown = eventShown = introShown = observing = false;
     cam.setSkyDirection(std::nullopt);
@@ -603,6 +613,47 @@ struct ClientApp::Impl {
     return {};
   }
 
+  // ---------------------------------------------------------------- comandos e predição
+  double tickStep() const { return 1.0 / std::max(1.0, session.welcome().tickRate); }
+
+  // Um comando por passo do servidor: num quadro rápido, só quando vence o passo (os toques seguem nos
+  // contadores do comando seguinte); num lento, até 4 de uma vez (o resto o servidor cobre repetindo o
+  // último). Cada um anda um passo da predição, com os números como chegam lá (f32 no fio).
+  void sendCommands(const proto::PlayerCommand& cmd, double dt) {
+    const double step = tickStep();
+    commandClock += dt;
+    int n = 0;
+    while (commandClock >= step && n < 4) {
+      commandClock -= step;
+      ++n;
+    }
+    if (commandClock >= step) commandClock = std::fmod(commandClock, step);
+    for (int i = 0; i < n; ++i) {
+      const proto::PlayerCommand c = i == 0 ? cmd : commands.again();
+      session.send(c);
+      if (opt.predict) {
+        const auto wire = proto::decode<proto::PlayerCommand>(proto::encode(c));
+        predictor.sent(wire ? *wire : c, step);
+      }
+    }
+  }
+
+  // Jogo pela rede: cada snapshot novo reconcilia; o próprio personagem aparece na posição prevista
+  // (a interpolada fica ~2 passos atrás, mais a latência).
+  void predictSelf(double dt) {
+    if (!opt.predict) return;
+    const proto::Snapshot* latest = session.snapshots().latest();
+    if (latest && latest->self && session.lastSnapshot() != predictedSnapshot) {
+      predictedSnapshot = session.lastSnapshot();
+      for (const proto::EntityState& e : latest->entities)
+        if (e.id == latest->self->playerId) predictor.reconcile(e, *latest->self, statics.map(static_cast<MapKind>(e.map)));
+    }
+    predictor.update(dt);
+    if (!predictor.active()) return;
+    const glm::dvec3 p = predictor.position(commandClock / tickStep());
+    world.placeSelf(p.x, p.y, p.z);
+  }
+
   // ---------------------------------------------------------------- quadro de jogo
   void gameFrame(double dt, double now, std::optional<std::filesystem::path> capture) {
     session.poll(now);
@@ -616,6 +667,7 @@ struct ClientApp::Impl {
       mode = Mode::Failed;
       return;
     }
+    predictSelf(dt);
     const proto::EntityState* me = world.me();
     const proto::PrivateState* P = world.self();
     ui.clear();
@@ -868,8 +920,7 @@ struct ClientApp::Impl {
     cc.camYaw = cam.yaw();
     cc.uiOpen = uiOpen;
     cc.aim = aim;
-    const proto::PlayerCommand cmd = commands.build(in, cc, tabChord);
-    session.send(cmd);
+    sendCommands(commands.build(in, cc, tabChord), dt);
 
     // cena
     HoverRing ring;

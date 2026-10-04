@@ -68,7 +68,7 @@ Estes são os acoplamentos que a reescrita precisa quebrar. Eles guiam a divisã
 | JSON (dados, saves) | nlohmann-json | core |
 | Log | `std::format` + `core/Log` (sem dependência externa) | core |
 | Testes | Catch2 v3 | tests |
-| Rede (fase futura) | GameNetworkingSockets (mensagens confiáveis e não confiáveis, criptografia) | net |
+| Rede | ENet 1.3.18 (canais confiáveis e não confiáveis sobre UDP; o plano era o GameNetworkingSockets, veja a seção 14) | net |
 | Build | CMake ≥ 3.28 + `CMakePresets.json` + vcpkg manifest | — |
 
 A animação usa um amostrador próprio sobre os clipes glTF (são poucos clipes, e as camadas procedurais
@@ -744,3 +744,84 @@ sem montar o cenário na CPU. Trocar a qualidade ou o tamanho da janela invalida
 `tools/compare_benchmark.py` compara com `demo/benchmark-results.json` (a demo no Chrome sem janela,
 com WebGL por software). No mesmo tipo de máquina, sem GPU (Mesa lavapipe), o C++ fica bem à frente:
 veja a tabela no README.
+
+## 14. Jogo pela rede (fase 8)
+
+### Transporte
+
+`net/EnetTransport` põe o `ITransport` sobre ENet 1.3.18 (UDP), com um canal ENet por canal do
+protocolo:
+
+| Canal | Entrega | Por quê |
+|---|---|---|
+| Commands | não confiável, em sequência | o comando atrasado perde para o mais novo |
+| Requests, Events | confiável e em ordem | comprar, fabricar, avisos e o Livro não podem se perder |
+| Snapshots | não confiável, fragmentos não confiáveis | um fragmento perdido perde o snapshot, e o próximo o substitui |
+
+- **Servidor:** o `EnetServer` escuta numa porta. `rpg_server --listen [PORTA]` usa a 27450 por padrão.
+- **Cliente:** o `EnetClient` conecta em segundo plano; o Hello espera a conexão abrir.
+- **Envio:** `flush()` manda a fila na hora. O servidor faz isso no fim de cada passo; o cliente, a cada envio.
+- **Acima do transporte, nada muda:** o mesmo `ServerHost` e a mesma `ClientSession` rodam sobre o
+  `LocalTransport` no jogo local e sobre o ENet em `--connect`.
+
+### Comandos: um por passo
+
+- **No cliente:** o `ClientApp` manda um `PlayerCommand` por passo do servidor (30/s). Num quadro
+  rápido, só quando o passo vence; os toques seguem nos contadores do comando seguinte. Num quadro
+  lento, até 4 de uma vez.
+- **No servidor:** os comandos entram numa fila por sessão, de no máximo 8, e cada passo aplica um.
+  Sem comando novo, vale o último, o que mantém o jogo andando com perda ou com um cliente lento.
+- **Por que um por passo:** cada comando enviado vale exatamente um passo, a mesma conta que a
+  predição faz.
+
+### Snapshots em delta
+
+`core/protocol/SnapshotDelta`:
+
+- **No servidor:** guarda por sessão os últimos 32 snapshots que mandou, codificados por entidade.
+- **A base:** cada comando leva `ackSnapshot`, o último snapshot que o cliente refez. O próximo vai
+  contra essa base e leva só:
+  - as entidades novas ou diferentes (comparando os bytes codificados), mais a lista das que saíram;
+  - o estado do mundo e o privado, só quando mudaram.
+- **Sem base:** sem base confirmada (entrada, troca de personagem, perdas demais), vai o snapshot
+  inteiro.
+- **No cliente:** um delta cuja base o cliente não tem é descartado (`staleSnapshots`).
+- **Numeração:** nunca volta numa conexão, nem entre personagens.
+
+### Predição do próprio personagem
+
+`client/net/Predictor` liga com `--connect` e com `--net-sim` com latência:
+
+- **Os passos:** refaz andar, correr, agachar e pular no estado livre com as mesmas funções do
+  `CharacterMotor` que o servidor usa, um passo por comando, com os números como chegam lá (`f32`
+  no fio).
+- **Reconciliação:** a cada snapshot, volta ao estado do servidor no comando `lastCommandSeq` e
+  refaz os ainda não confirmados.
+- **Correções:** a diferença para o que estava na tela some em ~100 ms; um teleporte (mais de 4 m)
+  entra direto.
+- **Quando desliga:** fora do estado livre (golpes, técnicas, esquiva, canal, derrubado) e com
+  clique para andar ou atacar. Aí vale a posição interpolada.
+- **Medido nos testes:** com latência fixa, a correção é nula, menos de 5 cm. Com variação, um passo
+  sem comando novo repete o anterior no servidor e a correção fica do tamanho de um passo.
+
+### Validação e entrada
+
+- **`server/CommandValidator`, por sessão:**
+  - taxa de comandos (90/s com rajada de 45) e de pedidos (30/s com rajada de 40). Os de
+    desenvolvimento, só aceitos com `--dev`, ficam de fora;
+  - movimento em −1…1, só os bits conhecidos de teclas seguradas, ângulos finitos;
+  - ponto mirado a no máximo 300 m do corpo.
+  - O resto (distância de uso, moedas, capacidade, combate) o mundo já confere em cada pedido.
+- **Entrada no mundo:** o Hello leva a versão do protocolo (3) e o resumo dos dados de design. O
+  resumo (`core/data/DataHash`) é o SHA-256 de `cpp/data` em ordem de caminho, sem os `\r` de um
+  checkout com CRLF. Dados diferentes não se entendem, porque os índices do protocolo vêm das
+  tabelas: o servidor recusa a entrada.
+
+### Desvios
+
+| Plano | Feito | Por quê |
+|---|---|---|
+| GameNetworkingSockets | ENet | biblioteca C pequena, empacotada nas distros (`libenet-dev`) e no vcpkg; o GNS pede protobuf e OpenSSL. Fica atrás do `ITransport` |
+| contas e banco de dados | um personagem por nome, em arquivo no servidor | fora do escopo desta reescrita; o `SaveStore` já separa personagem e mundo |
+| predição sempre ligada | só pela rede ou com latência simulada | no jogo local a latência é zero, e a posição interpolada já é a do servidor |
+| interesse por raio | o raio de 160 m da fase 2, por instância de mapa | já existia no `World::snapshot`; o delta corta o resto |

@@ -23,6 +23,11 @@ class CommandBuilder {
 
   // O comando mais recente (os passos do servidor reaproveitam o último enquanto não chega outro).
   const protocol::PlayerCommand& last() const { return cmd_; }
+  // O mesmo comando com o número seguinte (um quadro lento cobre mais de um passo do servidor).
+  protocol::PlayerCommand again() {
+    cmd_.seq = ++seq_;
+    return cmd_;
+  }
 
  private:
   protocol::PlayerCommand cmd_;

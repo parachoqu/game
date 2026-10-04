@@ -48,6 +48,16 @@ e mudo ficam em `settings.json`.
 - **Medição:** `--benchmark` mede os seis pontos de `measure-benchmark.mjs` nos três níveis; sem GPU,
   o C++ fica à frente da demo nos 18 pontos (tabela em [Desempenho](#desempenho)).
 
+**Fase 8 concluída:** o mesmo jogo pela rede.
+- **Servidor e clientes:** `rpg_server --listen` recebe jogadores por UDP (ENet) e cada
+  `rpg_local --connect` joga nele, no mesmo mundo.
+- **Snapshots:** vão em delta contra o último que o cliente confirmou.
+- **Comandos:** saem um por passo do servidor, passam por um validador de taxa e de limites, e o
+  próprio personagem é previsto com o mesmo motor do servidor e reconciliado a cada snapshot.
+- **Entrada:** o Hello leva a versão do protocolo e o resumo SHA-256 dos dados de design; com dados
+  diferentes, o servidor recusa a entrada.
+- **Fora do escopo:** contas e banco de dados. O servidor guarda um personagem por nome, em arquivo.
+
 - `rpg_core` (compartilhado por servidor e cliente):
   - dados de design de `config.js`, validados na carga;
   - mundo estático com paridade exata com a demo: relevo escavado pelo rio, pontes, água, biomas,
@@ -100,7 +110,7 @@ pacotes. O caminho do projeto pode ter espaço e acento (por exemplo `~/Área de
 
 ```bash
 sudo apt install cmake ninja-build g++ python3 nodejs libglm-dev nlohmann-json3-dev catch2 \
-  libfreetype-dev glslang-tools libvulkan1 mesa-vulkan-drivers \
+  libfreetype-dev libenet-dev glslang-tools libvulkan1 mesa-vulkan-drivers \
   libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxss-dev libxkbcommon-dev libwayland-dev
 # Kali/Debian testing: acrescente libsdl3-dev (a SDL3 do sistema evita o download)
 # Fedora: os pacotes equivalentes de glm, nlohmann-json, Catch2 3, freetype, SDL3 e vulkan via dnf
@@ -215,6 +225,20 @@ ordem de grandeza: os renderizadores por software não são os mesmos.
 # --data DIR e --sim DIR apontam para outros cpp/data e cpp/assets/sim; --dev aceita comandos de teste
 # saves em <diretório do usuário>/servidor (com --ticks, nenhum); --save-dir DIR e --no-save mudam isso
 ```
+
+### Jogar pela rede
+
+```bash
+./build/dev/apps/server/rpg_server --listen               # UDP 27450 (--listen 30000 muda; --max-players N)
+./build/dev/apps/local/rpg_local --connect 192.168.0.10   # em cada máquina; :PORTA se não for a 27450
+./build/dev/apps/local/rpg_local --net-sim latency:120,jitter:30,loss:2   # jogo local com rede simulada
+```
+
+- **Os dois lados** precisam do mesmo `cpp/data`. Com dados diferentes, a entrada é recusada.
+- **No `--connect`,** os saves ficam no servidor, um personagem por nome; "Continuar trajetória" retoma
+  o personagem com aquele nome. Aqui ficam só as preferências.
+- **A pausa** só para a simulação no jogo local de um jogador.
+- **ENet:** `libenet-dev` no apt ou `enet` no vcpkg; sem nenhum dos dois, o CMake baixa a v1.3.18.
 
 ## Dados de design
 

@@ -13,12 +13,15 @@ add_executable(rpg_tests
   core/TerrainTests.cpp
   core/ProtocolTests.cpp
   core/AnimRulesTests.cpp
+  core/DeltaTests.cpp
+  net/EnetTransportTests.cpp
   parity/WorldParityTests.cpp
   parity/SimParityTests.cpp
   sim/WorldTests.cpp
   server/ServerHostTests.cpp
   server/PersistenceTests.cpp
   server/EndToEndTests.cpp
+  server/OnlineTests.cpp
 )
 target_link_libraries(rpg_tests PRIVATE rpg_server Catch2::Catch2WithMain nlohmann_json::nlohmann_json)
 target_include_directories(rpg_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -39,7 +42,7 @@ endif()
 # Cliente sem janela (lógica, sessão contra o servidor, textos, geometria): roda em qualquer CI.
 if(RPG_BUILD_CLIENT)
   add_executable(rpg_client_tests client/ClientTests.cpp client/ScenePackTests.cpp client/PackSceneTests.cpp client/AnimTests.cpp
-    client/AudioTests.cpp client/RenderLogicTests.cpp)
+    client/AudioTests.cpp client/RenderLogicTests.cpp client/PredictorTests.cpp)
   target_link_libraries(rpg_client_tests PRIVATE rpg_client_core rpg_server Catch2::Catch2WithMain nlohmann_json::nlohmann_json)
   target_include_directories(rpg_client_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
   target_compile_definitions(rpg_client_tests PRIVATE
@@ -87,3 +90,5 @@ endif()
 add_test(NAME smoke.server_headless COMMAND rpg_server_app --data "${RPG_DATA_DIR}" --sim "${RPG_SIM_DIR}" --ticks 300)
 # Dois minutos de jogo com oito bots: combate, mortes, reaparecimento, grupos, acampamento e evento.
 add_test(NAME smoke.server_bots COMMAND rpg_server_app --data "${RPG_DATA_DIR}" --sim "${RPG_SIM_DIR}" --ticks 3600 --bots 8)
+# Abre a porta UDP (o sistema escolhe), roda 1 s e sai: o ENet linka e escuta.
+add_test(NAME smoke.server_listen COMMAND rpg_server_app --data "${RPG_DATA_DIR}" --sim "${RPG_SIM_DIR}" --listen 0 --ticks 30 --no-save)

@@ -24,6 +24,15 @@ const protocol::EntityState* ClientWorld::find(std::uint32_t id) const {
   return it == index_.end() ? nullptr : &entities_[it->second];
 }
 
+void ClientWorld::placeSelf(double x, double y, double z) {
+  const auto it = index_.find(playerId_);
+  if (it == index_.end()) return;
+  protocol::EntityState& e = entities_[it->second];
+  e.x = x;
+  e.y = y;
+  e.z = z;
+}
+
 MapKind ClientWorld::map() const {
   const protocol::EntityState* m = me();
   return m ? static_cast<MapKind>(m->map) : MapKind::Region;

@@ -10,6 +10,7 @@
 #include "client/net/SnapshotInterpolator.h"
 #include "core/protocol/PlayerCommand.h"
 #include "core/protocol/Session.h"
+#include "core/protocol/SnapshotDelta.h"
 #include "net/Transport.h"
 
 namespace rpg::client {
@@ -24,7 +25,8 @@ class ClientSession {
   // Sai do mundo sem desconectar (ReqLeave): a sessão volta a Idle e aceita um novo join.
   void leave(bool discard);
   void send(const protocol::Request& req);
-  void send(const protocol::PlayerCommand& cmd);
+  // O comando sai com `ackSnapshot` = o último snapshot refeito (a base do próximo delta).
+  void send(protocol::PlayerCommand cmd);
 
   // Lê tudo o que chegou. Snapshots vão para o interpolador; eventos para a fila.
   void poll(double localTime);
@@ -41,6 +43,10 @@ class ClientSession {
   std::uint64_t bytesIn() const { return bytesIn_; }
   std::uint64_t bytesOut() const { return bytesOut_; }
   std::uint64_t badMessages() const { return bad_; }
+  std::uint32_t lastSnapshot() const { return deltas_.lastSeq(); }
+  std::uint64_t fullSnapshots() const { return full_; }
+  std::uint64_t deltaSnapshots() const { return partial_; }
+  std::uint64_t staleSnapshots() const { return stale_; }  // sem a base (perdida) ou atrasados
 
  private:
   void sendBytes(net::Channel ch, const protocol::Bytes& b);
@@ -50,8 +56,9 @@ class ClientSession {
   std::string reject_;
   protocol::Welcome welcome_;
   SnapshotInterpolator snapshots_;
+  protocol::DeltaDecoder deltas_;
   std::vector<protocol::GameEvent> events_;
-  std::uint64_t bytesIn_ = 0, bytesOut_ = 0, bad_ = 0;
+  std::uint64_t bytesIn_ = 0, bytesOut_ = 0, bad_ = 0, full_ = 0, partial_ = 0, stale_ = 0;
 };
 
 }  // namespace rpg::client

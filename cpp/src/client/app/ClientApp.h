@@ -29,18 +29,22 @@ struct AppOptions {
   std::optional<std::string> view;  // enquadramento das capturas da demo (02_mercado…)
   std::optional<double> hour;       // força a hora da luz (capturas)
   bool autoStart = false;           // pula título e criação (personagem padrão)
-  bool autoContinue = false;
+  bool autoContinue = false;         // pula o título e retoma o último personagem ("Continuar trajetória")
   std::optional<std::string> quality;  // força o nível (alta, media, baixa) sem salvar
   // tools/measure-benchmark.mjs: seis pontos nos três níveis; mediana, p95, triângulos e chamadas
   bool benchmark = false;
   int benchFrames = 30;
-  std::filesystem::path benchOut = "benchmark-cpp.json";        // pula o título e retoma o último personagem ("Continuar trajetória")
+  std::filesystem::path benchOut = "benchmark-cpp.json";
   bool hideHud = false;
   bool portrait = false;            // câmera de frente para o próprio personagem (capturas da animação)
   bool dev = false;                 // comandos de desenvolvimento (tp, give…)
   bool debugUi = false;             // abre as ferramentas de depuração (F3) já no começo
   double fixedDt = 0;               // passo fixo do cliente (capturas reproduzíveis); 0 = relógio real
   std::string name, origin, start, model;  // personagem do autoStart
+  // Fase 8: resumo dos dados de design (vai no Hello; o servidor recusa se não bater) e predição do
+  // próprio personagem (ligada no jogo pela rede ou com latência simulada).
+  std::string dataHash;
+  bool predict = false;
   // Preferências e último personagem (Settings); vazio = só na memória (capturas e testes).
   std::filesystem::path settingsFile;
   // Há save para este nome? (jogo local: o servidor do mesmo processo). Sem a função, o título confia

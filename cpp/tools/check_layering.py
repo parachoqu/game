@@ -11,7 +11,8 @@ Cada diretório de src/ só pode incluir as camadas que estão abaixo dele:
 
 Além disso, core/net/sim/server não podem incluir bibliotecas de janela, GPU, áudio ou UI, e dentro do
 cliente só client/platform, client/render, client/audio e client/app falam com a plataforma (SDL): o resto
-(rpg_client_core) é lógica testável sem janela.
+(rpg_client_core) é lógica testável sem janela. A biblioteca de rede (ENet) só entra em net/: o resto fala
+com o ITransport.
 Sai com código 1 e lista cada violação (arquivo:linha) se alguma regra for quebrada.
 
     python3 tools/check_layering.py [raiz-do-cpp]
@@ -35,6 +36,9 @@ CLIENT_ONLY = re.compile(r"^(SDL[23]?/|SDL|RmlUi/|imgui|backends/imgui|fastgltf/
 # Partes do cliente que podem usar a plataforma (SDL, GPU, áudio).
 CLIENT_PLATFORM_DIRS = {"platform", "render", "audio", "app"}
 PLATFORM_ONLY = re.compile(r"^(SDL[23]?/|SDL)")
+
+# Biblioteca de rede: só net/ a inclui.
+NET_ONLY = re.compile(r"^enet/")
 
 INCLUDE = re.compile(r'^\s*#\s*include\s*[<"]([^>"]+)[>"]')
 SOURCE_SUFFIXES = {".h", ".hpp", ".cpp", ".cc", ".inl"}
@@ -61,6 +65,8 @@ def check(root: pathlib.Path) -> list[str]:
                 problems.append(f"{where}: a camada '{layer}' não pode incluir '{target}'")
             if layer != "client" and CLIENT_ONLY.match(target):
                 problems.append(f"{where}: '{target}' é biblioteca de cliente (janela/GPU/UI) e não pode entrar em '{layer}'")
+            if layer != "net" and NET_ONLY.match(target):
+                problems.append(f"{where}: '{target}' é a biblioteca de rede; só net/ a inclui (o resto usa o ITransport)")
             parts = path.relative_to(src).parts
             if layer == "client" and PLATFORM_ONLY.match(target) and (len(parts) < 3 or parts[1] not in CLIENT_PLATFORM_DIRS):
                 problems.append(f"{where}: '{target}' é da plataforma; em client/ só {sorted(CLIENT_PLATFORM_DIRS)} podem incluí-la")

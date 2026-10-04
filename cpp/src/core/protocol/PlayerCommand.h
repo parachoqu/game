@@ -36,6 +36,7 @@ enum class Press : std::uint8_t {
 struct PlayerCommand {
   std::uint32_t seq = 0;         // número do comando (reconciliação da predição)
   std::uint32_t clientTick = 0;
+  std::uint32_t ackSnapshot = 0; // último snapshot que o cliente refez (base do próximo delta)
   std::int8_t moveForward = 0;   // W − S
   std::int8_t moveRight = 0;     // D − A
   double camYaw = 0;             // giro da câmera: WASD é relativo a ele
@@ -55,6 +56,7 @@ struct PlayerCommand {
   void io(A& a) {
     a(seq);
     a(clientTick);
+    a(ackSnapshot);
     a(moveForward);
     a(moveRight);
     a.f32(camYaw);

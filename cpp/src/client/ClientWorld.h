@@ -31,6 +31,9 @@ class ClientWorld {
   MapKind map() const;
   std::uint32_t instance() const;
 
+  // Predição (jogo pela rede): o próprio personagem vai para a posição prevista.
+  void placeSelf(double x, double y, double z);
+
  private:
   std::uint32_t playerId_ = 0;
   std::vector<protocol::EntityState> entities_;

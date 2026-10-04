@@ -19,7 +19,7 @@
 
 namespace rpg::protocol {
 
-inline constexpr std::uint16_t kProtocolVersion = 2;
+inline constexpr std::uint16_t kProtocolVersion = 3;
 
 enum class EntityKind : std::uint8_t { Player, Enemy, Npc, Mount, Projectile, LootBag };
 

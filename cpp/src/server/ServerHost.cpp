@@ -14,6 +14,12 @@ namespace rpg::server {
 
 namespace proto = rpg::protocol;
 
+namespace {
+// Comandos à espera por sessão: um cliente adiantado (rajada da rede) perde os mais velhos. Os toques
+// não se perdem: os contadores de cada tecla seguem no comando seguinte.
+constexpr std::size_t kMaxQueuedCommands = 8;
+}  // namespace
+
 // Bot: um jogador sem conexão que anda ao acaso e ataca o que estiver perto (testes de carga).
 struct ServerHost::Bot {
   sim::EntityId player = 0;
@@ -50,12 +56,14 @@ ServerHost::~ServerHost() = default;
 void ServerHost::runTicks(std::uint64_t n) {
   for (std::uint64_t i = 0; i < n; ++i) {
     pumpNetwork();
+    clock_ += timestep_.step();
     tickOnce();
   }
 }
 
 int ServerHost::update(Seconds elapsed) {
   pumpNetwork();
+  clock_ += elapsed;
   const int steps = timestep_.advance(elapsed);
   for (int i = 0; i < steps; ++i) tickOnce();
   return steps;
@@ -90,9 +98,11 @@ void ServerHost::run(const std::atomic<bool>& stop) {
 
 void ServerHost::tickOnce() {
   stepBots();
+  applyCommands();
   world_.step(timestep_.step());
   routeEvents();
   if (config_.snapshotEvery <= 1 || world_.tick() % static_cast<std::uint64_t>(config_.snapshotEvery) == 0) sendSnapshots();
+  if (transport_) transport_->flush();
   if (store_ && !world_.paused()) {
     autosaveT_ += timestep_.step();
     if (autosaveT_ >= config_.autosaveEvery) {
@@ -117,10 +127,14 @@ void ServerHost::pumpNetwork() {
   net::Message msg;
   while (transport_->poll(msg)) {
     switch (msg.kind) {
-      case net::Message::Kind::Connected:
-        sessions_.push_back({msg.peer, world_.tick(), 0, 0, {}});
+      case net::Message::Kind::Connected: {
+        Session s;
+        s.connection = msg.peer;
+        s.connectedAt = world_.tick();
+        sessions_.push_back(std::move(s));
         log::info("cliente {} conectado (tick {})", msg.peer.value, world_.tick());
         break;
+      }
       case net::Message::Kind::Disconnected: {
         if (Session* s = sessionOf(msg.peer); s && s->player) {
           saveCharacter(*s);
@@ -142,14 +156,27 @@ void ServerHost::pumpNetwork() {
             ++ignoredMessages_;
             break;
           }
-          // canal não confiável: um comando mais velho que o último aplicado chega atrasado e é descartado
-          if (cmd->seq != 0 && cmd->seq <= s->lastCommandSeq) break;
-          s->lastCommandSeq = cmd->seq;
-          world_.setCommand(s->player, *cmd);
+          // canal não confiável: um comando mais velho que o último aceito chega atrasado e é descartado
+          if (cmd->seq != 0 && cmd->seq <= s->lastQueuedSeq) break;
+          const sim::Player* p = world_.state().player(s->player);
+          if (!p || !s->validator.command(*cmd, p->pos.x, p->pos.y, p->pos.z, clock_)) {
+            ++droppedMessages_;
+            break;
+          }
+          s->lastQueuedSeq = cmd->seq;
+          s->ackSnapshot = std::max(s->ackSnapshot, cmd->ackSnapshot);
+          s->commands.push_back(*cmd);
+          while (s->commands.size() > kMaxQueuedCommands) s->commands.pop_front();
         } else if (msg.channel == net::Channel::Requests) {
           auto m = proto::decode<proto::ClientMessage>(net::asU8(msg.bytes));
           if (!m) {
             ++ignoredMessages_;
+            break;
+          }
+          // taxa de pedidos (os de desenvolvimento, só aceitos com --dev, ficam de fora: roteiros de teste)
+          if (const auto* req = std::get_if<proto::Request>(&*m);
+              req && !std::holds_alternative<proto::ReqDev>(*req) && !s->validator.request(clock_)) {
+            ++droppedMessages_;
             break;
           }
           onClientMessage(*s, std::move(*m));
@@ -203,7 +230,7 @@ void ServerHost::join(Session& s, const proto::Hello& hello) {
     s.player = world_.addPlayer({name, origin, start, hello.model}, s.connection.value, true);
   }
   s.name = world_.state().player(s.player)->name;
-  s.lastCommandSeq = 0;
+  resetSession(s);
   // um personagem novo substitui o save de mesmo nome (main.js: clearSave ao começar)
   if (!w.resumed) saveCharacter(s);
   w.playerId = s.player;
@@ -224,8 +251,25 @@ void ServerHost::leave(Session& s, bool discard) {
   world_.removePlayer(s.player);
   log::info("{} saiu do mundo{}", s.name, discard ? " (save apagado)" : "");
   s.player = 0;
-  s.lastCommandSeq = 0;
+  resetSession(s);
   s.name.clear();
+}
+
+void ServerHost::resetSession(Session& s) {
+  s.lastCommandSeq = 0;
+  s.lastQueuedSeq = 0;
+  s.commands.clear();
+  s.ackSnapshot = 0;
+  s.delta.reset();  // o próximo snapshot vai inteiro (a numeração continua)
+}
+
+void ServerHost::applyCommands() {
+  for (Session& s : sessions_) {
+    if (!s.player || s.commands.empty()) continue;
+    s.lastCommandSeq = s.commands.front().seq;
+    world_.setCommand(s.player, s.commands.front());
+    s.commands.pop_front();
+  }
 }
 
 void ServerHost::onClientMessage(Session& s, proto::ClientMessage&& msg) {
@@ -266,9 +310,10 @@ void ServerHost::routeEvents() {
 
 void ServerHost::sendSnapshots() {
   if (!transport_) return;
-  for (const Session& s : sessions_) {
+  for (Session& s : sessions_) {
     if (!s.player) continue;
-    send(s.connection, net::Channel::Snapshots, proto::encode(world_.snapshot(s.player, config_.interestRadius)));
+    const proto::SnapshotDelta d = s.delta.encode(world_.snapshot(s.player, config_.interestRadius), s.ackSnapshot);
+    send(s.connection, net::Channel::Snapshots, proto::encode(d));
   }
 }
 

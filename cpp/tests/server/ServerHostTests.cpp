@@ -49,6 +49,7 @@ TEST_CASE("ServerHost roda numa thread própria e para quando pedido", "[server]
 }
 
 #include "core/protocol/Session.h"
+#include "core/protocol/SnapshotDelta.h"
 #include "net/Bytes.h"
 
 namespace {
@@ -57,6 +58,7 @@ namespace {
 struct Inbox {
   std::vector<rpg::protocol::ServerMessage> events;
   std::optional<rpg::protocol::Snapshot> snapshot;
+  rpg::protocol::DeltaDecoder decoder;
   int snapshots = 0;
   void drain(rpg::net::ITransport& t) {
     rpg::net::Message m;
@@ -67,7 +69,9 @@ struct Inbox {
         REQUIRE(e);
         events.push_back(std::move(*e));
       } else if (m.channel == rpg::net::Channel::Snapshots) {
-        auto s = rpg::protocol::decode<rpg::protocol::Snapshot>(rpg::net::asU8(m.bytes));
+        auto d = rpg::protocol::decode<rpg::protocol::SnapshotDelta>(rpg::net::asU8(m.bytes));
+        REQUIRE(d);
+        auto s = decoder.decode(*d);
         REQUIRE(s);
         snapshot = std::move(*s);
         ++snapshots;

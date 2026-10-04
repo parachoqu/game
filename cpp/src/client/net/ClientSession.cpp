@@ -14,6 +14,7 @@ ClientSession::ClientSession(std::unique_ptr<net::ITransport> transport) : trans
 void ClientSession::sendBytes(net::Channel ch, const proto::Bytes& b) {
   bytesOut_ += b.size();
   transport_->send(net::kServer, ch, net::asBytes(b));
+  transport_->flush();
 }
 
 void ClientSession::join(const proto::Hello& hello) {
@@ -34,8 +35,9 @@ void ClientSession::send(const proto::Request& req) {
   sendBytes(net::Channel::Requests, proto::encode(proto::ClientMessage{req}));
 }
 
-void ClientSession::send(const proto::PlayerCommand& cmd) {
+void ClientSession::send(proto::PlayerCommand cmd) {
   if (state_ != State::InGame) return;
+  cmd.ackSnapshot = deltas_.lastSeq();
   sendBytes(net::Channel::Commands, proto::encode(cmd));
 }
 
@@ -49,12 +51,20 @@ void ClientSession::poll(double localTime) {
     if (msg.kind != net::Message::Kind::Data) continue;
     bytesIn_ += msg.bytes.size();
     if (msg.channel == net::Channel::Snapshots) {
-      auto snap = proto::decode<proto::Snapshot>(net::asU8(msg.bytes));
-      if (!snap) {
+      auto delta = proto::decode<proto::SnapshotDelta>(net::asU8(msg.bytes));
+      if (!delta) {
         ++bad_;
         continue;
       }
-      if (state_ == State::InGame) snapshots_.push(std::move(*snap), localTime);
+      if (state_ != State::InGame) continue;
+      // a numeração do servidor nunca volta (nem entre personagens): o decodificador vale a sessão toda
+      auto snap = deltas_.decode(*delta);
+      if (!snap) {
+        ++stale_;
+        continue;
+      }
+      ++(delta->base == 0 ? full_ : partial_);
+      snapshots_.push(std::move(*snap), localTime);
       continue;
     }
     if (msg.channel != net::Channel::Events) continue;
