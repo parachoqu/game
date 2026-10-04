@@ -50,17 +50,26 @@ protocol::EntityState lerpEntity(const protocol::EntityState& a, const protocol:
   r.y = lerp(a.y, b.y, t);
   r.z = lerp(a.z, b.z, t);
   r.yaw = lerpAngle(a.yaw, b.yaw, t);
-  r.dodgeYaw = lerpAngle(a.dodgeYaw, b.dodgeYaw, t);
+  // a direção da esquiva só existe enquanto ela dura: no primeiro snapshot dela, a anterior vale 0 e
+  // misturar daria um meio-termo (o clipe e o giro do corpo são escolhidos nesse quadro)
+  if (a.dodgeProgress >= 0 && b.dodgeProgress >= 0) r.dodgeYaw = lerpAngle(a.dodgeYaw, b.dodgeYaw, t);
   r.speed = lerp(a.speed, b.speed, t);
   r.aimPitch = lerp(a.aimPitch, b.aimPitch, t);
+  // direção do passo: a demo usa o vetor unitário (mx, mz); a mistura de dois encurta nas viradas
   r.moveX = lerp(a.moveX, b.moveX, t);
   r.moveZ = lerp(a.moveZ, b.moveZ, t);
+  if (const double len = std::hypot(r.moveX, r.moveZ); (b.flags & protocol::kFlagMoving) != 0 && len > 1e-6) {
+    r.moveX /= len;
+    r.moveZ /= len;
+  }
   if (a.action == b.action && a.actionProgress >= 0 && b.actionProgress >= a.actionProgress)
     r.actionProgress = lerp(a.actionProgress, b.actionProgress, t);
   if (a.dodgeProgress >= 0 && b.dodgeProgress >= a.dodgeProgress) r.dodgeProgress = lerp(a.dodgeProgress, b.dodgeProgress, t);
   if (a.airPhase >= 0 && b.airPhase >= a.airPhase) r.airPhase = lerp(a.airPhase, b.airPhase, t);
   if (b.stateT >= a.stateT) r.stateT = lerp(a.stateT, b.stateT, t);
   if (b.deadT >= a.deadT) r.deadT = lerp(a.deadT, b.deadT, t);
+  // G.time - hitAt corre a cada quadro na demo; um golpe novo (b < a) vale direto
+  if (a.hitAge >= 0 && b.hitAge >= a.hitAge) r.hitAge = lerp(a.hitAge, b.hitAge, t);
   r.hpFrac = lerp(a.hpFrac, b.hpFrac, t);
   return r;
 }

@@ -204,6 +204,9 @@ struct Player {
   bool hasStaggerT = false;
   DamageSource downSrc;
   bool warnedBroken = false;
+  // A arma aparece na mão (P.model.setWeapon da demo)? Só muda ao equipar, ao reaparecer e ao carregar
+  // (inutilizada fica guardada) e no reparo; uma arma que quebra em combate continua à mostra.
+  bool weaponShown = true;
 
   // reação ao golpe (só o animador lê)
   std::optional<double> hitAt;

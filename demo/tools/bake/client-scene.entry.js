@@ -360,11 +360,11 @@ function humanScenarios() {
     { name: 'idle_fists', family: null, frames: ramp(80, () => ({ mps: 0 })) },
     { name: 'walk_run', family: 'espada', frames: [...walk(1.8, 30), ...walk(5.6, 30)], yaw: (i) => 0.6 + i * 0.01 },
     { name: 'strafe_back', family: 'arco', frames: [...ramp(20, () => ({ mps: 2.2, fwd: 0.2, strafe: 0.9 })), ...ramp(20, () => ({ mps: 2.0, fwd: -0.9, strafe: -0.3 }))] },
-    { name: 'slash', family: 'espada', frames: ramp(20, (i, n) => ({ mps: 0, attack: i / (n - 1), kind: 'slash', aimPitch: 0.2 })) },
+    { name: 'slash', family: 'espada', frames: ramp(20, (i, n) => ({ mps: 0, attack: i / (n - 1), kind: 'slash', aimPitch: 0.2 })), checkpoints: [6, 12] },
     { name: 'swing_walk', family: 'martelo', frames: [...walk(2, 10), ...ramp(16, (i, n) => ({ mps: 2, fwd: 1, attack: i / (n - 1), kind: 'swing' }))] },
-    { name: 'heavy_cast', family: 'tomo_fogo', frames: [...ramp(12, (i, n) => ({ mps: 0, attack: i / (n - 1), kind: 'heavy' })), ...ramp(12, (i, n) => ({ mps: 0, attack: i / (n - 1), kind: 'cast' }))] },
-    { name: 'bow_shot', family: 'arco', frames: ramp(18, (i, n) => ({ mps: 0, attack: i / (n - 1), kind: 'bow' })) },
-    { name: 'dodge_left', family: 'arco', frames: [...ramp(13, (i) => ({ mps: 0, dodge: Math.min(1, (i * DT) / 0.42), dodgeKey: 'dodgeLeft' })), ...ramp(8, () => ({ mps: 0 }))] },
+    { name: 'heavy_cast', family: 'tomo_fogo', frames: [...ramp(12, (i, n) => ({ mps: 0, attack: i / (n - 1), kind: 'heavy' })), ...ramp(12, (i, n) => ({ mps: 0, attack: i / (n - 1), kind: 'cast' }))], checkpoints: [5, 17] },
+    { name: 'bow_shot', family: 'arco', frames: ramp(18, (i, n) => ({ mps: 0, attack: i / (n - 1), kind: 'bow' })), checkpoints: [5, 10] },
+    { name: 'dodge_left', family: 'arco', frames: [...ramp(13, (i) => ({ mps: 0, dodge: Math.min(1, (i * DT) / 0.42), dodgeKey: 'dodgeLeft' })), ...ramp(8, () => ({ mps: 0 }))], checkpoints: [7, 15] },
     { name: 'roll', family: 'espada', frames: [...walk(3, 6), ...ramp(13, (i) => ({ mps: 0, dodge: Math.min(1, (i * DT) / 0.42), dodgeKey: 'roll' }))] },
     { name: 'hit_walk', family: 'espada', frames: [...walk(2, 12), ...ramp(14, (i) => ({ mps: 2, fwd: 1, hit: { side: 'left', t: i * DT } }))] },
     { name: 'hit_idle', family: 'espada', frames: ramp(14, (i) => ({ mps: 0, hit: { side: 'back', t: i * DT } })) },
@@ -374,6 +374,67 @@ function humanScenarios() {
     { name: 'mounted', family: 'lanca', frames: ramp(20, () => ({ mps: 0, mounted: true })) },
     { name: 'channel_meta', family: null, frames: [...ramp(15, () => ({ mps: 0, channel: true })), ...ramp(15, () => ({ mps: 0, metamorph: true }))] },
     { name: 'craft', family: 'martelo', frames: ramp(20, () => ({ mps: 0, craft: true })) },
+    ...aimScenarios(),
+    ...actionScenarios(),
+  ];
+}
+// A mira: o aim que player.js entrega é P.aimT, que updateCamera leva a 1 com min(1, dt·9) por quadro
+// enquanto se mira (1 − 0,7ᵏ a 30 quadros por segundo) e de volta a 0 ao soltar.
+const aimUp = (k) => 1 - Math.pow(1 - Math.min(1, DT * 9), k + 1);
+const aimDown = (k) => Math.pow(1 - Math.min(1, DT * 9), k + 1);
+function aimScenarios() {
+  const hold = (n, extra = {}) => ramp(n, () => ({ mps: 0, aim: 1, ...extra }));
+  const up = (n, extra = {}) => ramp(n, (i) => ({ mps: 0, aim: aimUp(i), ...extra }));
+  const shot = (kind, n, extra = {}) => ramp(n, (i, m) => ({ mps: 0, aim: 1, attack: 0.9 * i / (m - 1), kind, ...extra }));
+  return [
+    // arco: erguer e puxar (full), segurar (hold), soltar e voltar a puxar, e baixar
+    { name: 'bow_aim_hold', family: 'arco', frames: [...up(12), ...hold(30), ...ramp(10, (i) => ({ mps: 0, aim: aimDown(i) }))], checkpoints: [5, 11, 25, 41, 46] },
+    { name: 'bow_aim_fire', family: 'arco', frames: [...up(9), ...hold(12, { aimPitch: 0.15 }), ...shot('bow', 12, { aimPitch: 0.15 }), ...hold(10, { aimPitch: 0.15 })], checkpoints: [20, 24, 28, 36, 42] },
+    { name: 'bow_aim_charge', family: 'arco', frames: [...up(9, { aimPitch: 0.3 }), ...hold(6, { aimPitch: 0.3 }), ...shot('charge', 14, { aimPitch: 0.3 }), ...hold(6, { aimPitch: -0.25 })], checkpoints: [14, 20, 28, 34] },
+    { name: 'bow_aim_walk', family: 'arco', frames: [...up(8, { mps: 1.4, fwd: 1 }), ...ramp(20, () => ({ mps: 1.4, fwd: 1, aim: 1 })), ...ramp(15, () => ({ mps: 1.6, fwd: 0.3, strafe: 0.8, aim: 1 }))], checkpoints: [7, 20, 27, 42] },
+    { name: 'bow_aim_hit', family: 'arco', frames: [...up(6), ...hold(8), ...ramp(8, (i) => ({ mps: 0, aim: 1, hit: { side: 'front', t: i * DT } }))], checkpoints: [13, 17, 21] },
+    { name: 'bow_aim_air', family: 'arco', frames: [...hold(6), ...ramp(12, (i, n) => ({ mps: 2, fwd: 1, aim: 1, air: { phase: i / (n - 1), boosted: false } }))], checkpoints: [5, 11, 17] },
+    { name: 'bow_aim_mounted', family: 'arco', frames: hold(16, { mounted: true }), checkpoints: [8, 15] },
+    // mira das outras armas (ombros de lado, arma na linha do olhar, cabeça para o alvo)
+    { name: 'aim_sword', family: 'espada', frames: [...up(10), ...hold(10, { aimPitch: -0.3 })], checkpoints: [5, 19] },
+    { name: 'aim_crossbow', family: 'besta', frames: [...up(10), ...hold(8), ...shot('crossbow', 10)], checkpoints: [9, 17, 22, 27] },
+    { name: 'aim_tome', family: 'tomo_fogo', frames: [...up(10), ...hold(8, { aimPitch: 0.2 }), ...shot('cast', 10, { aimPitch: 0.2 })], checkpoints: [9, 17, 22, 27] },
+    { name: 'aim_staff', family: 'cajado_gelo', frames: [...up(10, { mps: 1.2, fwd: 1 }), ...hold(10, { mps: 1.2, fwd: 1 })], checkpoints: [6, 19] },
+  ];
+}
+// Um roteiro por tipo de golpe e por caso de esquiva, golpe, queda, agachar, pulo e canal, com poses
+// no meio da ação (no fim de uma rampa até 1 o peso do clipe já zerou).
+const ONE = ['kachujin'];
+function actionScenarios() {
+  const act = (kind, family, n = 14) => ({ name: `kind_${kind}`, family, models: ONE, frames: ramp(n, (i, m) => ({ mps: 0, attack: 0.65 * i / (m - 1), kind })), checkpoints: [Math.floor(n / 2), n - 1] });
+  const dodge = (key, family) => ({ name: `dodge_${key}`, family, models: ONE, frames: [...ramp(8, (i) => ({ mps: 0, dodge: Math.min(1, (i * DT) / 0.42), dodgeKey: key })), ...ramp(4, () => ({ mps: 0 }))], checkpoints: [7, 9, 11] });
+  return [
+    act('thrust', 'lanca'), act('rapid', 'manoplas'), act('spin', 'foice'), act('crossbow', 'besta'),
+    act('charge', 'arco'), act('heavy', 'machado'), act('cast', 'cajado_gelo'), act('bow', 'arco'),
+    act('slash', 'espada'), act('swing', 'maca'),
+    dodge('dodgeForward', 'besta'), dodge('dodgeBackward', null), dodge('dodgeRight', 'arco'), dodge('roll', 'adaga'),
+    { name: 'hit_front_idle', family: 'espada', models: ONE, frames: ramp(12, (i) => ({ mps: 0, hit: { side: 'front', t: i * DT } })), checkpoints: [5, 11] },
+    { name: 'hit_right_walk', family: 'espada', models: ONE, frames: [...ramp(8, () => ({ mps: 2, fwd: 1 })), ...ramp(12, (i) => ({ mps: 2, fwd: 1, hit: { side: 'right', t: i * DT } }))], checkpoints: [13, 19] },
+    { name: 'hit_during_attack', family: 'espada', models: ONE, frames: [...ramp(8, (i, n) => ({ mps: 0, attack: 0.5 * i / (n - 1), kind: 'slash' })), ...ramp(8, (i) => ({ mps: 0, attack: 0.5, kind: 'slash', hit: { side: 'back', t: i * DT } }))], checkpoints: [7, 11, 15] },
+    { name: 'hit_expire', family: 'espada', models: ONE, frames: ramp(40, (i) => ({ mps: 0, hit: { side: 'left', t: i * DT * 2.5 } })), checkpoints: [10, 25, 39] },
+    { name: 'death_backward_walk', family: 'machado', models: ONE, frames: [...ramp(10, () => ({ mps: 2, fwd: 1 })), ...ramp(30, (i) => ({ mps: 0, death: { fall: 'backward', t: i * DT } }))], checkpoints: [15, 25, 39] },
+    { name: 'crouch_posture', family: 'espada', models: ONE, frames: [...ramp(5, () => ({ mps: 0 })), ...ramp(20, () => ({ mps: 0, crouch: 1 })), ...ramp(15, () => ({ mps: 0 })), ...ramp(12, () => ({ mps: 1, fwd: -1, crouch: 1 }))], checkpoints: [8, 16, 28, 34, 51] },
+    { name: 'air_land', family: 'espada', models: ONE, frames: [...ramp(12, (i, n) => ({ mps: 2.5, fwd: 1, air: { phase: i / (n - 1), boosted: true } })), ...ramp(6, () => ({ mps: 2.5, fwd: 1 }))], checkpoints: [6, 11, 14, 17] },
+    { name: 'channel_only', family: 'martelo', models: ONE, frames: ramp(20, () => ({ mps: 0, channel: true })), checkpoints: [10, 19] },
+    { name: 'metamorph_walk', family: 'metamorfose', models: ONE, frames: ramp(20, () => ({ mps: 2, fwd: 1, metamorph: true })), checkpoints: [10, 19] },
+    { name: 'fists_walk_back', family: 'punhos', models: ONE, frames: ramp(20, () => ({ mps: 1.8, fwd: -1 })), checkpoints: [10, 19] },
+  ];
+}
+function quadScenarios() {
+  const base = [
+    ...ramp(20, () => ({ mps: 0 })), ...ramp(30, () => ({ mps: 5 })),
+    ...ramp(10, (i, n) => ({ mps: 0, windup: i / (n - 1) })), ...ramp(10, (i, n) => ({ mps: 0, attack: i / (n - 1) })),
+    ...ramp(8, () => ({ mps: 0, stun: true })), ...ramp(12, () => ({ mps: 0, down: true })),
+  ];
+  return [
+    { name: 'base', frames: base, checkpoints: [55, 65, 75] },
+    { name: 'down_up', frames: [...ramp(12, () => ({ mps: 0, down: true })), ...ramp(14, () => ({ mps: 0 }))], checkpoints: [11, 18, 25], beasts: true },
+    { name: 'windup_moving', frames: ramp(12, (i, n) => ({ mps: 3, windup: i / (n - 1) })), checkpoints: [6, 11], beasts: true },
   ];
 }
 function poseOf(pivot, body, skip = []) {
@@ -421,48 +482,59 @@ function exportAnimParity() {
     for (const model of ['kachujin', 'eve', 'paladina']) {
       if (!MODELS[model]) continue;
       for (const sc of humanScenarios()) {
+        if (sc.models && !sc.models.includes(model)) continue;
         const race = model === 'eve' ? 'elfo' : model === 'paladina' && sc.name === 'walk_run' ? 'anao' : 'humano';
         const h = makeHumanoid({ model, race });
         h.setWeapon(sc.family);
         h.root.position.set(X, Y, Z);
-        const frames = [];
+        const frames = [], checkpoints = [];
         sc.frames.forEach((f, i) => {
           const yaw = sc.yaw ? sc.yaw(i) : 0.6;
           h.root.rotation.y = yaw;
           const s = { dt: DT, attack: -1, dodge: -1, ...f };
           animateHumanoid(h, s);
           frames.push({ yaw, s: f });
+          if (sc.checkpoints?.includes(i)) checkpoints.push({ frame: i, ...poseOf(h.pivot, h.body, [h.gripR, h.gripL]) });
         });
         const rec = { model, race, scenario: sc.name, family: sc.family, frames, pose: poseOf(h.pivot, h.body, [h.gripR, h.gripL]) };
+        if (checkpoints.length) rec.checkpoints = checkpoints;
         if (sc.name === 'walk_run' || sc.name === 'slash') rec.skin = skinSamples(h.root, h.pivot, 24, [h.gripR, h.gripL]);
         out.humanoids.push(rec);
       }
     }
-    const beastScenario = [
-      ...ramp(20, () => ({ mps: 0 })), ...ramp(30, () => ({ mps: 5 })),
-      ...ramp(10, (i, n) => ({ mps: 0, windup: i / (n - 1) })), ...ramp(10, (i, n) => ({ mps: 0, attack: i / (n - 1) })),
-      ...ramp(8, () => ({ mps: 0, stun: true })), ...ramp(12, () => ({ mps: 0, down: true })),
-    ];
+    const makeQuad = (rig) => {
+      if (rig === 'lioness') {
+        const saved = MODELS.hound;
+        MODELS.hound = null;
+        const r = makeBeast({ scale: 1.1 });
+        MODELS.hound = saved;
+        return r;
+      }
+      return rig === 'hound' ? makeBeast({ scale: 0.9 }) : makeMount();
+    };
     const quads = [];
-    if (MODELS.lioness) {
-      const saved = MODELS.hound;
-      MODELS.hound = null;
-      quads.push(['lioness', 'beast', makeBeast({ scale: 1.1 })]);
-      MODELS.hound = saved;
-    }
-    if (MODELS.hound) quads.push(['hound', 'beast', makeBeast({ scale: 0.9 })]);
-    if (MODELS.horse) quads.push(['horse', 'mount', makeMount()]);
-    for (const [rig, kind, r] of quads) {
-      r.root.position.set(X, Y, Z);
-      const frames = [];
-      beastScenario.forEach((f, i) => {
-        const yaw = 0.6 + i * 0.02;
-        r.root.rotation.y = yaw;
-        if (kind === 'mount') animateMount(r, { dt: DT, speed: f.mps / 12.5 });
-        else animateBeast(r, { dt: DT, windup: -1, attack: -1, ...f });
-        frames.push({ yaw, s: f });
-      });
-      out.quadrupeds.push({ rig, kind, scale: r.scale, frames, pose: poseOf(r.pivot, r.body), skin: kind === 'mount' ? skinSamples(r.root, r.pivot) : null });
+    if (MODELS.lioness) quads.push(['lioness', 'beast']);
+    if (MODELS.hound) quads.push(['hound', 'beast']);
+    if (MODELS.horse) quads.push(['horse', 'mount']);
+    for (const sc of quadScenarios()) {
+      for (const [rig, kind] of quads) {
+        if (sc.beasts && kind !== 'beast') continue;
+        const r = makeQuad(rig);
+        r.root.position.set(X, Y, Z);
+        const frames = [], checkpoints = [];
+        sc.frames.forEach((f, i) => {
+          const yaw = 0.6 + i * 0.02;
+          r.root.rotation.y = yaw;
+          if (kind === 'mount') animateMount(r, { dt: DT, speed: f.mps / 12.5 });
+          else animateBeast(r, { dt: DT, windup: -1, attack: -1, ...f });
+          frames.push({ yaw, s: f });
+          if (sc.checkpoints?.includes(i)) checkpoints.push({ frame: i, ...poseOf(r.pivot, r.body) });
+        });
+        const rec = { rig, kind, scenario: sc.name, scale: r.scale, frames, pose: poseOf(r.pivot, r.body),
+          skin: kind === 'mount' && sc.name === 'base' ? skinSamples(r.root, r.pivot) : null };
+        if (checkpoints.length) rec.checkpoints = checkpoints;
+        out.quadrupeds.push(rec);
+      }
     }
   } finally {
     Math.random = savedRandom;

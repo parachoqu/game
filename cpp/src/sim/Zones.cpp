@@ -171,6 +171,7 @@ void respawn(Sim& s, Player& p) {
   p.invuln = 1.5;
   p.lastCombat = -99;
   p.deathPanel = false;
+  p.weaponShown = p.equip.weapon && p.equip.weapon->cond > 0;  // zones.js respawn: setWeapon(cond > 0 ? … : null)
   s.toPlayer(p, protocol::EvRespawned{});
 }
 

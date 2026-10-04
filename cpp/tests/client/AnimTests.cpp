@@ -5,6 +5,7 @@
 #include <cmath>
 #include <filesystem>
 #include <fstream>
+#include <map>
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -109,10 +110,13 @@ glm::mat4 bodyFromJs(const json& b) {
   return glm::scale(glm::translate(glm::mat4(1.0f), p) * eulerXYZ(r), s);
 }
 
-// Ângulo entre duas orientações (rad), sem o sinal do quaternion.
+// Ângulo entre duas orientações (rad), sem o sinal do quaternion. 4·asin(|a − b|/2) em double: o
+// 2·acos(dot) em float só enxerga degraus de ~1e-3 rad perto de 1 (o erro de arredondamento do dot).
 double angleBetween(const glm::quat& a, const glm::quat& b) {
-  const double d = std::min(1.0, std::abs(static_cast<double>(glm::dot(a, b))));
-  return 2.0 * std::acos(d);
+  const double s = glm::dot(a, b) < 0 ? -1.0 : 1.0;
+  const auto d = [s](float p, float q) { return static_cast<double>(p) - s * static_cast<double>(q); };
+  const double dx = d(a.x, b.x), dy = d(a.y, b.y), dz = d(a.z, b.z), dw = d(a.w, b.w);
+  return 4.0 * std::asin(std::min(1.0, std::sqrt(dx * dx + dy * dy + dz * dz + dw * dw) / 2.0));
 }
 
 struct PoseDiff {
@@ -175,6 +179,14 @@ double skinError(const Rig& r, const Pose& pose, const glm::mat4& rootBody, cons
     err = std::max(err, static_cast<double>(glm::length(glm::vec3(w) - want)));
   }
   return err;
+}
+
+// Poses gravadas no meio do roteiro (quadro → pose), além da do fim.
+std::map<std::size_t, const json*> checkpointsOf(const json& rec) {
+  std::map<std::size_t, const json*> out;
+  if (rec.contains("checkpoints"))
+    for (const json& c : rec["checkpoints"]) out[c["frame"].get<std::size_t>()] = &c;
+  return out;
 }
 
 glm::mat4 rootAt(double x, double y, double z, double yaw) {
@@ -277,10 +289,20 @@ TEST_CASE("Animação: humanoides iguais aos da demo", "[client][anim][parity]")
     w.camera = w.rootPos;
     w.groundHeight = [&map](double gx, double gz) { return map.groundHeight(gx, gz); };
     double yaw = 0;
+    const auto checkpoints = checkpointsOf(rec);
+    std::size_t frame = 0;
     for (const json& f : rec["frames"]) {
       yaw = f["yaw"].get<double>();
       w.rootYaw = yaw;
       REQUIRE(h.animate(humanInput(f["s"], dt), w));
+      if (const auto it = checkpoints.find(frame); it != checkpoints.end()) {
+        const PoseDiff c = comparePose(r, h.pose(), (*it->second)["nodes"]);
+        CAPTURE(frame, c.worst, c.angle, c.pos, c.worstPos);
+        CHECK(c.angle < 2e-3);
+        CHECK(c.pos < 2e-3);
+        CHECK(maxDiff(h.bodyMatrix(), bodyFromJs((*it->second)["body"])) < 1e-4);
+      }
+      ++frame;
     }
     const PoseDiff d = comparePose(r, h.pose(), rec["pose"]["nodes"]);
     CAPTURE(d.worst, d.angle, d.pos, d.worstPos);
@@ -302,8 +324,10 @@ TEST_CASE("Animação: quadrúpedes iguais aos da demo", "[client][anim][parity]
   const double dt = P["dt"].get<double>(), x = P["x"].get<double>(), y = P["y"].get<double>(), z = P["z"].get<double>();
   const StaticMap& map = rpg::test::staticWorld().map(MapKind::Region);
   for (const json& rec : P["quadrupeds"]) {
-    const std::string id = rec["rig"], kind = rec["kind"];
-    CAPTURE(id);
+    const std::string id = rec["rig"], kind = rec["kind"], scenario = rec.value("scenario", std::string("base"));
+    CAPTURE(id, scenario);
+    const auto checkpoints = checkpointsOf(rec);
+    std::size_t frame = 0;
     const Rig& r = rig(id);
     const QuadrupedAnimator::Kind k = kind == "mount" ? QuadrupedAnimator::Kind::Mount : id == "hound" ? QuadrupedAnimator::Kind::Hound : QuadrupedAnimator::Kind::Beast;
     QuadrupedAnimator a(r, k, rec["scale"].get<double>(), 0, [] { return 0.5; });
@@ -325,13 +349,21 @@ TEST_CASE("Animação: quadrúpedes iguais aos da demo", "[client][anim][parity]
       in.attack = s.value("attack", -1.0);
       if (k == QuadrupedAnimator::Kind::Mount) in = QuadrupedInput{dt, s.value("mps", 0.0) / 12.5 * 12.5, false, false, -1, -1};
       REQUIRE(a.animate(in, w));
+      if (const auto it = checkpoints.find(frame); it != checkpoints.end()) {
+        const PoseDiff c = comparePose(r, a.pose(), (*it->second)["nodes"]);
+        CAPTURE(frame, c.worst, c.angle, c.pos, c.worstPos);
+        CHECK(c.angle < 2e-3);
+        CHECK(c.pos < 2e-3);
+        CHECK(maxDiff(a.bodyMatrix(), bodyFromJs((*it->second)["body"])) < 1e-4);
+      }
+      ++frame;
     }
     const PoseDiff d = comparePose(r, a.pose(), rec["pose"]["nodes"]);
     CAPTURE(d.worst, d.angle, d.pos, d.worstPos);
     CHECK(d.angle < 2e-3);
     CHECK(d.pos < 2e-3);
     CHECK(maxDiff(a.bodyMatrix(), bodyFromJs(rec["pose"]["body"])) < 1e-4);
-    if (!rec["skin"].is_null()) {
+    if (rec.contains("skin") && !rec["skin"].is_null()) {
       const double e = skinError(r, a.pose(), rootAt(x, y, z, yaw) * a.bodyMatrix(), rec["skin"]);
       CAPTURE(e);
       CHECK(e < 2e-3);

@@ -99,6 +99,37 @@ TEST_CASE("Interpolação de snapshots: meio do caminho, ângulo pelo lado curto
   CHECK(si.dropped() == 1);
 }
 
+TEST_CASE("Interpolação de snapshots: direção da esquiva, idade do golpe e passo unitário", "[client]") {
+  proto::EntityState a, b;
+  a.dodgeProgress = -1;
+  a.dodgeYaw = 0;  // fora da esquiva o servidor manda 0
+  b.dodgeProgress = 0.08;
+  b.dodgeYaw = 2.0;
+  // primeiro snapshot da esquiva: vale a direção dela, não a média com 0 (o clipe é escolhido aqui)
+  CHECK(lerpEntity(a, b, 0.5).dodgeYaw == Approx(2.0));
+  a.dodgeProgress = 0.08;
+  a.dodgeYaw = 2.0;
+  b.dodgeProgress = 0.16;
+  b.dodgeYaw = 2.2;
+  CHECK(lerpEntity(a, b, 0.5).dodgeYaw == Approx(2.1));
+
+  // G.time − hitAt anda contínuo; um golpe novo zera
+  a.hitAge = 0.1;
+  b.hitAge = 0.1 + 1.0 / 30.0;
+  CHECK(lerpEntity(a, b, 0.5).hitAge == Approx(0.1 + 0.5 / 30.0));
+  b.hitAge = 0.0;
+  CHECK(lerpEntity(a, b, 0.5).hitAge == Approx(0.0));
+
+  // virando 90° em movimento: o passo continua unitário, como o (mx, mz) da demo
+  a.moveX = 1;
+  a.moveZ = 0;
+  b.moveX = 0;
+  b.moveZ = 1;
+  b.flags |= proto::kFlagMoving;
+  const auto m = lerpEntity(a, b, 0.5);
+  CHECK(std::hypot(m.moveX, m.moveZ) == Approx(1.0));
+}
+
 TEST_CASE("Sessão do cliente entra no mundo, anda com comandos e reaparece depois da derrota", "[client]") {
   server::ServerConfig cfg;
   cfg.devCommands = true;

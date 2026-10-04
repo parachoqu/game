@@ -148,6 +148,7 @@ struct CharacterViews::View {
   std::optional<double> dodgeVis;
   std::string dodgeKey;
   bool visInit = false;
+  double aimT = 0;  // player.js `updateCamera`: P.aimT → aiming com min(1, dt·9)
   std::vector<glm::mat4> nodes;
 };
 
@@ -378,7 +379,14 @@ void CharacterViews::update(const ClientWorld& world, const CharacterContext& ct
         s.mounted = mounted;
         s.dodge = dodging ? e.dodgeProgress : -1;
         if (dodging) s.dodgeKey = v.dodgeKey;
-        s.aim = 0;  // P.aimT da demo nunca sai de 0
+        // aim: P.aimT (updateCamera). O próprio jogador usa a rampa da câmera; os outros, a flag replicada.
+        if (ctx.localAim && me && e.id == me->id) {
+          v.aimT = *ctx.localAim;
+        } else {
+          const double aiming = (e.flags & proto::kFlagAiming) != 0 ? 1.0 : 0.0;
+          v.aimT += (aiming - v.aimT) * std::min(1.0, dt * 9);
+        }
+        s.aim = v.aimT;
         if (e.hitAge >= 0) s.hit = HumanoidInput::Hit{static_cast<rpg::anim::HitSide>(e.hitSide), e.hitAge};
         s.aimPitch = e.aimPitch;
         s.fwd = 1;

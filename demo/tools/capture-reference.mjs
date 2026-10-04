@@ -5,7 +5,7 @@
 // HUD e sem o overlay de depuração. Diferente de demo/captures/after (gravadas antes das últimas
 // mudanças da demo), estas refletem exatamente o build atual.
 //
-//   node demo/tools/capture-reference.mjs [pasta de saída] [--only 02_mercado,...,portrait] [--quality alta|media|baixa]
+//   node demo/tools/capture-reference.mjs [pasta de saída] [--only 02_mercado,...,portrait,portrait_aim] [--quality alta|media|baixa]
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { execSync } from 'node:child_process';
@@ -116,6 +116,26 @@ if (want('portrait')) {
   await frames(4);
   await shot('portrait');
   await page.evaluate(() => { window.__demo.G.uiOpen = null; window.__demo.nocam(); });
+}
+// retrato mirando com o arco (rpg_local --portrait-aim --start arqueiro): o botão direito segurado
+// pela câmera normal até o aimT chegar a 1 (a câmera livre o congela); depois de frente, pausado
+if (want('portrait_aim')) {
+  await page.evaluate(() => {
+    const D = window.__demo;
+    D.G.time = 52.5;
+    D.G.player.model.setWeapon('arco');
+    D.input.mouse.right = true;
+  });
+  await frames(40);
+  await page.evaluate(() => {
+    const D = window.__demo, P = D.G.player, yaw = P.model.root.rotation.y;
+    D.G.uiOpen = 'pause';
+    const x = P.pos.x, y = P.pos.y + 1.0, z = P.pos.z, sy = Math.sin(yaw), cy = Math.cos(yaw);
+    D.freecam(x + sy * 3.4, y + 0.5, z + cy * 3.4, x, y, z);
+  });
+  await frames(4);
+  await shot('portrait_aim');
+  await page.evaluate(() => { const D = window.__demo; D.input.mouse.right = false; D.G.uiOpen = null; D.nocam(); });
 }
 
 const place = (pos, look) => page.evaluate(([p, l]) => {

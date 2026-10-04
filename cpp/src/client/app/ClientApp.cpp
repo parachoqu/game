@@ -712,6 +712,7 @@ struct ClientApp::Impl {
       else gameUi->openPanel(Panel::Intents, 0, true);
     }
     const bool uiOpen = this->uiOpen() || P->cinematic;
+    if (opt.portraitAim && opt.portrait) in.right = true;  // retrato mirando (capturas da animação)
     const bool aiming = !uiOpen && in.right && canAim(*P);
     platform.setRelativeMouse(aiming);
 
@@ -740,7 +741,9 @@ struct ClientApp::Impl {
       const glm::dvec3 lk(view->look.x, std::max(view->look.y, vm.groundHeight(view->look.x, view->look.z) + 1.8), view->look.z);
       cam.setFreeCam(std::make_pair(pos, lk));
     }
-    if (opt.portrait && !view) {
+    // retrato mirando: a câmera de mira roda até o aimT chegar a 1 (a câmera livre congela o aimT, como
+    // o updateCamera da demo); depois vai para a frente
+    if (opt.portrait && !view && (!opt.portraitAim || cam.aimT() > 0.99)) {
       // de frente para o personagem, a 3,4 m, na altura do peito
       const glm::dvec3 at(me->x, me->y + 1.0, me->z), dir(std::sin(me->yaw), 0, std::cos(me->yaw));
       cam.setFreeCam(std::make_pair(at + dir * 3.4 + glm::dvec3(0, 0.5, 0), at));
@@ -958,7 +961,15 @@ struct ClientApp::Impl {
     if (pack && renderer.packLoaded()) collectEntityModels(*pack, world, statics, dynScene.models);
     dynScene.skinned.clear();
     dynScene.bones.clear();
-    if (packCharacters) characterViews->update(world, CharacterContext{&data, &statics, glm::vec3(vc.position), dt}, dynScene);
+    if (packCharacters) {
+      CharacterContext chars;
+      chars.data = &data;
+      chars.statics = &statics;
+      chars.camera = glm::vec3(vc.position);
+      chars.dt = dt;
+      if (!view) chars.localAim = cam.aimT();  // na câmera livre dos enquadramentos, o jogador não mira
+      characterViews->update(world, chars, dynScene);
+    }
     // pausa: a cena parada é desenhada uma vez e reaproveitada (só a interface muda)
     f.reuseScene = paused && pauseCached;
     f.cacheScene = paused && !pauseCached;

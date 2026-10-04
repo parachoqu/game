@@ -41,6 +41,7 @@ enum EntityFlag : std::uint32_t {
   kFlagAlive = 1u << 14,
   kFlagBallistic = 1u << 15,
   kFlagHuman = 1u << 16,       // inimigo humanoide (os demais usam o animador de fera)
+  kFlagAiming = 1u << 17,      // jogador mirando (botão direito): a pose de mira e o arco erguido
 };
 
 struct EntityState {

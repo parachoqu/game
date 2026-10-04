@@ -103,6 +103,8 @@ jobs:
           xvfb-run -a -s "-screen 0 1280x800x24" ./build/ci/apps/local/rpg_local --size 1100x700 --auto --debug-ui --frames 60 --screenshot shots/depuracao.png
           # o personagem de frente (modelo com pele, pose ociosa, arma na mão), como o retrato de capture-reference.mjs
           ./build/ci/apps/local/rpg_local --headless --size 1100x700 --auto --dev --hide-hud --portrait --hour 12 --frames 64 --screenshot shots/portrait.png
+          # mirando com o arco (capture-reference.mjs --only portrait_aim, com o modelo padrão da demo)
+          ./build/ci/apps/local/rpg_local --headless --size 1100x700 --auto --dev --hide-hud --portrait-aim --start arqueiro --model paladina --hour 12 --frames 64 --screenshot shots/portrait_aim.png
       - uses: actions/upload-artifact@v4
         with:
           name: capturas-cliente

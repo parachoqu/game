@@ -203,6 +203,8 @@ void repair(Sim& s, Player& p, GearSlot slot) {
   p.coins -= c.coins;
   if (c.lingote && !removeFrom(p.inv, lingote, 1)) removeFrom(p.storage, lingote, 1);
   g->cond = 100;
+  // a demo só devolve a arma à mão ao reequipar ou reaparecer; aqui ela volta já no reparo
+  if (slot == GearSlot::Weapon) p.weaponShown = true;
   s.sfx(p, SoundId::Craft);
   s.toast(p, MessageId::RepairDone, {itemArg(g->id)}, ToastKind::Item);
   stat(p, "repairs");

@@ -556,6 +556,37 @@ agachar e pular, montado, canalização, metamorfose, fabricação) rodados nos 
 mesma pose em cada nó (até 2·10⁻³ rad), o mesmo corpo e os mesmos vértices com pele no mundo (até
 2 mm).
 
+Além da pose do fim, os roteiros gravam poses no meio da ação (`checkpoints`): no fim de uma rampa
+até `attack = 1` o peso do clipe já zerou. Por isso cobrem também:
+
+- **mira:** com o arco, segurar, disparar e repuxar, o tiro carregado com a mira para cima e para
+  baixo, andando e de lado, com golpe, no ar e montado; e a mira de espada, besta, tomo e cajado;
+- **golpes:** um roteiro por tipo (thrust, rapid, spin, crossbow, charge, heavy, cast, bow, slash,
+  swing);
+- **esquivas e impactos:** as quatro esquivas e o rolamento com a cauda, golpes de cada lado (parado,
+  andando, durante ataque e expirando);
+- **corpo:** morte para trás andando, as transições de agachar, pouso, canal, metamorfose andando;
+- **quadrúpedes:** o cão levantando e a fera preparando o bote em movimento.
+
+### A mira, a interpolação e a arma na mão
+
+- **Mira:** `animateHumanoid` recebe `aim: P.aimT`, que o `updateCamera` leva a 1 com
+  `min(1, dt·9)` enquanto se mira (`P.aiming && !G.uiOpen`).
+  - O próprio jogador usa o `ThirdPersonCamera::aimT()`, a mesma rampa, sem esperar o snapshot.
+  - Os outros jogadores usam a flag replicada `kFlagAiming`, com a mesma rampa por vista.
+  - Até esta correção o cliente mandava `aim = 0`, porque o roteiro do bake não passava pelo
+    `updateCamera` e o aimT ficava em 0 nele. Assim a pose de mira e o arco erguido (`bowAim`) não
+    apareciam.
+- **Interpolação dos snapshots:**
+  - a direção da esquiva só interpola com os dois snapshots esquivando, porque o clipe e o giro do
+    corpo são escolhidos no primeiro quadro;
+  - a idade do golpe anda contínua, como o `G.time − hitAt`;
+  - a direção do passo continua unitária nas viradas.
+- **Arma na mão:** segue o `setWeapon` da demo.
+  - Some ao equipar uma arma inutilizada e ao reaparecer com ela.
+  - Uma arma que quebra em combate continua à mostra.
+  - Aqui ela volta também no reparo e ao carregar o save (na demo, só ao reequipar ou reaparecer).
+
 ### Desvios e particularidades
 
 | Demo | Cliente C++ | Por quê |
@@ -564,7 +595,6 @@ mesma pose em cada nó (até 2·10⁻³ rad), o mesmo corpo e os mesmos vértice
 | texturas procedurais em canvas, PNG/JPEG embutidos | WebP q95 com alfa sem perdas (imagens embutidas: os bytes originais) | ~20 MB em vez de ~54 MB; `--lossless` grava sem perdas |
 | PMREM do three para o reflexo do ambiente | harmônicos esféricos (difusa) + equirretangular com mip por rugosidade | aproximação mais simples do PMREM: a difusa é a mesma, o reflexo fica um pouco diferente |
 | o equirretangular do IBL sobe com `flipY = false` (de cabeça para baixo) | reproduzido | paridade |
-| `P.aimT` nunca sai de 0 (a pose de mira com arco não aparece) | reproduzido (`aim = 0`) | paridade |
 | `quadruped()` guarda só a rotação da pose base, e o primeiro `mixerStep` zera a posição de Spine1, Spine2, Head e Jaw da leoa | reproduzido | paridade (a leoa só aparece sem o modelo do cão do vazio) |
 | sombras, GTAO, bloom e cobertura do chão | fase 7 (seção 13) | |
 

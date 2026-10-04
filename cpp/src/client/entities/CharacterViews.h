@@ -66,6 +66,9 @@ struct CharacterContext {
   const StaticWorld* statics = nullptr;
   glm::vec3 camera{0.0f};  // posição da câmera (nível de detalhe da animação)
   double dt = 1.0 / 60.0;
+  // P.aimT do próprio jogador (ThirdPersonCamera::aimT, a rampa de updateCamera): vem do input local,
+  // sem esperar o snapshot. Os outros jogadores usam a flag de mira replicada com a mesma rampa.
+  std::optional<double> localAim;
 };
 
 class CharacterViews {

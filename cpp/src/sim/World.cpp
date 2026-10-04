@@ -123,7 +123,10 @@ void equipFromInv(Sim& s, Player& p, std::size_t i) {
   p.inv.erase(p.inv.begin() + static_cast<std::ptrdiff_t>(i));
   if (*slot) p.inv.push_back(**slot);
   *slot = e;
-  if (it.kind == ItemKind::Weapon) p.warnedBroken = false;
+  if (it.kind == ItemKind::Weapon) {
+    p.warnedBroken = false;
+    p.weaponShown = e.cond > 0;  // panels.js: setWeapon(e.cond > 0 ? family : null)
+  }
   s.sfx(p, SoundId::Ui);
 }
 
@@ -684,7 +687,7 @@ protocol::Snapshot World::snapshot(EntityId viewerId, double radius) const {
     e.state = static_cast<std::uint8_t>(p.state);
     e.stateT = p.stateT;
     e.speed = p.mounted ? 0 : p.speedNow;
-    if (p.equip.weapon) e.weapon = s.data.items[p.equip.weapon->id].family.value;
+    if (p.equip.weapon && p.weaponShown) e.weapon = s.data.items[p.equip.weapon->id].family.value;
     if (p.state == PlayerState::Attack && p.basic) {
       e.action = static_cast<std::uint8_t>(p.basic->kind);
       e.actionProgress = std::min(1.0, p.stateT / (p.basic->windup + p.basic->recover));
@@ -710,6 +713,7 @@ protocol::Snapshot World::snapshot(EntityId viewerId, double radius) const {
     e.moveZ = p.moveZ;
     if (p.moving) e.flags |= protocol::kFlagMoving;
     if (p.crouch) e.flags |= protocol::kFlagCrouch;
+    if (p.aiming && !p.uiOpen) e.flags |= protocol::kFlagAiming;  // updateCamera: aiming = P.aiming && !G.uiOpen
     if (p.mounted) e.flags |= protocol::kFlagMounted;
     if (p.metamorphT > 0) e.flags |= protocol::kFlagMetamorph;
     if (p.state == PlayerState::Channel && p.channel && p.channel->anim) e.flags |= protocol::kFlagChannelAnim;

@@ -67,6 +67,9 @@ if(RPG_BUILD_CLIENT)
     # personagem de perto: malhas com pele (skinned.vert), arma na mão e NPCs
     add_test(NAME smoke.client_portrait
       COMMAND rpg_local --headless --auto --dev --hide-hud --portrait --size 640x360 --frames 40 --screenshot "${CMAKE_BINARY_DIR}/smoke_portrait.png")
+    # mirando com o arco: a câmera de mira até o aimT chegar a 1 e o retrato de frente (bowAim)
+    add_test(NAME smoke.client_portrait_aim
+      COMMAND rpg_local --headless --auto --dev --hide-hud --portrait-aim --start arqueiro --size 640x360 --frames 48 --screenshot "${CMAKE_BINARY_DIR}/smoke_portrait_aim.png")
     # sombras, oclusão, bloom, FXAA e cobertura do chão nos três níveis (tools/measure-benchmark.mjs)
     add_test(NAME smoke.client_benchmark
       COMMAND rpg_local --benchmark --size 640x360 --bench-frames 2 --bench-out "${CMAKE_BINARY_DIR}/benchmark-cpp.json")

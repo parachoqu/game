@@ -79,7 +79,7 @@ e mudo ficam em `settings.json`.
   telegrafias e partículas; o pacote visual da demo (cenário, céu, personagens animados) e, sem ele,
   o cenário grey-box da fase 3.
 - `rpg_local`: servidor numa thread + cliente, ligados por `LocalTransport`.
-- **Testes: 138** (134 sem GPU), entre eles uma trajetória inteira pelo protocolo (comprar, coletar,
+- **Testes: 141** (136 sem GPU), entre eles uma trajetória inteira pelo protocolo (comprar, coletar,
   fabricar, cair na Fronteira, recuperar a carga, portal, extração, salvar e retomar). Os de paridade repetem 19 roteiros jogados pela própria demo (do
   boot completo a cada técnica das 18 armas) e exigem o mesmo resultado **bit a bit**, quadro a
   quadro; os da animação refazem os roteiros dos animadores da demo e conferem a pose nó a nó. Os desvios
@@ -183,6 +183,8 @@ Capturas sem monitor, nos enquadramentos de `demo/captures/after`:
 # interface: 01b_create_screen, 14_hud (intenções), 15_inventario, 16_livro, 17_mapa
 ./build/dev/apps/local/rpg_local --headless --size 1100x700 --auto --dev --hide-hud --portrait --frames 64 \
   --model kachujin --screenshot retrato.png   # o personagem de frente (modelo, pose e arma)
+./build/dev/apps/local/rpg_local --headless --size 1100x700 --auto --dev --hide-hud --portrait-aim \
+  --start arqueiro --model paladina --frames 64 --screenshot mira.png   # mirando com o arco
 ```
 
 ### Desempenho
@@ -310,7 +312,7 @@ node demo/tools/bake-client-scene.mjs --check   # só confere
 
 Capturas para comparar com a demo: `node demo/tools/capture-reference.mjs DIR` grava os 14
 enquadramentos da demo atual (Chromium com SwiftShader, alguns minutos por enquadramento; `--only
-portrait` grava o retrato do personagem), e `python3 cpp/tools/compare_captures.py DIR shots --out
+portrait` grava o retrato do personagem e `--only portrait_aim`, o retrato mirando com o arco), e `python3 cpp/tools/compare_captures.py DIR shots --out
 relatorio` compara com as do `rpg_local`.
 
 ## Regras de camada

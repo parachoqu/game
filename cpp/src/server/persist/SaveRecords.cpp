@@ -425,6 +425,7 @@ sim::EntityId loadCharacter(sim::World& w, const Json& rec, std::uint32_t sessio
     return it == equip.end() ? std::nullopt : readGear(s, *it, dropped);
   };
   p.equip.weapon = gear("weapon");
+  p.weaponShown = p.equip.weapon && p.equip.weapon->cond > 0;  // como ao reaparecer
   p.equip.armor = gear("armor");
   p.equip.bag = gear("bag");
   p.equip.mount = gear("mount");

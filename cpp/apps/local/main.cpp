@@ -5,7 +5,7 @@
 //   rpg_local [--data DIR] [--sim DIR] [--assets DIR] [--size WxH] [--fullscreen] [--no-vsync]
 //             [--seed S] [--dev] [--net-sim latency:MS,jitter:MS,loss:PCT]
 //             [--auto] [--name N] [--origin O] [--start S] [--model M]
-//             [--view NOME] [--hour H] [--hide-hud] [--portrait] [--frames N] [--screenshot ARQ.png] [--headless]
+//             [--view NOME] [--hour H] [--hide-hud] [--portrait] [--portrait-aim] [--frames N] [--screenshot ARQ.png] [--headless]
 //
 //   --connect HOST[:PORTA]  joga num rpg_server --listen (porta padrão 27450), sem servidor local;
 //                  liga a predição do próprio personagem (também ligada com --net-sim com latência)
@@ -18,6 +18,7 @@
 //                  01_title_screen); liga --auto, --dev e esconde o HUD
 //   --frames N     sai depois de N quadros de jogo (com --screenshot, grava o último)
 //   --portrait     câmera de frente para o próprio personagem (conferir modelo e animação)
+//   --portrait-aim o mesmo retrato, mirando (botão direito segurado): a pose de mira e o arco erguido
 //   --headless     sem janela: desenha fora da tela (captura e testes em CI)
 //   --save-dir DIR saves e preferências (padrão: o diretório do usuário, ver core/Paths.h)
 //   --no-save      não carrega nem grava nada (padrão nas execuções automáticas: --view, --headless, --frames)
@@ -85,7 +86,7 @@ int usage() {
   std::fprintf(stderr,
                "uso: rpg_local [--data DIR] [--sim DIR] [--assets DIR] [--size WxH] [--fullscreen] [--no-vsync] [--seed S]\n"
                "                [--dev] [--debug-ui] [--net-sim latency:MS,jitter:MS,loss:PCT] [--auto] [--continue] [--quality Q] [--name N] [--origin O]\n"
-               "                [--start S] [--model M] [--view NOME] [--hour H] [--hide-hud] [--portrait] [--frames N]\n"
+               "                [--start S] [--model M] [--view NOME] [--hour H] [--hide-hud] [--portrait] [--portrait-aim] [--frames N]\n"
                "                [--screenshot ARQ.png] [--headless] [--save-dir DIR] [--no-save] [--import-save ARQ]\n"
                "                [--benchmark] [--bench-frames N] [--bench-out ARQ] [--connect HOST[:PORTA]]\n");
   return 2;
@@ -197,6 +198,7 @@ int main(int argc, char** argv) {
       opt.hour = h;
     } else if (a == "--hide-hud") opt.hideHud = true;
     else if (a == "--portrait") opt.portrait = true;
+    else if (a == "--portrait-aim") opt.portrait = opt.portraitAim = true;
     else if (a == "--frames" && v && parseNumber(std::string_view(argv[++i]), opt.frames)) {}
     else if (a == "--screenshot" && v) opt.screenshot = rpg::pathFromUtf8(argv[++i]);
     else if (a == "--headless") opt.headless = true;
