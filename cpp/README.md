@@ -79,7 +79,7 @@ e mudo ficam em `settings.json`.
   telegrafias e partículas; o pacote visual da demo (cenário, céu, personagens animados) e, sem ele,
   o cenário grey-box da fase 3.
 - `rpg_local`: servidor numa thread + cliente, ligados por `LocalTransport`.
-- **Testes: 123** (120 sem GPU), entre eles uma trajetória inteira pelo protocolo (comprar, coletar,
+- **Testes: 138** (134 sem GPU), entre eles uma trajetória inteira pelo protocolo (comprar, coletar,
   fabricar, cair na Fronteira, recuperar a carga, portal, extração, salvar e retomar). Os de paridade repetem 19 roteiros jogados pela própria demo (do
   boot completo a cada técnica das 18 armas) e exigem o mesmo resultado **bit a bit**, quadro a
   quadro; os da animação refazem os roteiros dos animadores da demo e conferem a pose nó a nó. Os desvios
