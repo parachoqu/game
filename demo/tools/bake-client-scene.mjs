@@ -233,6 +233,9 @@ const rigs = Object.fromEntries(Object.entries(json.rigs || {}).map(([id, r]) =>
     tracks: c.tracks.map((t) => ({ ...t, times: vstream(t.times, t.count, 4), values: vstream(t.values, t.count, t.size * 4) })),
   }])),
 }]));
+// cobertura do chão: 16 bytes por instância (ver client-scene.entry.js); por último, para não mudar os
+// deslocamentos do resto do binário
+const groundCover = json.groundCover ? { ...json.groundCover, items: vstream(json.groundCover.items, json.groundCover.count, 16) } : null;
 const sceneBin = Buffer.concat(parts);
 
 // Luz de ambiente do dia: o HDRI reduzido do kit (RGBE em WebP sem perdas) vai como está, com as
@@ -248,7 +251,7 @@ const scene = {
   lodBands: json.lodBands,
   sources, textures, materials: json.materials, geometries,
   terrain, static: json.static, instanced, lodFields,
-  dynamic: json.dynamic, templates: json.templates, environment, rigs, clipMeta: json.clipMeta,
+  dynamic: json.dynamic, templates: json.templates, environment, rigs, clipMeta: json.clipMeta, groundCover,
   bin: { file: 'scene.bin', bytes: sceneBin.length, sha256: createHash('sha256').update(sceneBin).digest('hex') },
 };
 files.set('scene.bin', sceneBin);
@@ -260,7 +263,8 @@ const animParity = Buffer.from(JSON.stringify(json.animParity) + '\n');
 // ---------------------------------------------------------------- gravar ou conferir
 const summary = `${geometries.length} geometrias, ${json.materials.length} materiais, ${textures.length} texturas `
   + `(${sources.length} imagens), ${json.terrain.length} blocos de relevo, ${json.static.length} malhas, `
-  + `${instanced.length} instanciadas, ${lodFields.length} campos de LOD; scene.bin ${(sceneBin.length / 1048576).toFixed(1)} MB`;
+  + `${instanced.length} instanciadas, ${lodFields.length} campos de LOD, `
+  + `${groundCover ? groundCover.count : 0} instâncias de cobertura do chão; scene.bin ${(sceneBin.length / 1048576).toFixed(1)} MB`;
 if (check) {
   const bad = [];
   for (const [name, data] of files) {

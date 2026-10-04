@@ -5,10 +5,11 @@
 #   cmake --build --preset dev --target rpg_update_shaders
 # copia os .spv recém-compilados para shaders/spv (commite junto com o GLSL).
 set(RPG_SHADERS
-  mesh.vert skinned.vert surface.frag terrain.frag
+  mesh.vert skinned.vert surface.frag terrain.frag shadow.frag
   scene.vert scene.frag water.frag
   unlit.vert unlit.frag
   fullscreen.vert sky.frag composite.frag stars.vert stars.frag
+  aonormal.frag gtao.frag aoblur.frag bloom_bright.frag bloom_blur.frag fxaa.frag
   ui.vert ui.frag
   rml.vert rml_color.frag rml_texture.frag rml_gradient.frag
   rml_fs.vert rml_copy.frag rml_blur.frag rml_shadow.frag rml_matrix.frag rml_mask.frag

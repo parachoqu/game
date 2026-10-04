@@ -25,6 +25,8 @@ struct FrameUniforms {
   float occTarget[4];  // OCC.uTarget; w: alcance da grama (U.uGrassFar)
   float sky[4];        // x: tempo do céu (G.time; no título, o tempo da tela); y: estrelas (uNight); z: linhas; w: escala de pixel
   float sh[9][4];      // irradiância do ambiente em harmônicos esféricos (E(n), já com as constantes)
+  float shadowMatrix[16];  // mundo → recorte da câmera do sol (ShadowCamera::viewProj)
+  float shadow[4];         // x: bias; y: normalBias (m); z: raio do filtro (uv); w: 1 com sombra
 
   static void put(float* dst, const glm::mat4& m) { std::memcpy(dst, &m[0][0], sizeof(float) * 16); }
   static void put4(float* dst, glm::vec3 v, float w) {
@@ -34,6 +36,6 @@ struct FrameUniforms {
     dst[3] = w;
   }
 };
-static_assert(sizeof(FrameUniforms) == 16 * 4 * 2 + 16 * 14 + 16 * 9);
+static_assert(sizeof(FrameUniforms) == 16 * 4 * 3 + 16 * 15 + 16 * 9);
 
 }  // namespace rpg::client

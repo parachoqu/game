@@ -29,7 +29,12 @@ struct AppOptions {
   std::optional<std::string> view;  // enquadramento das capturas da demo (02_mercado…)
   std::optional<double> hour;       // força a hora da luz (capturas)
   bool autoStart = false;           // pula título e criação (personagem padrão)
-  bool autoContinue = false;        // pula o título e retoma o último personagem ("Continuar trajetória")
+  bool autoContinue = false;
+  std::optional<std::string> quality;  // força o nível (alta, media, baixa) sem salvar
+  // tools/measure-benchmark.mjs: seis pontos nos três níveis; mediana, p95, triângulos e chamadas
+  bool benchmark = false;
+  int benchFrames = 30;
+  std::filesystem::path benchOut = "benchmark-cpp.json";        // pula o título e retoma o último personagem ("Continuar trajetória")
   bool hideHud = false;
   bool portrait = false;            // câmera de frente para o próprio personagem (capturas da animação)
   bool dev = false;                 // comandos de desenvolvimento (tp, give…)

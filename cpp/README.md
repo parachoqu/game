@@ -15,7 +15,7 @@ kit, portal, sacos e projéteis — e os personagens também: os modelos Mixamo 
 a leoa, o cão do vazio e o cavalo, com pele na GPU, os clipes já adaptados pela demo, o mixer do three
 e as camadas procedurais de `characters.js` (inércia, idle vivo, inclinação no declive, esquivas,
 golpes, morte direcional, montado), os tons por facção, as sombras em silhueta e as armas na mão.
-Sombras, cobertura do chão e pós-processamento são da fase 7.
+Sombras, cobertura do chão e pós-processamento chegaram na fase 7.
 
 **Fase 5 concluída:** a interface é a da demo, em RmlUi desenhado pelo próprio renderizador
 (SDL_GPU): `index.html` + `styles.css` viraram `assets/ui/game.rml` + `game.rcss` com os mesmos ids
@@ -35,6 +35,18 @@ save e volta ao título. Saves da demo entram com `--import-save` (a migração 
 antigo ou posição inválida voltam ao abrigo, com aviso). Os 23 sons e as duas ambiências de
 `audio.js` são sintetizados em C++ e tocam pela SDL3. Sensibilidade e inversão da câmera, qualidade
 e mudo ficam em `settings.json`.
+
+**Fase 7 concluída:** a luz e o acabamento da demo.
+- **Sombra do sol:** mapa de profundidade que acompanha o jogador, com o castShadow de cada objeto da
+  demo; os sombreadores da vegetação até 55 m e os personagens até 36 m.
+- **Pós-processamento:** GTAO em meia resolução, bloom do `UnrealBloomPass` e FXAA no lugar do SMAA.
+- **Cobertura do chão:** grama, flores, cogumelos, seixos, galhos e grama de campo, que o bake gera
+  com a própria `generateCell` da demo.
+- **Qualidade:** os três níveis de `quality.js`, com ajuste automático nos primeiros segundos e troca
+  na pausa.
+- **Pausa:** a cena parada é desenhada uma vez.
+- **Medição:** `--benchmark` mede os seis pontos de `measure-benchmark.mjs` nos três níveis; sem GPU,
+  o C++ fica à frente da demo nos 18 pontos (tabela em [Desempenho](#desempenho)).
 
 - `rpg_core` (compartilhado por servidor e cliente):
   - dados de design de `config.js`, validados na carga;
@@ -130,6 +142,7 @@ Outros presets:
 ./build/dev/apps/local/rpg_local --net-sim latency:120,jitter:30,loss:2   # rede simulada
 ./build/dev/apps/local/rpg_local --size 1600x900 --fullscreen --no-vsync --dev
 ./build/dev/apps/local/rpg_local --continue      # retoma o último personagem, sem passar pelo título
+./build/dev/apps/local/rpg_local --quality media # alta, media ou baixa (sem o ajuste automático)
 ```
 
 Saves e preferências ficam em `~/.local/share/projeto-game` (ou `$XDG_DATA_HOME/projeto-game`; no
@@ -161,6 +174,37 @@ Capturas sem monitor, nos enquadramentos de `demo/captures/after`:
 ./build/dev/apps/local/rpg_local --headless --size 1100x700 --auto --dev --hide-hud --portrait --frames 64 \
   --model kachujin --screenshot retrato.png   # o personagem de frente (modelo, pose e arma)
 ```
+
+### Desempenho
+
+```bash
+./build/dev/apps/local/rpg_local --benchmark                 # grava benchmark-cpp.json
+python3 tools/compare_benchmark.py ../demo/benchmark-results.json benchmark-cpp.json
+```
+
+`--benchmark` roda sem janela (sem vsync). Ele percorre os seis pontos de
+`demo/tools/measure-benchmark.mjs` (mercado, ponte principal, garganta, bosque, entreposto norte e
+ermos) nos níveis alta, média e baixa. Em cada ponto a câmera livre fica a 8 m do ponto, olhando para o
+alvo, e mede 30 quadros (`--bench-frames N`) esperando a GPU terminar cada um, como o `readPixels` da
+demo. O resultado traz mediana, p95, triângulos e chamadas de desenho por ponto, no formato de
+`demo/benchmark-results.json`.
+
+Medido sem GPU nos dois lados, em 1100×700: a demo no Chrome sem janela com WebGL por software
+(`demo/benchmark-results.json`) e o C++ no Mesa lavapipe (4 núcleos, `--bench-frames 10`). Mediana do
+tempo de quadro em ms:
+
+| Ponto | Alta: demo | Alta: C++ | Média: demo | Média: C++ | Baixa: demo | Baixa: C++ |
+|---|---:|---:|---:|---:|---:|---:|
+| mercado | 3705 | 586 | 2437 | 384 | 5887 | 248 |
+| ponte principal | 3561 | 1050 | 3130 | 590 | 4855 | 263 |
+| garganta | 3913 | 1187 | 2617 | 594 | 2184 | 280 |
+| bosque | 3908 | 1270 | 3115 | 775 | 4297 | 516 |
+| entreposto norte | 5292 | 972 | 4526 | 546 | 4364 | 239 |
+| ermos | 2676 | 306 | 1338 | 247 | 519 | 181 |
+
+O C++ é mais rápido nos 18 pontos (de 2,9× a 24×) e o p95 fica colado na mediana: não há as travadas
+de 9–15 s da demo. Numa GPU de verdade, os dois andam muito mais rápido. A comparação vale como
+ordem de grandeza: os renderizadores por software não são os mesmos.
 
 ### O servidor dedicado
 

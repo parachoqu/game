@@ -63,14 +63,16 @@ Renderer::~Renderer() {
   }
   for (DynBuffer* d : {&I.instances, &I.unlitVerts, &I.uiVerts, &I.skyStars, &I.skyLines, &I.skyOverlay})
     if (d->buf) SDL_ReleaseGPUBuffer(I.dev, d->buf);
+  I.releasePost();
   I.releasePack();
   I.releaseRml();
   if (I.identity) SDL_ReleaseGPUBuffer(I.dev, I.identity);
   if (I.staging) SDL_ReleaseGPUTransferBuffer(I.dev, I.staging);
   if (I.download) SDL_ReleaseGPUTransferBuffer(I.dev, I.download);
-  for (SDL_GPUTexture* t : {I.hdr, I.depth, I.out, I.atlas})
+  for (SDL_GPUTexture* t : {I.hdr, I.depth, I.out, I.atlas, I.shadowMap})
     if (t) SDL_ReleaseGPUTexture(I.dev, t);
-  if (I.linear) SDL_ReleaseGPUSampler(I.dev, I.linear);
+  for (SDL_GPUSampler* s : {I.linear, I.shadowSampler})
+    if (s) SDL_ReleaseGPUSampler(I.dev, s);
   for (SDL_GPUGraphicsPipeline* p : {I.scene, I.water, I.unlit, I.sky, I.composite, I.ui, I.stars, I.lines})
     if (p) SDL_ReleaseGPUGraphicsPipeline(I.dev, p);
   if (I.window) SDL_ReleaseWindowFromGPUDevice(I.dev, I.window);
@@ -78,6 +80,10 @@ Renderer::~Renderer() {
 }
 
 const char* Renderer::driver() const { return SDL_GetGPUDeviceDriver(impl_->dev); }
+
+void Renderer::configure(const RenderSettings& s) { impl_->settings = s; }
+void Renderer::waitIdle() { SDL_WaitForGPUIdle(impl_->dev); }
+const RenderSettings& Renderer::settings() const { return impl_->settings; }
 SDL_GPUDevice* Renderer::device() const { return impl_->dev; }
 SDL_GPUTextureFormat Renderer::outputFormat() { return Impl::kOutFmt; }
 
@@ -138,6 +144,7 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
     return false;
   }
   I.ensureTargets(outW_, outH_);
+  I.ensureShadowMap(I.settings.shadowSize > 0 ? I.settings.shadowSize : 16);
 
   // ---------------------------------------------------------------- dados dinâmicos
   std::vector<Instance> inst;
@@ -252,6 +259,13 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
     SDL_EndGPUCopyPass(cp);
   }
 
+  I.ensurePostTargets(I.texW, I.texH);
+  // pausa barata: a cena composta do quadro guardado vai direto para a saída
+  const bool reuse = f.reuseScene && I.post.sceneCached;
+  if (!reuse) {
+  // ---------------------------------------------------------------- sombra do sol
+  if (packOn && f.shadows && I.settings.shadowSize > 0) I.drawShadows(cmd, f, stats_);
+
   // ---------------------------------------------------------------- passe de cena (HDR)
   SDL_GPUColorTargetInfo hdrT{};
   hdrT.texture = I.hdr;
@@ -358,19 +372,66 @@ bool Renderer::render(const Frame& f, const std::optional<std::filesystem::path>
   }
   SDL_EndGPURenderPass(rp);
 
+  // ---------------------------------------------------------------- pós-processamento
+  const bool aoOn = packOn && I.settings.gtao;
+  const bool bloomOn = I.settings.bloom;
+  const bool fxaaOn = I.settings.fxaa;
+  if (aoOn) I.drawAo(cmd, f, stats_);
+  if (bloomOn) I.drawBloom(cmd, stats_);
+
   // ---------------------------------------------------------------- saída: composição + interface
+  // UnrealBloomPass: força 0,14 e fatores 1,0 / 0,8 / 0,6 / 0,4 / 0,2 puxados pelo raio 0,4 (lerpBloomFactor)
+  const auto lerpBloom = [](float factor) { return factor + (1.2f - factor - factor) * 0.4f; };
+  const float composite[12] = {f.exposure, aoOn ? 0.85f : 0.0f, bloomOn ? 0.14f : 0.0f, 0,
+                               lerpBloom(1.0f), lerpBloom(0.8f), lerpBloom(0.6f), lerpBloom(0.4f),
+                               lerpBloom(0.2f), 0, 0, 0};
   SDL_GPUColorTargetInfo outT{};
-  outT.texture = I.out;
+  outT.texture = fxaaOn ? I.post.ldr : I.out;
   outT.load_op = SDL_GPU_LOADOP_DONT_CARE;
   outT.store_op = SDL_GPU_STOREOP_STORE;
   rp = SDL_BeginGPURenderPass(cmd, &outT, 1, nullptr);
-  const float post[4] = {f.exposure, 0, 0, 0};
-  SDL_PushGPUFragmentUniformData(cmd, 0, post, sizeof post);
+  SDL_PushGPUFragmentUniformData(cmd, 0, composite, sizeof composite);
   SDL_BindGPUGraphicsPipeline(rp, I.composite);
-  SDL_GPUTextureSamplerBinding sceneTex{I.hdr, I.linear};
-  SDL_BindGPUFragmentSamplers(rp, 0, &sceneTex, 1);
+  SDL_GPUTexture* black = I.post.black;
+  const SDL_GPUTextureSamplerBinding compTex[7] = {
+      {I.hdr, I.linear},
+      {aoOn ? I.post.ao : I.post.white, I.linear},
+      {bloomOn ? I.post.bloomV[0] : black, I.linear},
+      {bloomOn ? I.post.bloomV[1] : black, I.linear},
+      {bloomOn ? I.post.bloomV[2] : black, I.linear},
+      {bloomOn ? I.post.bloomV[3] : black, I.linear},
+      {bloomOn ? I.post.bloomV[4] : black, I.linear},
+  };
+  SDL_BindGPUFragmentSamplers(rp, 0, compTex, 7);
   SDL_DrawGPUPrimitives(rp, 3, 1, 0, 0);
   ++stats_.drawCalls;
+  SDL_EndGPURenderPass(rp);
+  if (fxaaOn) {
+    const float size[4] = {static_cast<float>(I.texW), static_cast<float>(I.texH), 1.0f / static_cast<float>(I.texW),
+                           1.0f / static_cast<float>(I.texH)};
+    I.fullscreen(cmd, I.out, I.post.fxaa, {{I.post.ldr, I.post.clamp}}, size, sizeof size, stats_);
+  }
+  }  // !reuse
+  const auto copyTexture = [&](SDL_GPUTexture* from, SDL_GPUTexture* to) {
+    SDL_GPUCopyPass* cp = SDL_BeginGPUCopyPass(cmd);
+    SDL_GPUTextureLocation src{};
+    src.texture = from;
+    SDL_GPUTextureLocation dst{};
+    dst.texture = to;
+    SDL_CopyGPUTextureToTexture(cp, &src, &dst, static_cast<Uint32>(I.texW), static_cast<Uint32>(I.texH), 1, false);
+    SDL_EndGPUCopyPass(cp);
+  };
+  if (reuse) {
+    copyTexture(I.post.sceneCache, I.out);
+  } else if (f.cacheScene) {
+    copyTexture(I.out, I.post.sceneCache);
+    I.post.sceneCached = true;
+  }
+  SDL_GPUColorTargetInfo uiT{};
+  uiT.texture = I.out;
+  uiT.load_op = SDL_GPU_LOADOP_LOAD;
+  uiT.store_op = SDL_GPU_STOREOP_STORE;
+  SDL_GPURenderPass* rp = SDL_BeginGPURenderPass(cmd, &uiT, 1, nullptr);
   if (uiBytes && I.atlas) {
     const float screen[4] = {static_cast<float>(outW_), static_cast<float>(outH_), 0, 0};
     SDL_PushGPUVertexUniformData(cmd, 0, screen, sizeof screen);

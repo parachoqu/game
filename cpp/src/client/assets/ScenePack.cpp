@@ -63,9 +63,23 @@ PackDraw draw(const json& j) {
   d.matrix = mat4(j.at("matrix"));
   d.map = j.value("map", 0);
   d.renderOrder = j.value("renderOrder", 0);
+  d.cast = j.value("cast", true);
   d.group = j.value("group", std::string{});
   d.name = j.value("name", std::string{});
   return d;
+}
+
+std::vector<PackLodPart> lodParts(const json& j) {
+  std::vector<PackLodPart> parts;
+  for (const auto& p : j) {
+    PackLodPart part;
+    part.geometry = p.at("geometry").get<int>();
+    part.material = p.at("material").get<int>();
+    const auto tint = p.value("tint", json());
+    part.tint = tint.is_null() ? PackLodPart::Tint::None : tint.get<std::string>() == "fol" ? PackLodPart::Tint::Foliage : PackLodPart::Tint::Trunk;
+    parts.push_back(part);
+  }
+  return parts;
 }
 
 std::vector<PackDraw> draws(const json& j) {
@@ -208,6 +222,7 @@ ScenePack ScenePack::load(const std::filesystem::path& dir) {
     in.material = i.at("material").get<int>();
     in.count = i.at("count").get<std::uint32_t>();
     in.group = i.value("group", std::string{});
+    in.cast = i.value("cast", true);
     in.matrices = stream(i.at("matrices"));
     if (!i.at("colors").is_null()) in.colors = stream(i.at("colors"));
     P.instanced.push_back(std::move(in));
@@ -218,18 +233,8 @@ ScenePack ScenePack::load(const std::filesystem::path& dir) {
     field.band = f.at("band").get<std::string>();
     field.secondary = f.at("secondary").get<bool>();
     field.map = f.at("map").get<int>();
-    for (const auto& lv : f.at("levels")) {
-      std::vector<PackLodPart> parts;
-      for (const auto& p : lv) {
-        PackLodPart part;
-        part.geometry = p.at("geometry").get<int>();
-        part.material = p.at("material").get<int>();
-        const auto tint = p.at("tint");
-        part.tint = tint.is_null() ? PackLodPart::Tint::None : tint.get<std::string>() == "fol" ? PackLodPart::Tint::Foliage : PackLodPart::Tint::Trunk;
-        parts.push_back(part);
-      }
-      field.levels.push_back(std::move(parts));
-    }
+    for (const auto& lv : f.at("levels")) field.levels.push_back(lodParts(lv));
+    if (f.contains("shadow")) field.shadow = lodParts(f.at("shadow"));
     for (const auto& c : f.at("chunks"))
       field.chunks.push_back({c.at("n").get<std::uint32_t>(), c.at("cx").get<float>(), c.at("cz").get<float>(), c.at("radius").get<float>(), stream(c.at("items"))});
     P.lodFields.push_back(std::move(field));
@@ -238,6 +243,28 @@ ScenePack ScenePack::load(const std::filesystem::path& dir) {
   P.lodBands["tree"] = bands.at("tree").get<std::vector<float>>();
   P.lodBands["shrub"] = bands.at("shrub").get<std::vector<float>>();
   P.shadowFar = bands.at("shadowFar").get<double>();
+  if (const auto gc = J.find("groundCover"); gc != J.end() && gc->is_object()) {
+    PackGroundCover& G = P.groundCover;
+    G.present = true;
+    G.cell = gc->at("cell").get<double>();
+    G.origin = gc->at("origin").get<double>();
+    G.n = gc->at("n").get<int>();
+    for (const auto& k : gc->at("kinds")) {
+      PackCoverKind kind;
+      kind.name = k.at("name").get<std::string>();
+      for (const auto& v : k.at("variants")) kind.variants.push_back({lodParts(v.at("near")), lodParts(v.at("far"))});
+      G.kinds.push_back(std::move(kind));
+    }
+    for (const auto& cl : gc->at("cells")) {
+      PackCoverCell cell;
+      cell.i = cl.at("i").get<int>();
+      cell.j = cl.at("j").get<int>();
+      for (const auto& s : cl.at("kinds")) cell.kinds.push_back({s.at(0).get<std::uint32_t>(), s.at(1).get<std::uint32_t>(), s.at(2).get<std::uint32_t>()});
+      G.cells.push_back(std::move(cell));
+    }
+    G.count = gc->at("count").get<std::uint32_t>();
+    G.items = stream(gc->at("items"));
+  }
   const auto& dyn = J.at("dynamic");
   for (const auto& n : dyn.at("nodes")) P.nodes.push_back(model(n));
   for (const auto& s : dyn.at("shrines")) P.shrines.push_back(model(s));

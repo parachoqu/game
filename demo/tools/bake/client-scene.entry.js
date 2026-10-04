@@ -24,6 +24,8 @@ import { initTurbulent, TS } from '../../src/game/turbulent.js';
 import { CAMP } from '../../src/game/camp.js';
 import { createLootBag } from '../../src/game/zones.js';
 import { TURB_GATE_X } from '../../src/world/coordinates.js';
+import { generateCell, CELL as COVER_CELL, COVER } from '../../src/world/ground-cover.js';
+import { levelParts } from '../../src/engine/props.js';
 
 // ---------------------------------------------------------------- aleatoriedade fixa (bake reprodutível)
 function mulberry(seed) {
@@ -236,10 +238,10 @@ class Exporter {
     if (groups && Array.isArray(mesh.material)) {
       for (const g of groups) {
         if (!mats[g.material]) continue;
-        out.push({ geometry, material: await this.material(mats[g.material]), start: g.start, count: g.count, matrix });
+        out.push({ geometry, material: await this.material(mats[g.material]), start: g.start, count: g.count, matrix, cast: !!mesh.castShadow });
       }
     } else {
-      out.push({ geometry, material: await this.material(mats[0]), matrix });
+      out.push({ geometry, material: await this.material(mats[0]), matrix, cast: !!mesh.castShadow });
     }
     return out;
   }
@@ -535,6 +537,7 @@ export async function bake(log = () => {}) {
 
   // ------------------------------------------------ campos de LOD (vegetação)
   const lodMeshSet = new Set();
+  const shadowJobs = [];
   for (const f of LOD_FIELDS) {
     const field = { name: f.name, band: f.band, secondary: !!f.secondary, levels: [], chunks: [] };
     const first = f.chunks[0];
@@ -548,6 +551,8 @@ export async function bake(log = () => {}) {
       }
       field.levels.push(parts);
     }
+    // sombreadores (lod-field.js `shadowParts`): exportados no fim (os índices do resto não mudam)
+    if (first.shadow) shadowJobs.push([field, first.shadow]);
     for (const c of f.chunks) {
       for (const s of [...c.slots, ...(c.shadow ? [c.shadow] : [])]) for (const im of s.meshes) lodMeshSet.add(im);
       // por instância: matriz (16), cor da copa (3), tom do tronco (1)
@@ -597,7 +602,7 @@ export async function bake(log = () => {}) {
         out.instanced.push({
           map: mapOf(o.count ? matrices[12] : center.x), group: label,
           geometry: ex.geometry(o.geometry), material: await ex.material(Array.isArray(o.material) ? o.material[0] : o.material),
-          count: o.count, matrices: ex.bin.push(matrices),
+          count: o.count, matrices: ex.bin.push(matrices), cast: !!o.castShadow,
           colors: o.instanceColor ? ex.bin.push(new Float32Array(o.instanceColor.array.subarray(0, o.count * 3))) : -1,
         });
       }
@@ -646,6 +651,75 @@ export async function bake(log = () => {}) {
   out.clipMeta = MODELS.clipMeta;
   out.animParity = exportAnimParity();
   log(`personagens: ${Object.keys(out.rigs).join(', ')}`);
+
+  // ------------------------------------------------ acréscimos da fase 7 (depois de tudo: os índices de
+  // geometrias, materiais e texturas do resto ficam como estavam)
+  // sombreadores dos campos de LOD (lod-field.js `shadowParts`): só desenham na passada de sombra
+  for (const [field, slot] of shadowJobs) {
+    field.shadow = [];
+    for (const im of slot.meshes) {
+      const tint = im.instanceColor ? (im.instanceColor === slot.fol ? 'fol' : 'trunk') : null;
+      field.shadow.push({ geometry: ex.geometry(im.geometry), material: await ex.material(im.material), tint });
+    }
+  }
+  // ------------------------------------------------ cobertura do chão (ground-cover.js), célula a célula
+  // generateCell é determinístico por célula; o cliente só escolhe as células em volta da câmera e
+  // corta cada lista pela densidade (a lista já vem em ordem aleatória). Por instância, 16 bytes:
+  // x e z (u16 na célula), y (f32), escala e escala vertical (u16, ×1000), giro (u8) e cor (3 × u8, ×127,5).
+  {
+    const KINDS = ['grass', 'flower', 'mushroom', 'pebble', 'branch', 'meadow', 'meadowTall'];
+    const VARIANTS = { pebble: 5, meadow: 8, meadowTall: 3 };
+    const NC = 1024 / COVER_CELL;
+    const cover = { cell: COVER_CELL, origin: -512, n: NC, meadowStep: COVER.meadowStep, kinds: [], cells: [] };
+    for (const k of KINDS) {
+      const variants = [];
+      for (let v = 0; v < (VARIANTS[k] || 1); v++) {
+        const lv = {};
+        for (const [key, level] of [['near', 1], ['far', 2]]) {
+          lv[key] = [];
+          for (const [geo, material] of levelParts(k, v, level)) lv[key].push({ geometry: ex.geometry(geo), material: await ex.material(material) });
+        }
+        variants.push(lv);
+      }
+      cover.kinds.push({ name: k, variants });
+    }
+    const items = [];
+    let total = 0;
+    for (let j = 0; j < NC; j++) for (let i = 0; i < NC; i++) {
+      const data = generateCell(i, j);
+      const x0 = -512 + i * COVER_CELL, z0 = -512 + j * COVER_CELL;
+      const kinds = [];
+      let any = false;
+      for (const k of KINDS) {
+        const list = data[k];
+        kinds.push([data.variant[k] || 0, total, list.length]);
+        if (list.length) any = true;
+        const buf = new ArrayBuffer(list.length * 16), dv = new DataView(buf);
+        list.forEach((it, n) => {
+          const o = n * 16;
+          const q = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v)));
+          dv.setUint16(o, q((it.x - x0) / COVER_CELL * 65535, 0, 65535), true);
+          dv.setUint16(o + 2, q((it.z - z0) / COVER_CELL * 65535, 0, 65535), true);
+          dv.setFloat32(o + 4, it.y, true);
+          dv.setUint16(o + 8, q(it.s * 1000, 0, 65535), true);
+          dv.setUint16(o + 10, q(it.sy * 1000, 0, 65535), true);
+          const rot = ((it.rot % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+          dv.setUint8(o + 12, q(rot / (Math.PI * 2) * 256, 0, 256) & 255);
+          for (let c = 0; c < 3; c++) dv.setUint8(o + 13 + c, q(it.c[c] * 127.5, 0, 255));
+        });
+        items.push(new Uint8Array(buf));
+        total += list.length;
+      }
+      if (any) cover.cells.push({ i, j, kinds });
+    }
+    const all = new Uint8Array(total * 16);
+    let off = 0;
+    for (const b of items) { all.set(b, off); off += b.length; }
+    cover.count = total;
+    cover.items = ex.bin.push(all);
+    out.groundCover = cover;
+    log(`cobertura do chão: ${cover.cells.length} células, ${total} instâncias`);
+  }
 
   out.geometries = ex.geometries;
   out.materials = ex.materials;

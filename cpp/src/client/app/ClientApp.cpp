@@ -26,7 +26,9 @@
 #include "client/game/Aim.h"
 #include "client/game/CommandBuilder.h"
 #include "client/game/Lighting.h"
+#include "client/game/Quality.h"
 #include "client/game/Settings.h"
+#include "client/game/ShadowCamera.h"
 #include "client/game/Targets.h"
 #include "client/game/ThirdPersonCamera.h"
 #include "client/geom/SceneBatch.h"
@@ -78,6 +80,17 @@ const ViewDef kViews[] = {
     {"13_vista_elevada_horizonte", {-260, 140, -180}, {60, 25, 180}},
 };
 
+// tools/measure-benchmark.mjs: os seis pontos (câmera livre a 8 m do ponto, olhando para o alvo)
+const ViewDef kBenchPoints[] = {
+    {"mercado", {40, 24, 405}, {40, 18, 375}},
+    {"ponte_principal", {-15, 23, 120}, {0, 18, 145}},
+    {"garganta", {-25, 30, -50}, {-25, 24, -95}},
+    {"bosque", {-70, 30, -80}, {-120, 24, -80}},
+    {"entreposto_norte", {35, 62, -395}, {35, 58, -435}},
+    {"ermos", {-315, 102, -335}, {-360, 98, -375}},
+};
+constexpr const char* kBenchTiers[] = {"alta", "media", "baixa"};
+
 const ViewDef* findView(const std::string& n) {
   for (const ViewDef& v : kViews)
     if (n == v.name) return &v;
@@ -85,6 +98,22 @@ const ViewDef* findView(const std::string& n) {
 }
 
 enum class Mode : std::uint8_t { Loading, Title, Create, Joining, Game, Failed };
+
+// --benchmark: ponto e nível atuais, tempos do ponto e resultados (fora do Impl: o optional de uma
+// struct aninhada com inicializadores não se constrói por padrão no clang)
+struct Bench {
+  std::size_t tier = 0, point = 0;
+  int frame = 0;
+  std::vector<double> times;
+  struct Result {
+    std::string tier, point;
+    double median = 0, p95 = 0;
+    std::uint64_t tris = 0;
+    std::uint32_t calls = 0, shadowCalls = 0;
+  };
+  std::vector<Result> results;
+  bool done = false;
+};
 
 }  // namespace
 
@@ -123,9 +152,17 @@ struct ClientApp::Impl {
   int loadStep = 0, bootPhase = -1, bootSubs = 0;
   double titleT = 0, lastCmdSent = -1;
   bool tabChord = false, paused = false, snapCamera = true, viewTeleported = false;
+  bool pauseCached = false;  // a cena da pausa já está guardada no renderizador
   int gameFrames = 0, totalFrames = 0;
   bool deathShown = false, eventShown = false, introShown = false, observing = false;
   Settings settings;
+  const QualityLevel* q = &qualityLevel("alta");
+  AutoQuality autoQuality{true};
+  double rawFrameMs = 16;
+  std::optional<ShadowView> shadowView;  // sombra do sol deste quadro (gameFrame)
+  // --benchmark: ponto e nível atuais, quadro dentro do ponto e os resultados
+  std::optional<Bench> bench;
+  static constexpr int kBenchSettle = 12, kBenchWarm = 2;
   std::unique_ptr<audio::AudioDevice> sound;
   std::string quality = "alta";
   bool muted = false;
@@ -176,6 +213,9 @@ struct ClientApp::Impl {
     muted = settings.muted;
     sound = std::make_unique<audio::AudioDevice>(!opt.headless && !opt.view);
     sound->setMuted(muted);
+    applyQuality(opt.quality ? *opt.quality : quality);
+    // ajuste automático só jogando de verdade (capturas e testes precisam do nível fixo)
+    autoQuality = AutoQuality(settings.qualityChosen || opt.quality || opt.view || opt.headless || opt.fixedDt > 0);
     // main.js PHASES: as mesmas fases e pesos da barra
 #ifdef RPG_HAS_IMGUI
     if (opt.dev && !platform.headless()) {
@@ -234,6 +274,7 @@ struct ClientApp::Impl {
       } else {
         packMeshes = buildPackMeshes(*pack, statics);
         worldView = std::make_unique<WorldView>(*pack, packMeshes);
+        worldView->setDetail(detailFor(*q));
         renderer.loadPack(*pack, packMeshes, worldView->staticInstances());
         if (characters) characterViews = std::make_unique<CharacterViews>(*pack, *characters);
       }
@@ -265,14 +306,38 @@ struct ClientApp::Impl {
     return &skyFrame;
   }
 
-  // Cenário do pacote para a câmera deste quadro.
+  // Cenário do pacote para a câmera deste quadro (com a sombra do sol, quando `shadowView` existe).
   const PackFrame* packFor(const ViewCamera& v, double gameTime) {
     if (!worldView || !renderer.packLoaded()) return nullptr;
     const glm::vec3 eye(v.position);
     const glm::vec3 fwd = glm::normalize(glm::vec3(v.target - v.position));
     dynScene.time = gameTime;
-    worldView->update(eye, glm::mat4(v.viewProj()), fwd, dynScene, packFrame);
+    worldView->update(eye, glm::mat4(v.viewProj()), fwd, dynScene, packFrame, shadowView ? &*shadowView : nullptr);
     return &packFrame;
+  }
+
+  // quality.js applyQuality: sombra, pós-processamento, alcance do cenário e da vegetação.
+  void applyQuality(std::string_view key) {
+    q = &qualityLevel(key);
+    quality = std::string(q->key);
+    renderer.configure(RenderSettings{q->shadow, q->gtao, q->bloom, q->smaa});
+    if (worldView) worldView->setDetail(detailFor(*q));
+    pauseCached = false;  // a cena guardada mudou de aparência
+  }
+
+  // Sombra do sol em volta de `focus` (sky.js: luz 160 m acima do jogador na direção do sol).
+  void shadowFor(FrameUniforms& u, glm::vec3 focus) {
+    shadowView.reset();
+    if (!renderer.packLoaded() || q->shadow <= 0) return;
+    const glm::vec3 toLight(u.sunDir[0], u.sunDir[1], u.sunDir[2]);
+    const ShadowCamera sc = sunShadowCamera(toLight, focus, static_cast<float>(q->shadowSpan), static_cast<float>(q->shadowFar), q->shadow);
+    FrameUniforms::put(u.shadowMatrix, sc.viewProj);
+    // renderer.js: bias -0,0004, normalBias 0,05, radius 2,5 (texels)
+    u.shadow[0] = -0.0004f;
+    u.shadow[1] = 0.05f;
+    u.shadow[2] = 2.5f / static_cast<float>(q->shadow);
+    u.shadow[3] = 1.0f;
+    shadowView = ShadowView{sc.viewProj, focus, q->vegShadow ? static_cast<float>(q->vegShadowFar) : 0.0f, 36.0f};
   }
 
   void saveSettings() {
@@ -382,7 +447,8 @@ struct ClientApp::Impl {
     FrameUniforms::put4(u.camDir, glm::normalize(glm::vec3(v.target - v.position)), static_cast<float>(in.width));
     // recorte pontilhado (OCC): da câmera até o alvo dela; na câmera livre, desligado
     FrameUniforms::put4(u.occCam, glm::vec3(v.position), static_cast<float>(in.height));
-    FrameUniforms::put4(u.occTarget, glm::vec3(occTarget ? *occTarget : v.position), 80.0f);
+    // ground-cover.js: U.uGrassFar = COVER.radius · 0,94
+    FrameUniforms::put4(u.occTarget, glm::vec3(occTarget ? *occTarget : v.position), static_cast<float>(q->coverRadius * 0.94));
     // luz de ambiente da hora (kit de dia, atmosfera no resto, nenhuma na Turbulenta)
     if (renderer.packLoaded() && env.update(Lg.sunDir, turbulent, Lg.daylight.day)) renderer.setEnvironment(env.current());
     for (std::size_t i = 0; i < 9; ++i) FrameUniforms::put4(u.sh[i], env.sh()[i], 0);
@@ -565,8 +631,23 @@ struct ClientApp::Impl {
     mode = Mode::Game;
     ++gameFrames;
     handleKeys();
+    // main.js: ajuste automático da qualidade (só jogando, sem painel aberto)
+    if (!uiOpen()) {
+      if (const auto next = autoQuality.sample(rawFrameMs, quality)) {
+        applyQuality(*next);
+        fx.toast(std::format("Qualidade gráfica ajustada para {} para manter a fluidez. Dá para trocar no menu de pausa (Esc).", q->label),
+                 proto::ToastKind::Info, 7);
+      }
+    }
 
     const ViewDef* view = opt.view ? findView(*opt.view) : nullptr;
+    if (bench && !bench->done) {
+      view = &kBenchPoints[bench->point];
+      if (bench->frame == 0) {
+        applyQuality(kBenchTiers[bench->tier]);
+        viewTeleported = false;
+      }
+    }
     MapKind mapKind = static_cast<MapKind>(me->map);
     // turbulent.js: zumbido dentro da Turbulenta, vento no resto do mundo
     sound->setAmbience(mapKind == MapKind::Turbulent ? audio::Ambience::Turbulent : audio::Ambience::World);
@@ -592,10 +673,13 @@ struct ClientApp::Impl {
     subj.speedNow = me->speed;
     subj.aiming = aiming;
     if (view) {
-      if (!viewTeleported && opt.dev) {
+      if (!viewTeleported && (opt.dev || bench)) {
         const glm::dvec3 d = glm::normalize(glm::dvec3(view->look.x - view->pos.x, 0, view->look.z - view->pos.z));
         if (!view->turbulent)
           session.send(proto::Request{proto::ReqDev{proto::DevCommand::Teleport, view->pos.x - d.x * 8, view->pos.z - d.z * 8, 0}});
+        // capturas e benchmark: a simulação para (o teleporte vale mesmo parado). Num renderizador por
+        // software, 40 quadros são um minuto de jogo, e os inimigos derrubariam o personagem.
+        session.send(proto::Request{proto::ReqPause{true}});
         viewTeleported = true;
       }
       if (view->turbulent) mapKind = MapKind::Turbulent;
@@ -689,8 +773,9 @@ struct ClientApp::Impl {
         else if (l == "camsens:alta") cam.prefs.sens = CamSensitivity::Alta;
         else if (l == "caminvert") cam.prefs.invert = !cam.prefs.invert;
         else if (l.rfind("quality:", 0) == 0) {
-          quality = l.substr(8);
+          applyQuality(l.substr(8));
           settings.qualityChosen = true;
+          autoQuality.stop();
         } else if (l == "mute") muted = !muted;
         else if (l == "restart") {
           restart();
@@ -806,6 +891,11 @@ struct ClientApp::Impl {
     const double hour = opt.hour ? *opt.hour : clockAt(gameTime, ClockConfig{}).hour;
     Renderer::Frame f;
     f.uniforms = uniforms(vc, hour, mapKind == MapKind::Turbulent, now, view ? nullptr : &vc.target);
+    // a sombra acompanha o jogador (na câmera livre dos enquadramentos, o ponto olhado)
+    shadowFor(f.uniforms, view ? glm::vec3(vc.target) : glm::vec3(me->x, me->y, me->z));
+    f.shadows = shadowView.has_value();
+    f.view = glm::mat4(vc.view());
+    f.proj = glm::mat4(vc.projection());
     if (W) {
       dynScene.nodeDepleted.assign(W->nodes.size(), false);
       for (std::size_t i = 0; i < W->nodes.size(); ++i) dynScene.nodeDepleted[i] = W->nodes[i].charges == 0;
@@ -818,7 +908,11 @@ struct ClientApp::Impl {
     dynScene.skinned.clear();
     dynScene.bones.clear();
     if (packCharacters) characterViews->update(world, CharacterContext{&data, &statics, glm::vec3(vc.position), dt}, dynScene);
-    f.pack = packFor(vc, gameTime);
+    // pausa: a cena parada é desenhada uma vez e reaproveitada (só a interface muda)
+    f.reuseScene = paused && pauseCached;
+    f.cacheScene = paused && !pauseCached;
+    pauseCached = paused;
+    f.pack = f.reuseScene ? nullptr : packFor(vc, gameTime);
     {
       std::vector<SkyInput::Gone> gone;
       if (W)
@@ -887,6 +981,8 @@ struct ClientApp::Impl {
     unlit.clear();
     Renderer::Frame f;
     f.uniforms = uniforms(cam.view(), opt.hour ? *opt.hour : 23.2, false, now);
+    f.view = glm::mat4(cam.view().view());
+    f.proj = glm::mat4(cam.view().projection());
     f.pack = packFor(cam.view(), 0);
     {
       // a estrela da tela de título some aos 5 s (main.js)
@@ -947,7 +1043,56 @@ struct ClientApp::Impl {
     }
   }
 
+  // Depois de cada quadro medido: avança o ponto e o nível; no fim, imprime e grava o relatório.
+  void benchStep(double ms) {
+    Bench& b = *bench;
+    if (mode != Mode::Game || b.done) return;
+    const int f = b.frame++;
+    if (f >= kBenchSettle + kBenchWarm) b.times.push_back(ms);
+    if (f < kBenchSettle + kBenchWarm + opt.benchFrames - 1) return;
+    std::vector<double> t = b.times;
+    std::sort(t.begin(), t.end());
+    Bench::Result r;
+    r.tier = kBenchTiers[b.tier];
+    r.point = kBenchPoints[b.point].name;
+    r.median = t[t.size() / 2];
+    r.p95 = t[std::min(t.size() - 1, static_cast<std::size_t>(static_cast<double>(t.size()) * 0.95))];
+    r.tris = renderer.stats().triangles;
+    r.calls = renderer.stats().drawCalls;
+    r.shadowCalls = renderer.stats().shadowDraws;
+    log::info("benchmark [{}] {}: mediana {:.2f} ms, p95 {:.2f} ms, {} triângulos, {} chamadas ({} na sombra)", r.tier, r.point, r.median, r.p95,
+              r.tris, r.calls, r.shadowCalls);
+    b.results.push_back(std::move(r));
+    b.times.clear();
+    b.frame = 0;
+    if (++b.point >= std::size(kBenchPoints)) {
+      b.point = 0;
+      if (++b.tier >= std::size(kBenchTiers)) b.done = true;
+    }
+    if (!b.done) return;
+    // o formato de demo/benchmark-baseline.json: { nível: { ponto: { median, p95, tris, calls } } }
+    std::string json = "{\n";
+    for (std::size_t ti = 0; ti < std::size(kBenchTiers); ++ti) {
+      json += std::format("  \"{}\": {{\n", kBenchTiers[ti]);
+      bool first = true;
+      for (const Bench::Result& x : b.results) {
+        if (x.tier != kBenchTiers[ti]) continue;
+        json += std::format("{}    \"{}\": {{ \"median\": {:.2f}, \"p95\": {:.2f}, \"tris\": {}, \"calls\": {}, \"shadowCalls\": {} }}",
+                            first ? "" : ",\n", x.point, x.median, x.p95, x.tris, x.calls, x.shadowCalls);
+        first = false;
+      }
+      json += std::format("\n  }}{}\n", ti + 1 < std::size(kBenchTiers) ? "," : "");
+    }
+    json += "}\n";
+    if (std::FILE* fp = std::fopen(pathToUtf8(opt.benchOut).c_str(), "wb")) {
+      std::fwrite(json.data(), 1, json.size(), fp);
+      std::fclose(fp);
+      log::info("benchmark gravado em {}", pathToUtf8(opt.benchOut));
+    }
+  }
+
   int run() {
+    if (opt.benchmark) bench.emplace();
     double last = platform.now();
     while (true) {
       const double now = platform.now();
@@ -956,6 +1101,7 @@ struct ClientApp::Impl {
         frameMs = frameMs * 0.9 + (now - last) * 1000 * 0.1;
         fps = frameMs > 0 ? 1000 / frameMs : 0;
       }
+      rawFrameMs = (now - last) * 1000;
       double dt = opt.fixedDt > 0 ? opt.fixedDt : std::min(0.05, now - last);
       last = now;
       platform.pump(in);
@@ -984,6 +1130,13 @@ struct ClientApp::Impl {
           break;
       }
       in.endFrame();
+      if (bench) {
+        // como o readPixels da demo: o quadro só termina quando a GPU termina
+        renderer.waitIdle();
+        benchStep((platform.now() - now) * 1000);
+        if (bench->done) break;
+        continue;
+      }
       if (last_ && (mode == Mode::Game || titleCapture)) {
         if (capture) log::info("captura gravada em {}", pathToUtf8(*capture));
         break;

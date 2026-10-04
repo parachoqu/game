@@ -45,7 +45,8 @@ void Renderer::Impl::releasePack() {
   for (SDL_GPUSampler* s : {P.clampLinear, P.envSampler})
     if (s) SDL_ReleaseGPUSampler(dev, s);
   for (const auto& [k, p] : P.pipelines) SDL_ReleaseGPUGraphicsPipeline(dev, p);
-  for (SDL_GPUShader* s : {P.meshV, P.skinnedV, P.surfaceF, P.terrainF})
+  for (const auto& [k, p] : P.shadowPipelines) SDL_ReleaseGPUGraphicsPipeline(dev, p);
+  for (SDL_GPUShader* s : {P.meshV, P.skinnedV, P.surfaceF, P.terrainF, P.shadowF})
     if (s) SDL_ReleaseGPUShader(dev, s);
   P = PackGpu{};
 }
@@ -195,8 +196,9 @@ void Renderer::loadPack(const ScenePack& sp, const PackMeshes& meshes, const std
   PackGpu& P = I.pack;
   P.meshV = I.shader("mesh.vert", SDL_GPU_SHADERSTAGE_VERTEX, 0, 2);
   P.skinnedV = I.shader("skinned.vert", SDL_GPU_SHADERSTAGE_VERTEX, 0, 2, 1);
-  P.surfaceF = I.shader("surface.frag", SDL_GPU_SHADERSTAGE_FRAGMENT, 7, 2);
-  P.terrainF = I.shader("terrain.frag", SDL_GPU_SHADERSTAGE_FRAGMENT, 5, 2);
+  P.surfaceF = I.shader("surface.frag", SDL_GPU_SHADERSTAGE_FRAGMENT, 8, 2);
+  P.terrainF = I.shader("terrain.frag", SDL_GPU_SHADERSTAGE_FRAGMENT, 6, 2);
+  P.shadowF = I.shader("shadow.frag", SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 2);
 
   P.vb = I.staticBuffer(SDL_GPU_BUFFERUSAGE_VERTEX, meshes.vertices.data(), static_cast<Uint32>(meshes.vertices.size() * sizeof(PackVertex)));
   P.ib = I.staticBuffer(SDL_GPU_BUFFERUSAGE_INDEX, meshes.indices.data(), static_cast<Uint32>(meshes.indices.size() * sizeof(std::uint32_t)));
@@ -277,10 +279,10 @@ void Renderer::loadPack(const ScenePack& sp, const PackMeshes& meshes, const std
       bind(0, m.setup.textures[0], true, P.whiteArray);
       bind(1, m.setup.textures[1], true, P.whiteArray);
       bind(2, m.setup.textures[2], false, P.white);
-      m.bindingCount = 5;  // 3 = ambiente, 4 = DFG (no desenho)
+      m.bindingCount = 6;  // 3 = ambiente, 4 = DFG, 5 = sombra (no desenho)
     } else {
       for (std::size_t s = 0; s < kSurfaceSlots; ++s) bind(s, m.setup.textures[s], false, s == 1 ? P.flatNormal : P.white);
-      m.bindingCount = 7;  // 5 = ambiente, 6 = DFG
+      m.bindingCount = 8;  // 5 = ambiente, 6 = DFG, 7 = sombra
     }
     P.materials.push_back(m);
   }
@@ -341,9 +343,10 @@ void Renderer::Impl::drawPack(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* rp, 
     SDL_PushGPUVertexUniformData(cmd, 1, &d, sizeof d);
     if (mi != boundMat) {
       SDL_PushGPUFragmentUniformData(cmd, 1, &m.setup.block, sizeof m.setup.block);
-      std::array<SDL_GPUTextureSamplerBinding, 7> b = m.bindings;
-      b[m.bindingCount - 2] = {P.env, P.envSampler};
-      b[m.bindingCount - 1] = {P.dfg, P.clampLinear};
+      std::array<SDL_GPUTextureSamplerBinding, 8> b = m.bindings;
+      b[m.bindingCount - 3] = {P.env, P.envSampler};
+      b[m.bindingCount - 2] = {P.dfg, P.clampLinear};
+      b[m.bindingCount - 1] = {shadowMap, shadowSampler};
       SDL_BindGPUFragmentSamplers(rp, 0, b.data(), m.bindingCount);
       boundMat = mi;
     }
@@ -398,4 +401,151 @@ void Renderer::Impl::drawPack(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* rp, 
   }
 }
 
+// ---------------------------------------------------------------- sombra do sol
+void Renderer::Impl::ensureShadowMap(int size) {
+  size = std::max(size, 16);
+  if (shadowMap && shadowMapSize == size) return;
+  if (shadowMap) SDL_ReleaseGPUTexture(dev, shadowMap);
+  if (!shadowSampler) {
+    for (SDL_GPUTextureFormat f : {SDL_GPU_TEXTUREFORMAT_D32_FLOAT, SDL_GPU_TEXTUREFORMAT_D16_UNORM}) {
+      if (SDL_GPUTextureSupportsFormat(dev, f, SDL_GPU_TEXTURETYPE_2D,
+                                       SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER)) {
+        shadowFmt = f;
+        break;
+      }
+    }
+    SDL_GPUSamplerCreateInfo si{};
+    si.min_filter = si.mag_filter = SDL_GPU_FILTER_LINEAR;
+    si.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
+    si.address_mode_u = si.address_mode_v = si.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
+    si.enable_compare = true;
+    si.compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
+    shadowSampler = SDL_CreateGPUSampler(dev, &si);
+    if (!shadowSampler) gpuFail("SDL_CreateGPUSampler (sombra)");
+  }
+  shadowMap = texture(shadowFmt, SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER, size, size);
+  shadowMapSize = size;
+  // começa iluminado (profundidade 1) para o primeiro quadro sem passada de sombra
+  SDL_GPUCommandBuffer* cmd = SDL_AcquireGPUCommandBuffer(dev);
+  SDL_GPUDepthStencilTargetInfo dt{};
+  dt.texture = shadowMap;
+  dt.clear_depth = 1.0f;
+  dt.load_op = SDL_GPU_LOADOP_CLEAR;
+  dt.store_op = SDL_GPU_STOREOP_STORE;
+  dt.stencil_load_op = SDL_GPU_LOADOP_DONT_CARE;
+  dt.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
+  SDL_EndGPURenderPass(SDL_BeginGPURenderPass(cmd, nullptr, 0, &dt));
+  SDL_SubmitGPUCommandBuffer(cmd);
+}
+
+// three WebGLShadowMap: a passada de sombra desenha o lado oposto do material (FrontSide → BackSide).
+SDL_GPUGraphicsPipeline* Renderer::Impl::shadowPipeline(Cull cull, bool mirrored, bool skinned) {
+  const auto key = std::make_tuple(static_cast<int>(cull), mirrored, skinned);
+  if (const auto it = pack.shadowPipelines.find(key); it != pack.shadowPipelines.end()) return it->second;
+  const SDL_GPUVertexBufferDescription bufs[3] = {
+      {0, sizeof(PackVertex), SDL_GPU_VERTEXINPUTRATE_VERTEX, 0},
+      {1, sizeof(Instance), SDL_GPU_VERTEXINPUTRATE_INSTANCE, 0},
+      {2, sizeof(SkinVertex), SDL_GPU_VERTEXINPUTRATE_VERTEX, 0},
+  };
+  const SDL_GPUVertexAttribute attrs[15] = {
+      {0, 0, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3, 0},        {1, 0, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3, 12},
+      {2, 0, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2, 24},       {3, 0, SDL_GPU_VERTEXELEMENTFORMAT_HALF4, 32},
+      {4, 0, SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4_NORM, 40},  {5, 0, SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4_NORM, 44},
+      {6, 0, SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4_NORM, 48},  {7, 0, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT, 52},
+      {8, 1, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4, 0},        {9, 1, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4, 16},
+      {10, 1, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4, 32},      {11, 1, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4, 48},
+      {12, 1, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4, 64},
+      {13, 2, SDL_GPU_VERTEXELEMENTFORMAT_USHORT4, 0},      {14, 2, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4, 8},
+  };
+  SDL_GPUGraphicsPipelineCreateInfo pi{};
+  pi.vertex_shader = skinned ? pack.skinnedV : pack.meshV;
+  pi.fragment_shader = pack.shadowF;
+  pi.vertex_input_state = {bufs, skinned ? 3u : 2u, attrs, skinned ? 15u : 13u};
+  pi.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
+  pi.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
+  pi.rasterizer_state.cull_mode = cull == Cull::None ? SDL_GPU_CULLMODE_NONE : cull == Cull::Back ? SDL_GPU_CULLMODE_FRONT : SDL_GPU_CULLMODE_BACK;
+  pi.rasterizer_state.front_face = mirrored ? SDL_GPU_FRONTFACE_CLOCKWISE : SDL_GPU_FRONTFACE_COUNTER_CLOCKWISE;
+  pi.rasterizer_state.enable_depth_clip = true;
+  pi.depth_stencil_state.enable_depth_test = true;
+  pi.depth_stencil_state.enable_depth_write = true;
+  pi.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
+  pi.target_info.num_color_targets = 0;
+  pi.target_info.has_depth_stencil_target = true;
+  pi.target_info.depth_stencil_format = shadowFmt;
+  SDL_GPUGraphicsPipeline* p = SDL_CreateGPUGraphicsPipeline(dev, &pi);
+  if (!p) gpuFail("SDL_CreateGPUGraphicsPipeline (sombra)");
+  pack.shadowPipelines.emplace(key, p);
+  return p;
+}
+
+void Renderer::Impl::drawShadows(SDL_GPUCommandBuffer* cmd, const Renderer::Frame& f, FrameStats& st) {
+  PackGpu& P = pack;
+  SDL_GPUDepthStencilTargetInfo dt{};
+  dt.texture = shadowMap;
+  dt.clear_depth = 1.0f;
+  dt.load_op = SDL_GPU_LOADOP_CLEAR;
+  dt.store_op = SDL_GPU_STOREOP_STORE;
+  dt.stencil_load_op = SDL_GPU_LOADOP_DONT_CARE;
+  dt.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
+  SDL_GPURenderPass* rp = SDL_BeginGPURenderPass(cmd, nullptr, 0, &dt);
+  // os mesmos uniformes do quadro, vistos do sol (o vento e o alcance da grama seguem a câmera)
+  FrameUniforms u = f.uniforms;
+  std::memcpy(u.viewProj, u.shadowMatrix, sizeof u.viewProj);
+  SDL_PushGPUVertexUniformData(cmd, 0, &u, sizeof u);
+  SDL_PushGPUFragmentUniformData(cmd, 0, &u, sizeof u);
+  const SDL_GPUBufferBinding ib{P.ib, 0};
+  SDL_BindGPUIndexBuffer(rp, &ib, SDL_GPU_INDEXELEMENTSIZE_32BIT);
+  SDL_GPUGraphicsPipeline* bound = nullptr;
+  int boundMat = -1;
+  bool bonesBound = false;
+  for (const PackDrawCmd& d : f.pack->shadowDraws) {
+    const PackGpu::Mat& m = P.materials[static_cast<std::size_t>(d.material)];
+    if (m.setup.terrain) continue;
+    const MeshSlice& s = P.geometries[static_cast<std::size_t>(d.geometry)];
+    const bool skinned = d.boneBase >= 0;
+    if (skinned && (s.skinBase < 0 || !P.bones.buf)) continue;
+    SDL_GPUGraphicsPipeline* p = shadowPipeline(m.setup.cull, d.mirrored, skinned);
+    if (p != bound) {
+      SDL_BindGPUGraphicsPipeline(rp, p);
+      bound = p;
+      boundMat = -1;
+    }
+    if (skinned && !bonesBound) {
+      SDL_BindGPUVertexStorageBuffers(rp, 0, &P.bones.buf, 1);
+      bonesBound = true;
+    }
+    DrawBlock db = m.setup.draw;
+    db.wind[2] = d.instanced ? 1.0f : 0.0f;
+    db.wind[3] = static_cast<float>(d.tint);
+    if (skinned) {
+      db.wind[1] = 0.0f;
+      db.flags[1] = static_cast<float>(d.boneBase);
+    }
+    SDL_PushGPUVertexUniformData(cmd, 1, &db, sizeof db);
+    if (d.material != boundMat) {
+      SDL_PushGPUFragmentUniformData(cmd, 1, &m.setup.block, sizeof m.setup.block);
+      SDL_BindGPUFragmentSamplers(rp, 0, &m.bindings[0], 1);
+      boundMat = d.material;
+    }
+    SDL_GPUBuffer* inst = d.frameInstances || skinned ? P.frameInst.buf : P.staticInst;
+    if (skinned) {
+      const SDL_GPUBufferBinding vb[3] = {
+          {P.vb, static_cast<Uint32>(s.baseVertex) * static_cast<Uint32>(sizeof(PackVertex))},
+          {inst, static_cast<Uint32>(d.firstInstance * sizeof(Instance))},
+          {P.skinVB, static_cast<Uint32>(s.skinBase) * static_cast<Uint32>(sizeof(SkinVertex))},
+      };
+      SDL_BindGPUVertexBuffers(rp, 0, vb, 3);
+      SDL_DrawGPUIndexedPrimitives(rp, s.indexCount, 1, s.firstIndex, 0, 0);
+    } else {
+      const SDL_GPUBufferBinding vb[2] = {{P.vb, 0}, {inst, static_cast<Uint32>(d.firstInstance * sizeof(Instance))}};
+      SDL_BindGPUVertexBuffers(rp, 0, vb, 2);
+      SDL_DrawGPUIndexedPrimitives(rp, s.indexCount, d.instanceCount, s.firstIndex, s.baseVertex, 0);
+    }
+    ++st.drawCalls;
+    ++st.shadowDraws;
+  }
+  SDL_EndGPURenderPass(rp);
+}
+
 }  // namespace rpg::client
+

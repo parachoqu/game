@@ -25,6 +25,7 @@ layout(set = 2, binding = 3) uniform sampler2D tMetal;
 layout(set = 2, binding = 4) uniform sampler2D tAo;
 layout(set = 2, binding = 5) uniform sampler2D tEnv;
 layout(set = 2, binding = 6) uniform sampler2D tDfg;
+layout(set = 2, binding = 7) uniform sampler2DShadow tShadow;
 
 layout(location = 0) in vec3 vWorld;
 layout(location = 1) in vec3 vNormal;
@@ -133,12 +134,13 @@ void main() {
   if ((feats & FEAT_ANOMALY) != 0) emissive *= 0.72 + 0.38 * sin(t * 1.7);
   float ao = (maps & MAP_AO) != 0 ? texture(tAo, vUv).r : 1.0;
 
+  float shadow = sunShadow(tShadow, vWorld, vNormal);
   vec3 light;
   if (model == 1) {
-    light = shadeLambert(diffuseColor.rgb, normal, ao);
+    light = shadeLambert(diffuseColor.rgb, normal, ao, shadow);
   } else {
     Physical m = makePhysical(diffuseColor.rgb, roughnessFactor, metalnessFactor, nonPerturbed);
-    light = shadeStandard(m, normal, viewDir, ao, tEnv, tDfg);
+    light = shadeStandard(m, normal, viewDir, ao, tEnv, tDfg, shadow);
   }
   light += emissive;
   outColor = vec4(applyFogExp2(light, vWorld), (misc & 4) != 0 ? diffuseColor.a : 1.0);

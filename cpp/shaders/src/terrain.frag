@@ -22,6 +22,7 @@ layout(set = 2, binding = 1) uniform sampler2DArray uTN;
 layout(set = 2, binding = 2) uniform sampler2D uMacro;
 layout(set = 2, binding = 3) uniform sampler2D tEnv;
 layout(set = 2, binding = 4) uniform sampler2D tDfg;
+layout(set = 2, binding = 5) uniform sampler2DShadow tShadow;
 
 layout(location = 0) in vec3 vWorld;
 layout(location = 1) in vec3 vNormal;
@@ -82,6 +83,6 @@ void main() {
   vec3 normal = normalize(sNrm + swn * 0.001);
   vec3 viewDir = normalize(F.camPos.xyz - vWorld);
   Physical m = makePhysical(diffuse, roughness, M.pbr.y, geomNormal);
-  vec3 light = shadeStandard(m, normal, viewDir, 1.0, tEnv, tDfg);
+  vec3 light = shadeStandard(m, normal, viewDir, 1.0, tEnv, tDfg, sunShadow(tShadow, vWorld, vNormal));
   outColor = vec4(applyFogExp2(light, vWorld), 1.0);
 }

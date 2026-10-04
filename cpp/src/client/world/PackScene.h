@@ -12,6 +12,7 @@
 //                           paliçada extra do acampamento.
 #include <array>
 #include <cstdint>
+#include <memory>
 #include <optional>
 #include <vector>
 
@@ -89,7 +90,18 @@ struct PackFrame {
   std::vector<PackDrawCmd> draws;
   std::vector<Instance> instances;           // instâncias deste quadro
   std::vector<glm::mat4> bones;              // paletas das malhas com pele (no mundo)
+  std::vector<PackDrawCmd> shadowDraws;      // passada de sombra do sol (instâncias em `instances`)
   std::uint32_t lodInstances = 0;            // vegetação ativa (relatórios)
+};
+
+// Sombra do sol neste quadro: quem entra na passada de profundidade. Cada objeto segue o castShadow
+// da demo; a vegetação desenha os sombreadores de lod-field.js até `vegetationFar` da câmera
+// (arbustos até 60% disso) e os personagens só perto do foco (characters.js, 34–38 m).
+struct ShadowView {
+  glm::mat4 viewProj{1.0f};  // ShadowCamera::viewProj
+  glm::vec3 focus{0.0f};
+  float vegetationFar = 55;  // LOD_BANDS.shadowFar; 0 = vegetação sem sombra
+  float characterFar = 36;
 };
 
 // Alcances de `quality.js` (nível Alta por padrão).
@@ -97,6 +109,7 @@ struct WorldDetail {
   float tileNear = 300, blockFar = 1600, extraFar = 900;
   std::vector<float> treeBands{28, 65, 150, 700}, shrubBands{22, 50, 360};
   float secondaryDensity = 1;
+  float coverRadius = 84, coverDensity = 1;  // cobertura do chão (setGroundCoverQuality)
 };
 
 // Estado dos modelos dinâmicos do cenário (vem do mundo replicado).
@@ -131,9 +144,12 @@ struct DynamicSceneState {
   std::vector<glm::mat4> bones;
 };
 
+class GroundCover;
+
 class WorldView {
  public:
   WorldView(const ScenePack& pack, const PackMeshes& meshes);
+  ~WorldView();
 
   void setDetail(const WorldDetail& d);
   const WorldDetail& detail() const { return detail_; }
@@ -142,7 +158,9 @@ class WorldView {
   const std::vector<Instance>& staticInstances() const { return staticInstances_; }
 
   // Monta o quadro para a câmera (posição e viewProj).
-  void update(glm::vec3 cam, const glm::mat4& viewProj, const glm::vec3& camForward, const DynamicSceneState& dyn, PackFrame& out);
+  // Com `shadow`, também monta PackFrame::shadowDraws (recortados pelo volume da câmera do sol).
+  void update(glm::vec3 cam, const glm::mat4& viewProj, const glm::vec3& camForward, const DynamicSceneState& dyn, PackFrame& out,
+              const ShadowView* shadow = nullptr);
 
   // updateLODFields isolado (testes): devolve o nível atual de cada instância de um campo.
   void updateLod(glm::vec2 cam, bool force = false);
@@ -185,6 +203,7 @@ class WorldView {
   const ScenePack& pack_;
   const PackMeshes& meshes_;
   WorldDetail detail_;
+  std::unique_ptr<GroundCover> cover_;
   std::vector<Instance> staticInstances_;
   std::vector<StaticEntry> statics_;
   std::vector<InstancedEntry> instanced_;

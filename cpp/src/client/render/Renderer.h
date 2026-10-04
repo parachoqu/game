@@ -37,7 +37,15 @@ struct RendererOptions {
   bool vsync = true;
 };
 
+// Qualidade (engine/quality.js): mapa de sombra do sol e passes de pós-processamento.
+struct RenderSettings {
+  int shadowSize = 4096;  // lado do mapa de sombra; 0 = sem sombra
+  bool gtao = true, bloom = true, fxaa = true;
+  bool operator==(const RenderSettings&) const = default;
+};
+
 struct FrameStats {
+  std::uint32_t shadowDraws = 0;
   std::uint32_t drawCalls = 0;
   std::uint64_t triangles = 0;
   std::uint32_t chunksDrawn = 0;
@@ -62,12 +70,23 @@ class Renderer {
   // Luz de ambiente (equirretangular linear); nullptr remove.
   void setEnvironment(const EnvironmentMap* env);
 
+  void configure(const RenderSettings& s);
+  void waitIdle();  // espera a GPU terminar (medidas de tempo de quadro)
+  const RenderSettings& settings() const;
+
   struct Frame {
     FrameUniforms uniforms;
     int map = 0;
     glm::vec3 cameraPos{0.0f};
     const InstanceLists* dynamic = nullptr;
     const PackFrame* pack = nullptr;  // cenário do pacote visual (com o pacote carregado)
+    // Passada de sombra do sol (PackFrame::shadowDraws), com `uniforms.shadowMatrix` e `uniforms.shadow`
+    // já preenchidos; sem ela, `uniforms.shadow[3]` precisa ser 0.
+    bool shadows = false;
+    glm::mat4 view{1.0f}, proj{1.0f};
+    // Pausa barata: `cacheScene` guarda a cena composta deste quadro; `reuseScene` a reaproveita (sem
+    // sombra, cena nem pós) e só redesenha a interface por cima. Sem cache válido, desenha tudo.
+    bool cacheScene = false, reuseScene = false;  // câmera (a oclusão de ambiente trabalha no espaço de vista)
     const SkyFrame* sky = nullptr;    // estrelas, constelações, lua
     const std::vector<ColorVertex>* unlit = nullptr;
     const UiBatch* ui = nullptr;

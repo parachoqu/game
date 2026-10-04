@@ -1,11 +1,15 @@
 #include "client/world/PackScene.h"
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstring>
+#include <string>
+#include <unordered_map>
 
 #include <glm/gtc/packing.hpp>
 
+#include "client/world/GroundCover.h"
 #include "core/world/StaticWorld.h"
 
 namespace rpg::client {
@@ -55,6 +59,71 @@ struct Frustum {
 
 bool startsWith(const std::string& s, const char* prefix) { return s.rfind(prefix, 0) == 0; }
 
+// Geometrias usadas só por materiais de dois lados (side = DoubleSide).
+std::vector<bool> doubleSidedOnly(const ScenePack& pack) {
+  std::vector<int> use(pack.geometries.size(), 0);  // 1: dois lados; 2: um lado
+  const auto mark = [&](int g, int m) {
+    if (g < 0 || m < 0 || static_cast<std::size_t>(g) >= use.size() || static_cast<std::size_t>(m) >= pack.materials.size()) return;
+    use[static_cast<std::size_t>(g)] |= pack.materials[static_cast<std::size_t>(m)].side == 2 ? 1 : 2;
+  };
+  const auto draws = [&](const std::vector<PackDraw>& v) {
+    for (const PackDraw& d : v) mark(d.geometry, d.material);
+  };
+  const auto parts = [&](const std::vector<PackLodPart>& v) {
+    for (const PackLodPart& p : v) mark(p.geometry, p.material);
+  };
+  draws(pack.statics);
+  for (const PackInstanced& in : pack.instanced) mark(in.geometry, in.material);
+  for (const PackLodField& f : pack.lodFields) {
+    for (const auto& l : f.levels) parts(l);
+    parts(f.shadow);
+  }
+  for (const PackModel& m : pack.nodes) draws(m.parts);
+  for (const PackModel& m : pack.shrines) draws(m.parts);
+  if (pack.campPalisade) draws(pack.campPalisade->parts);
+  for (const auto* table : {&pack.templates, &pack.weapons, &pack.projectiles})
+    for (const auto& [name, v] : *table) draws(v);
+  for (const auto& [name, rig] : pack.rigs)
+    for (const PackRigMesh& m : rig.meshes) mark(m.geometry, m.material);
+  for (const PackCoverKind& k : pack.groundCover.kinds)
+    for (const PackCoverKind::Variant& v : k.variants) {
+      parts(v.near);
+      parts(v.far);
+    }
+  std::vector<bool> out(use.size());
+  for (std::size_t i = 0; i < use.size(); ++i) out[i] = use[i] == 1;
+  return out;
+}
+
+// A folhagem do kit repete cada cartão (A A D D: dois no sentido da normal, dois invertidos, todos
+// com a mesma normal). Com profundidade exata e LessEqual, como no three, o último desenhado sempre
+// vence; num rasterizador em que a ordem dos vértices muda o arredondamento da profundidade
+// (lavapipe), as cópias brigam e a normal vira a cada linha de pixels. Fica só o último triângulo de
+// cada grupo de coincidentes — a mesma imagem, com metade dos triângulos.
+std::vector<std::uint32_t> keepLastCoincident(const std::vector<float>& pos, const std::vector<std::uint32_t>& idx) {
+  const std::size_t tris = idx.size() / 3;
+  std::unordered_map<std::string, std::size_t> last;
+  last.reserve(tris);
+  std::vector<std::string> keys(tris);
+  for (std::size_t t = 0; t < tris; ++t) {
+    std::array<std::array<float, 3>, 3> v{};
+    for (std::size_t k = 0; k < 3; ++k) {
+      const std::size_t i = idx[t * 3 + k];
+      if (i * 3 + 2 >= pos.size()) return idx;
+      v[k] = {pos[i * 3], pos[i * 3 + 1], pos[i * 3 + 2]};
+    }
+    std::sort(v.begin(), v.end());
+    keys[t].assign(reinterpret_cast<const char*>(v.data()), sizeof v);
+    last[keys[t]] = t;
+  }
+  if (last.size() == tris) return idx;
+  std::vector<std::uint32_t> out;
+  out.reserve(last.size() * 3);
+  for (std::size_t t = 0; t < tris; ++t)
+    if (last[keys[t]] == t) out.insert(out.end(), idx.begin() + static_cast<std::ptrdiff_t>(t * 3), idx.begin() + static_cast<std::ptrdiff_t>(t * 3 + 3));
+  return out;
+}
+
 }  // namespace
 
 // ---------------------------------------------------------------- malhas
@@ -66,7 +135,9 @@ PackMeshes buildPackMeshes(const ScenePack& pack, const StaticWorld& world) {
   M.vertices.reserve(vTotal);
 
   const auto half = [](float f) { return glm::packHalf1x16(f); };
-  for (const PackGeometry& g : pack.geometries) {
+  const std::vector<bool> twoSided = doubleSidedOnly(pack);
+  for (std::size_t gi = 0; gi < pack.geometries.size(); ++gi) {
+    const PackGeometry& g = pack.geometries[gi];
     MeshSlice s;
     s.baseVertex = static_cast<std::int32_t>(M.vertices.size());
     s.firstIndex = static_cast<std::uint32_t>(M.indices.size());
@@ -111,7 +182,8 @@ PackMeshes buildPackMeshes(const ScenePack& pack, const StaticWorld& world) {
       }
     }
     if (g.index) {
-      const std::vector<std::uint32_t> idx = pack.decodeIndices(*g.index);
+      std::vector<std::uint32_t> idx = pack.decodeIndices(*g.index);
+      if (twoSided[gi]) idx = keepLastCoincident(pos, idx);
       M.indices.insert(M.indices.end(), idx.begin(), idx.end());
       s.indexCount = static_cast<std::uint32_t>(idx.size());
     } else {
@@ -247,9 +319,12 @@ WorldView::WorldView(const ScenePack& pack, const PackMeshes& meshes) : pack_(pa
     fields_.push_back(std::move(fs));
   }
   tileNear_.assign(meshes.terrain.size(), 0);
+  cover_ = std::make_unique<GroundCover>(pack);
   detail_.treeBands = pack.lodBands.count("tree") ? pack.lodBands.at("tree") : detail_.treeBands;
   detail_.shrubBands = pack.lodBands.count("shrub") ? pack.lodBands.at("shrub") : detail_.shrubBands;
 }
+
+WorldView::~WorldView() = default;
 
 void WorldView::setDetail(const WorldDetail& d) {
   detail_ = d;
@@ -318,13 +393,18 @@ std::uint32_t WorldView::activeCount(std::size_t field) const {
   return n;
 }
 
-void WorldView::update(glm::vec3 cam, const glm::mat4& viewProj, const glm::vec3& fwd, const DynamicSceneState& dyn, PackFrame& out) {
+void WorldView::update(glm::vec3 cam, const glm::mat4& viewProj, const glm::vec3& fwd, const DynamicSceneState& dyn, PackFrame& out,
+                       const ShadowView* shadow) {
   out.terrain.clear();
   out.draws.clear();
   out.instances.clear();
   out.bones.clear();
+  out.shadowDraws.clear();
   out.lodInstances = 0;
   const Frustum fr(viewProj);
+  const Frustum lightFr(shadow ? shadow->viewProj : viewProj);
+  const auto casts = [&](glm::vec3 c, float r) { return shadow && lightFr.sphere(c, r); };
+  const auto nearFocus = [&](glm::vec3 c, float far) { return shadow && std::hypot(c.x - shadow->focus.x, c.z - shadow->focus.z) < far; };
   const glm::vec2 c2(cam.x, cam.z);
   const bool turbNear = glm::length(kTurbCenter - c2) < detail_.blockFar * 0.5f + 200.0f;
   const auto depthOf = [&](glm::vec3 p) { return glm::dot(p - cam, fwd); };
@@ -345,13 +425,16 @@ void WorldView::update(glm::vec3 cam, const glm::mat4& viewProj, const glm::vec3
     const PackDraw& d = pack_.statics[static_cast<std::size_t>(e.draw)];
     if (d.map == 1 && !turbNear) continue;
     const float dist = std::hypot(e.center.x - cam.x, e.center.z - cam.z);
+    bool inRange = true;
     if (e.cullFar > 0) {
       const float lim = (e.cullFar < 4 ? detail_.extraFar * 0.45f : detail_.extraFar) + e.cullFar;
-      if (dist > lim) continue;
-    } else if (dist - e.radius > detail_.blockFar) {
-      continue;
+      inRange = dist <= lim;
+    } else {
+      inRange = dist - e.radius <= detail_.blockFar;
     }
-    if (!fr.sphere(e.center, e.radius)) continue;
+    const bool visible = inRange && fr.sphere(e.center, e.radius);
+    const bool cast = d.cast && casts(e.center, e.radius);
+    if (!visible && !cast) continue;
     PackDrawCmd c;
     c.geometry = d.geometry;
     c.material = d.material;
@@ -359,12 +442,15 @@ void WorldView::update(glm::vec3 cam, const glm::mat4& viewProj, const glm::vec3
     c.mirrored = e.mirrored;
     c.renderOrder = d.renderOrder;
     c.viewDepth = depthOf(e.center);
-    out.draws.push_back(c);
+    if (visible) out.draws.push_back(c);
+    if (cast) out.shadowDraws.push_back(c);
   }
   for (const InstancedEntry& e : instanced_) {
     const PackInstanced& in = pack_.instanced[static_cast<std::size_t>(e.index)];
     if (in.map == 1 && !turbNear) continue;
-    if (!fr.sphere(e.center, e.radius)) continue;
+    const bool visible = fr.sphere(e.center, e.radius);
+    const bool cast = in.cast && casts(e.center, e.radius);
+    if (!visible && !cast) continue;
     PackDrawCmd c;
     c.geometry = in.geometry;
     c.material = in.material;
@@ -373,7 +459,8 @@ void WorldView::update(glm::vec3 cam, const glm::mat4& viewProj, const glm::vec3
     c.instanced = true;
     c.tint = in.colors ? Tint::Color : Tint::None;
     c.viewDepth = depthOf(e.center);
-    out.draws.push_back(c);
+    if (visible) out.draws.push_back(c);
+    if (cast) out.shadowDraws.push_back(c);
   }
 
   // vegetação com LOD por instância: uma faixa de instâncias por (campo, nível)
@@ -403,6 +490,30 @@ void WorldView::update(glm::vec3 cam, const glm::mat4& viewProj, const glm::vec3
         out.draws.push_back(c);
       }
     }
+    // sombreadores (lod-field.js `updateChunk`): instâncias até `shadowFar` da câmera
+    const float sfar = shadow ? (f.tree ? shadow->vegetationFar : shadow->vegetationFar * 0.6f) : 0.0f;
+    if (f.src->shadow.empty() || sfar <= 0) continue;
+    const auto first = static_cast<std::uint32_t>(out.instances.size());
+    for (const LodChunk& c : f.chunks) {
+      if (std::hypot(c.cx - cam.x, c.cz - cam.z) - c.radius > sfar) continue;
+      if (!lightFr.sphere(c.center, c.sphereRadius)) continue;
+      const std::uint32_t limit = f.src->secondary ? static_cast<std::uint32_t>(std::floor(static_cast<double>(c.n) * static_cast<double>(detail_.secondaryDensity))) : c.n;
+      for (std::uint32_t i = 0; i < limit; ++i)
+        if (std::hypot(c.px[i] - cam.x, c.pz[i] - cam.z) < sfar) out.instances.push_back(c.items[i]);
+    }
+    const auto count = static_cast<std::uint32_t>(out.instances.size()) - first;
+    if (!count) continue;
+    for (const PackLodPart& p : f.src->shadow) {
+      PackDrawCmd c;
+      c.geometry = p.geometry;
+      c.material = p.material;
+      c.firstInstance = first;
+      c.instanceCount = count;
+      c.frameInstances = true;
+      c.instanced = true;
+      c.tint = p.tint == PackLodPart::Tint::Foliage ? Tint::Foliage : p.tint == PackLodPart::Tint::Trunk ? Tint::Trunk : Tint::None;
+      out.shadowDraws.push_back(c);
+    }
   }
 
   // modelos dinâmicos do cenário
@@ -426,7 +537,9 @@ void WorldView::update(glm::vec3 cam, const glm::mat4& viewProj, const glm::vec3
       glm::vec3 c;
       float r = 0;
       boundsOf(meshes_.geometries[static_cast<std::size_t>(part.geometry)], w, c, r);
-      if (!fr.sphere(c, r)) continue;
+      const bool visible = fr.sphere(c, r);
+      const bool cast = part.cast && casts(c, r);
+      if (!visible && !cast) continue;
       PackDrawCmd d;
       d.geometry = part.geometry;
       d.material = part.material;
@@ -435,7 +548,8 @@ void WorldView::update(glm::vec3 cam, const glm::mat4& viewProj, const glm::vec3
       d.mirrored = glm::determinant(glm::mat3(w)) < 0.0f;
       d.viewDepth = depthOf(c);
       out.instances.push_back(makeInstance(w));
-      out.draws.push_back(d);
+      if (visible) out.draws.push_back(d);
+      if (cast) out.shadowDraws.push_back(d);
     }
   };
   for (std::size_t i = 0; i < pack_.nodes.size(); ++i) {
@@ -453,7 +567,9 @@ void WorldView::update(glm::vec3 cam, const glm::mat4& viewProj, const glm::vec3
       glm::vec3 c;
       float r = 0;
       boundsOf(meshes_.geometries[static_cast<std::size_t>(mi.geometry)], mi.root, c, r);
-      if (!fr.sphere(c, r)) continue;
+      const bool visible = fr.sphere(c, r);
+      const bool cast = nearFocus(c, shadow ? shadow->characterFar : 0.0f) && casts(c, r);
+      if (!visible && !cast) continue;
       PackDrawCmd d;
       d.geometry = mi.geometry;
       d.material = mi.material;
@@ -470,7 +586,8 @@ void WorldView::update(glm::vec3 cam, const glm::mat4& viewProj, const glm::vec3
         d.tint = Tint::Color;
       }
       out.instances.push_back(inst);
-      out.draws.push_back(d);
+      if (visible) out.draws.push_back(d);
+      if (cast) out.shadowDraws.push_back(d);
       continue;
     }
     int shard = 0;
@@ -496,7 +613,9 @@ void WorldView::update(glm::vec3 cam, const glm::mat4& viewProj, const glm::vec3
       glm::vec3 c;
       float r = 0;
       boundsOf(meshes_.geometries[static_cast<std::size_t>(part.geometry)], w, c, r);
-      if (!fr.sphere(c, r)) continue;
+      const bool visible = fr.sphere(c, r);
+      const bool cast = part.cast && nearFocus(c, shadow ? shadow->characterFar + 2.0f : 0.0f) && casts(c, r);
+      if (!visible && !cast) continue;
       PackDrawCmd d;
       d.geometry = part.geometry;
       d.material = part.material;
@@ -511,7 +630,8 @@ void WorldView::update(glm::vec3 cam, const glm::mat4& viewProj, const glm::vec3
         d.tint = Tint::Color;
       }
       out.instances.push_back(inst);
-      out.draws.push_back(d);
+      if (visible) out.draws.push_back(d);
+      if (cast) out.shadowDraws.push_back(d);
     }
   }
 
@@ -519,7 +639,9 @@ void WorldView::update(glm::vec3 cam, const glm::mat4& viewProj, const glm::vec3
   if (!dyn.skinned.empty()) {
     out.bones = dyn.bones;
     for (const SkinnedInstance& si : dyn.skinned) {
-      if (!fr.sphere(si.center, si.radius)) continue;
+      const bool visible = fr.sphere(si.center, si.radius);
+      const bool cast = nearFocus(si.center, shadow ? shadow->characterFar : 0.0f) && casts(si.center, si.radius);
+      if (!visible && !cast) continue;
       PackDrawCmd d;
       d.geometry = si.geometry;
       d.material = si.material;
@@ -536,9 +658,13 @@ void WorldView::update(glm::vec3 cam, const glm::mat4& viewProj, const glm::vec3
         d.tint = Tint::Color;
       }
       out.instances.push_back(inst);
-      out.draws.push_back(d);
+      if (visible) out.draws.push_back(d);
+      if (cast) out.shadowDraws.push_back(d);
     }
   }
+
+  // cobertura do chão em volta da câmera (não faz sombra: castShadow = false)
+  if (cover_) cover_->update(cam, viewProj, detail_.coverRadius, detail_.coverDensity, out);
 
   // ordem do three: opacos por renderOrder; transparentes por renderOrder e de trás para a frente
   const auto transparent = [&](const PackDrawCmd& d) { return pack_.materials[static_cast<std::size_t>(d.material)].transparent; };

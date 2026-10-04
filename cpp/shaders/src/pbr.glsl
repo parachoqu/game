@@ -146,11 +146,28 @@ vec3 hemiIrradiance(vec3 n) {
 }
 vec3 sunLight() { return F.sunColor.rgb * F.sunDir.w; }
 
+// Sombra do sol (DirectionalLight.castShadow + PCFShadowMap do three): a posição anda `normalBias` m
+// na normal de vértice, a profundidade ganha `bias` e 3×3 amostras com comparação (cada uma já bilinear)
+// num raio de `shadowRadius` texels. Fora do volume da câmera do sol, iluminado.
+float sunShadow(sampler2DShadow sm, vec3 world, vec3 vertexNormal) {
+  if (F.shadowParams.w <= 0.0) return 1.0;
+  vec4 p = F.shadowMatrix * vec4(world + normalize(vertexNormal) * F.shadowParams.y, 1.0);
+  vec3 ndc = p.xyz / p.w;
+  vec2 uv = vec2(ndc.x * 0.5 + 0.5, 0.5 - ndc.y * 0.5);
+  float z = ndc.z + F.shadowParams.x;
+  if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0 || z > 1.0) return 1.0;
+  float r = F.shadowParams.z;
+  float s = 0.0;
+  for (int y = -1; y <= 1; y++)
+    for (int x = -1; x <= 1; x++) s += texture(sm, vec3(uv + vec2(float(x), float(y)) * r, z));
+  return s / 9.0;
+}
+
 // MeshStandardMaterial
-vec3 shadeStandard(Physical m, vec3 n, vec3 v, float ao, sampler2D env, sampler2D dfg) {
+vec3 shadeStandard(Physical m, vec3 n, vec3 v, float ao, sampler2D env, sampler2D dfg, float shadow) {
   vec3 l = normalize(F.sunDir.xyz);
   float dotNL = saturate(dot(n, l));
-  vec3 irr = dotNL * sunLight();
+  vec3 irr = dotNL * sunLight() * shadow;
   vec3 directSpecular = irr * BRDF_GGX_Multiscatter(l, v, n, m, dfg);
   vec3 directDiffuse = irr * BRDF_Lambert(m.diffuseContribution);
   vec3 indirectDiffuse = hemiIrradiance(n) * BRDF_Lambert(m.diffuseContribution);
@@ -174,9 +191,9 @@ vec3 shadeStandard(Physical m, vec3 n, vec3 v, float ao, sampler2D env, sampler2
 }
 
 // MeshLambertMaterial (o ambiente entra na irradiância, como no r185)
-vec3 shadeLambert(vec3 diffuse, vec3 n, float ao) {
+vec3 shadeLambert(vec3 diffuse, vec3 n, float ao, float shadow) {
   vec3 l = normalize(F.sunDir.xyz);
-  vec3 direct = saturate(dot(n, l)) * sunLight() * BRDF_Lambert(diffuse);
+  vec3 direct = saturate(dot(n, l)) * sunLight() * shadow * BRDF_Lambert(diffuse);
   vec3 irr = hemiIrradiance(n);
   if (envOn()) irr += shIrradiance(n) * F.params.z;
   return direct + irr * BRDF_Lambert(diffuse) * ao;

@@ -566,7 +566,7 @@ mesma pose em cada nó (até 2·10⁻³ rad), o mesmo corpo e os mesmos vértice
 | o equirretangular do IBL sobe com `flipY = false` (de cabeça para baixo) | reproduzido | paridade |
 | `P.aimT` nunca sai de 0 (a pose de mira com arco não aparece) | reproduzido (`aim = 0`) | paridade |
 | `quadruped()` guarda só a rotação da pose base, e o primeiro `mixerStep` zera a posição de Spine1, Spine2, Head e Jaw da leoa | reproduzido | paridade (a leoa só aparece sem o modelo do cão do vazio) |
-| sombras, GTAO, bloom e cobertura do chão | fase 7 | |
+| sombras, GTAO, bloom e cobertura do chão | fase 7 (seção 13) | |
 
 ## 11. A interface (fase 5)
 
@@ -658,3 +658,89 @@ mestre em 0,55 e a ambiência com a rampa de 1,5 s. `AudioDevice` abre um stream
 como `EvSound` (`FxState::sounds`), a ambiência segue o mapa (vento na região, zumbido na Turbulenta)
 e o mudo da pausa vale para os dois.
 
+
+## 13. Sombras, pós-processamento, cobertura do chão e qualidade (fase 7)
+
+### Passes do quadro
+
+`render/Renderer.cpp` desenha cada quadro nesta ordem (o EffectComposer da demo, com a sombra antes):
+
+1. **Sombra do sol** (`drawShadows`, RendererPack.cpp)
+   - **Alvo e câmera:** profundidade D32 do tamanho do nível, desenhada pela `ShadowCamera`
+     ortográfica. Ela fica ±`shadowSpan` m em volta do jogador, a luz 160 m acima dele na direção do
+     sol, e o centro é encaixado no texel.
+   - **Quem desenha:** o que `WorldView::update` põe em `PackFrame::shadowDraws`, segundo o
+     castShadow de cada objeto da demo (o bake grava `cast`):
+     - os sombreadores dos campos de LOD até `vegShadowFar`, e os arbustos a 60% disso;
+     - os personagens até 36 m do foco;
+     - a cobertura do chão e o relevo não fazem sombra.
+   - **Faces:** a passada desenha o lado oposto do material (`shadowSide` do three) e recorta por
+     alfa (`shadow.frag`).
+   - **Na luz:** `pbr.glsl` `sunShadow` multiplica só a luz direta. A posição anda pelo normalBias de
+     0,05 m, a profundidade ganha o bias de -0,0004, e o filtro é PCF 3×3 com comparação de hardware
+     num raio de 2,5 texels.
+2. **Cena HDR:** a mesma de antes.
+3. **Oclusão de ambiente** (só alta, `drawAo`, RendererPost.cpp):
+   - **Normais e profundidade:** em meia resolução, só das malhas opacas sem alphaTest e não
+     instanciadas, o `_overrideVisibility` da demo (`aonormal.frag`).
+   - **GTAO (`gtao.frag`):** o horizonte de Jimenez, com 4 fatias × 3 passos por lado, raio 0,8 m,
+     expoente de distância 1,5 e espessura 1,2.
+   - **Filtro de Poisson (`aoblur.frag`):** 12 amostras num disco de 5 px, pesadas por oclusão,
+     profundidade e normal.
+4. **Bloom** (alta e média, `drawBloom`): passa-alta com limiar 1,15 e o teto de 3,0 da demo, já com a
+   oclusão, depois cinco níveis de desfoque separável (kernels 6, 10, 14, 18, 22 com sigma = raio/3, os do three r185) a partir da meia
+   resolução.
+5. **Composição** (`composite.frag`):
+   - multiplica a cena pela oclusão com mistura de 0,85;
+   - soma o bloom com força de 0,14 e os fatores do `lerpBloomFactor`;
+   - depois aplica a exposição, o ACES e o sRGB.
+6. **FXAA** (alta e média) da saída para a textura final; a interface vem por cima.
+
+### Níveis (`client/game/Quality`)
+
+- **Tabela:** a `LEVELS` de `quality.js`. Cada nível vira:
+  - as `RenderSettings` (tamanho da sombra, GTAO, bloom, FXAA);
+  - o `WorldDetail` (blocos de relevo, alcance do cenário, faixas de LOD das árvores e arbustos,
+    densidade do sub-bosque, raio e densidade da cobertura);
+  - os alcances da sombra.
+- **`uGrassFar`:** é o raio da cobertura × 0,94, como em `setGroundCoverQuality`.
+- **`AutoQuality`:** é o `sampleFrame` (90 quadros de aquecimento, mediana de 120, desce um nível
+  acima de 30 ms, no máximo duas vezes). Fica desligado quando o jogador escolheu o nível na pausa
+  (`settings.json`) e nas execuções automáticas.
+
+### Cobertura do chão pelo bake
+
+`generateCell` (ground-cover.js) depende de cinco módulos do mundo da demo (`heightfield`,
+`functional-areas`, `vegetation-fields`, `scene-world`, `noise`). Em vez de duplicá-los em C++, o bake
+visual roda a própria função nas 1.024 células de 32 m e grava as listas.
+
+- **Formato:** 16 bytes por instância (x e z u16 na célula, y f32, escalas u16, giro u8, cor 3 × u8),
+  comprimidos com o codec do meshoptimizer. São cerca de 711 mil instâncias, 9 MB.
+- **Moldes:** os de cada tipo e variante (`levelParts`, perto e longe).
+- **No cliente (`world/GroundCover`):** escolhe as células no raio e decide perto/longe a 26 m. O corte
+  pelo `show` da demo é 1 − 0,55 · smoothstep(30, raio, d) vezes a densidade, e funciona porque a
+  lista já vem em ordem aleatória. As instâncias montadas ficam num cache das últimas 96 células.
+
+### Pausa barata
+
+Com a pausa aberta, o primeiro quadro guarda a cena composta (`cacheScene`). Os seguintes copiam essa
+imagem para a saída (`reuseScene`) e só desenham a interface: sem sombra, cena, oclusão nem bloom, e
+sem montar o cenário na CPU. Trocar a qualidade ou o tamanho da janela invalida o cache.
+
+### Desvios
+
+| Demo | Cliente C++ | Por quê |
+|---|---|---|
+| SMAAPass | FXAA (Lottes, variante de console) | mesmo papel num passe só, sem as tabelas de área e busca do SMAA |
+| GTAOShader + PoissonDenoiseShader do three | GTAO de Jimenez com 4 × 3 amostras + filtro de Poisson de 12 | mesma ideia e parâmetros; a amostragem do three não foi copiada linha a linha |
+| PCFShadowMap (5 amostras num disco de Vogel girado por ruído por pixel) | PCF 3×3 com comparação bilinear | mesmo raio de 2,5 texels, sem o ruído por pixel, que o FXAA espalharia |
+| folhagem do kit com cada cartão repetido (A A D D, mesma normal): o LessEqual com profundidade exata mostra sempre o último | `buildPackMeshes` deixa só o último triângulo de cada grupo de coincidentes nas geometrias só de dois lados | no lavapipe a ordem dos vértices muda o arredondamento, as cópias brigavam e a normal virava a cada linha; a imagem fica a do three, com metade dos triângulos |
+| a grama de campo fica mais espaçada nos níveis baixos (`meadowStep` refaz as células) | as listas do nível alto rareadas pela densidade | o bake grava um espaçamento só |
+| `updateCharacterShadows` com histerese 34–38 m | corte fixo em 36 m | sem estado por personagem no cliente |
+
+### Medidas
+
+`rpg_local --benchmark` mede os mesmos seis pontos de `measure-benchmark.mjs`, e
+`tools/compare_benchmark.py` compara com `demo/benchmark-results.json` (a demo no Chrome sem janela,
+com WebGL por software). No mesmo tipo de máquina, sem GPU (Mesa lavapipe), o C++ fica bem à frente:
+veja a tabela no README.

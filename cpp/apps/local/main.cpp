@@ -8,6 +8,9 @@
 //
 //   --auto         pula título e criação (personagem padrão)
 //   --continue     pula o título e retoma o último personagem salvo
+//   --quality Q    nível gráfico (alta, media, baixa) sem ajuste automático
+//   --benchmark    mede os seis pontos de demo/tools/measure-benchmark.mjs nos três níveis e grava
+//                  benchmark-cpp.json (--bench-frames N quadros por ponto, --bench-out ARQ); liga --headless
 //   --view NOME    enquadramento das capturas da demo (02_mercado … 13_vista_elevada_horizonte,
 //                  01_title_screen); liga --auto, --dev e esconde o HUD
 //   --frames N     sai depois de N quadros de jogo (com --screenshot, grava o último)
@@ -75,9 +78,10 @@ bool parseNetSim(std::string_view s, rpg::net::NetSim& out) {
 int usage() {
   std::fprintf(stderr,
                "uso: rpg_local [--data DIR] [--sim DIR] [--assets DIR] [--size WxH] [--fullscreen] [--no-vsync] [--seed S]\n"
-               "                [--dev] [--debug-ui] [--net-sim latency:MS,jitter:MS,loss:PCT] [--auto] [--continue] [--name N] [--origin O]\n"
+               "                [--dev] [--debug-ui] [--net-sim latency:MS,jitter:MS,loss:PCT] [--auto] [--continue] [--quality Q] [--name N] [--origin O]\n"
                "                [--start S] [--model M] [--view NOME] [--hour H] [--hide-hud] [--portrait] [--frames N]\n"
-               "                [--screenshot ARQ.png] [--headless] [--save-dir DIR] [--no-save] [--import-save ARQ]\n");
+               "                [--screenshot ARQ.png] [--headless] [--save-dir DIR] [--no-save] [--import-save ARQ]\n"
+               "                [--benchmark] [--bench-frames N] [--bench-out ARQ]\n");
   return 2;
 }
 
@@ -144,6 +148,10 @@ int main(int argc, char** argv) {
       if (!parseNetSim(argv[++i], netSim)) return usage();
     } else if (a == "--auto") opt.autoStart = true;
     else if (a == "--continue") opt.autoContinue = true;
+    else if (a == "--quality" && v) opt.quality = argv[++i];
+    else if (a == "--benchmark") opt.benchmark = true;
+    else if (a == "--bench-frames" && v && parseNumber(std::string_view(argv[++i]), opt.benchFrames) && opt.benchFrames > 0) {}
+    else if (a == "--bench-out" && v) opt.benchOut = rpg::pathFromUtf8(argv[++i]);
     else if (a == "--name" && v) opt.name = argv[++i];
     else if (a == "--origin" && v) opt.origin = argv[++i];
     else if (a == "--start" && v) opt.start = argv[++i];
@@ -179,9 +187,17 @@ int main(int argc, char** argv) {
     opt.fixedDt = 1.0 / 30.0;
   }
   opt.dataDir = dataDir;
+  if (opt.benchmark) {
+    opt.headless = true;  // fora da tela: sem vsync limitando o quadro
+    opt.autoStart = true;
+    opt.dev = cfg.devCommands = true;
+    opt.hideHud = true;
+    if (!opt.hour) opt.hour = 12.0;
+    if (opt.width == 1280 && opt.height == 720) opt.width = 1100, opt.height = 700;  // a janela da demo no benchmark
+  }
   // saves e preferências: ligados ao jogar; desligados nas execuções automáticas (capturas, CI), que
   // precisam começar sempre do mesmo estado, a menos que --save-dir seja dado
-  const bool automation = opt.view || opt.headless || opt.frames > 0;
+  const bool automation = opt.view || opt.headless || opt.frames > 0 || opt.benchmark;
   if (!noSave && (saveDir || !automation || importFile)) cfg.saveDir = saveDir ? *saveDir : rpg::userDataDir();
   if (cfg.saveDir) {
     opt.settingsFile = *cfg.saveDir / "settings.json";

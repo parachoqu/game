@@ -100,12 +100,14 @@ struct PackDraw {
   glm::mat4 matrix{1.0f};
   int map = 0;
   int renderOrder = 0;
+  bool cast = true;  // castShadow da demo
   std::string group, name;
 };
 
 struct PackInstanced {
   int map = 0, geometry = -1, material = -1;
   std::uint32_t count = 0;
+  bool cast = true;
   std::string group;
   PackStream matrices;
   std::optional<PackStream> colors;
@@ -127,7 +129,35 @@ struct PackLodField {
   bool secondary = false;
   int map = 0;
   std::vector<std::vector<PackLodPart>> levels;
+  std::vector<PackLodPart> shadow;  // sombreadores (lod-field.js `shadowParts`); vazio = não faz sombra
   std::vector<PackLodChunk> chunks;
+};
+
+// Cobertura do chão (ground-cover.js): as listas de `generateCell` de cada célula de 32 m, já em ordem
+// aleatória (cortar do fim rareia por igual). Por instância, 16 bytes: x e z (u16 na célula), y (f32),
+// escala e escala vertical (u16 ×1000), giro (u8, volta inteira em 256) e cor (3 × u8, ×127,5).
+struct PackCoverKind {
+  std::string name;  // grass, flower, mushroom, pebble, branch, meadow, meadowTall
+  struct Variant {
+    std::vector<PackLodPart> near, far;  // levelParts(kind, variante, 1) e (…, 2)
+  };
+  std::vector<Variant> variants;
+};
+struct PackCoverCell {
+  int i = 0, j = 0;
+  struct Slot {
+    std::uint32_t variant = 0, first = 0, count = 0;
+  };
+  std::vector<Slot> kinds;  // na ordem de PackGroundCover::kinds
+};
+struct PackGroundCover {
+  bool present = false;
+  double cell = 32, origin = -512;
+  int n = 32;
+  std::vector<PackCoverKind> kinds;
+  std::vector<PackCoverCell> cells;
+  std::uint32_t count = 0;
+  PackStream items;
 };
 
 struct PackTerrainLod {
@@ -227,6 +257,7 @@ struct ScenePack {
   PackEnvironment environment;
   std::map<std::string, PackRig, std::less<>> rigs;
   std::map<std::string, PackClipMeta, std::less<>> clipMeta;
+  PackGroundCover groundCover;
 
   // Lê scene.json + scene.bin (confere o tamanho). Lança std::runtime_error com o motivo.
   static ScenePack load(const std::filesystem::path& dir);

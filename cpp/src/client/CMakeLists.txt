@@ -14,6 +14,8 @@ add_library(rpg_client_core STATIC
   game/CommandBuilder.cpp
   game/Lighting.cpp
   game/Settings.cpp
+  game/Quality.cpp
+  game/ShadowCamera.cpp
   fx/FxState.cpp
   audio/Synth.cpp
   ui/Localization.cpp
@@ -37,6 +39,7 @@ add_library(rpg_client_core STATIC
   assets/Image.cpp
   assets/EnvironmentMap.cpp
   world/PackScene.cpp
+  world/GroundCover.cpp
   world/PackMaterials.cpp
   world/SkyView.cpp
   world/EntityModels.cpp
@@ -58,6 +61,7 @@ add_library(rpg_client STATIC
   render/Renderer.cpp
   render/RendererPack.cpp
   render/RendererRml.cpp
+  render/RendererPost.cpp
   app/ClientApp.cpp
 )
 if(TARGET rpg_imgui AND RPG_FETCH_DEPS)

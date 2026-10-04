@@ -39,7 +39,7 @@ endif()
 # Cliente sem janela (lógica, sessão contra o servidor, textos, geometria): roda em qualquer CI.
 if(RPG_BUILD_CLIENT)
   add_executable(rpg_client_tests client/ClientTests.cpp client/ScenePackTests.cpp client/PackSceneTests.cpp client/AnimTests.cpp
-    client/AudioTests.cpp)
+    client/AudioTests.cpp client/RenderLogicTests.cpp)
   target_link_libraries(rpg_client_tests PRIVATE rpg_client_core rpg_server Catch2::Catch2WithMain nlohmann_json::nlohmann_json)
   target_include_directories(rpg_client_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
   target_compile_definitions(rpg_client_tests PRIVATE
@@ -64,6 +64,9 @@ if(RPG_BUILD_CLIENT)
     # personagem de perto: malhas com pele (skinned.vert), arma na mão e NPCs
     add_test(NAME smoke.client_portrait
       COMMAND rpg_local --headless --auto --dev --hide-hud --portrait --size 640x360 --frames 40 --screenshot "${CMAKE_BINARY_DIR}/smoke_portrait.png")
+    # sombras, oclusão, bloom, FXAA e cobertura do chão nos três níveis (tools/measure-benchmark.mjs)
+    add_test(NAME smoke.client_benchmark
+      COMMAND rpg_local --benchmark --size 640x360 --bench-frames 2 --bench-out "${CMAKE_BINARY_DIR}/benchmark-cpp.json")
   endif()
 endif()
 

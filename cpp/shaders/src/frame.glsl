@@ -18,7 +18,9 @@
   vec4 occCam;     /* w: altura da tela */ \
   vec4 occTarget;  /* w: alcance da grama */ \
   vec4 sky;        /* x: tempo do céu; y: estrelas (uNight); z: linhas das constelações; w: escala de pixel */ \
-  vec4 sh[9];
+  vec4 sh[9];                  \
+  mat4 shadowMatrix; /* mundo → recorte da câmera do sol */ \
+  vec4 shadowParams; /* x: bias; y: normalBias (m); z: raio do filtro (uv); w: 1 com sombra */
 
 vec3 srgbToLinear(vec3 c) {
   return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(vec3(0.04045), c));

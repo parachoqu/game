@@ -2,6 +2,8 @@
 // Estado interno do Renderer (compartilhado entre Renderer.cpp, RendererPack.cpp e RendererRml.cpp).
 #include <array>
 #include <cstdint>
+#include <cstring>
+#include <initializer_list>
 #include <map>
 #include <memory>
 #include <optional>
@@ -85,7 +87,7 @@ struct PackGpu {
   };
   struct Mat {
     MaterialSetup setup;
-    std::array<SDL_GPUTextureSamplerBinding, 7> bindings{};
+    std::array<SDL_GPUTextureSamplerBinding, 8> bindings{};
     Uint32 bindingCount = 0;
   };
   using PipelineKey = std::tuple<bool, int, int, bool, bool, bool, float, float, bool, bool>;
@@ -100,7 +102,10 @@ struct PackGpu {
   SDL_GPUSampler *clampLinear = nullptr, *envSampler = nullptr;
   std::map<std::tuple<int, int, bool, bool, int>, SDL_GPUSampler*> samplers;
   std::map<PipelineKey, SDL_GPUGraphicsPipeline*> pipelines;
-  SDL_GPUShader *meshV = nullptr, *skinnedV = nullptr, *surfaceF = nullptr, *terrainF = nullptr;
+  SDL_GPUShader *meshV = nullptr, *skinnedV = nullptr, *surfaceF = nullptr, *terrainF = nullptr, *shadowF = nullptr;
+  std::map<std::tuple<int, bool, bool>, SDL_GPUGraphicsPipeline*> shadowPipelines;  // (face recortada, espelhada, pele)
+  SDL_GPUShader* aoNormalF = nullptr;
+  std::map<std::tuple<int, bool, bool>, SDL_GPUGraphicsPipeline*> aoPipelines;      // normais da oclusão
   DynBuffer frameInst, bones;
 };
 
@@ -137,6 +142,24 @@ struct RmlGpu {
   std::vector<std::uint8_t> vtx, idx;
 };
 
+// Pós-processamento (RendererPost.cpp): oclusão de ambiente (GTAO em meia resolução: normais e
+// profundidade das malhas opacas, oclusão, filtro), bloom (passa-alta + cinco níveis de desfoque) e FXAA.
+struct PostGpu {
+  bool ready = false;
+  SDL_GPUShader* fullV = nullptr;
+  SDL_GPUGraphicsPipeline *gtao = nullptr, *aoBlur = nullptr, *brightPass = nullptr, *blur = nullptr, *fxaa = nullptr;
+  SDL_GPUSampler *point = nullptr, *clamp = nullptr;
+  int w = 0, h = 0;
+  SDL_GPUTexture *aoNormal = nullptr, *aoDepth = nullptr, *ao = nullptr, *aoTmp = nullptr;  // meia resolução
+  SDL_GPUTexture* brightTex = nullptr;                                                  // meia resolução
+  std::array<SDL_GPUTexture*, 5> bloomH{}, bloomV{};
+  std::array<int, 5> bloomW{}, bloomHgt{};
+  SDL_GPUTexture* ldr = nullptr;  // saída antes do FXAA
+  SDL_GPUTexture* sceneCache = nullptr;  // cena composta guardada (pausa)
+  bool sceneCached = false;
+  SDL_GPUTexture *white = nullptr, *black = nullptr;  // oclusão neutra, bloom nulo
+};
+
 struct Renderer::Impl {
   SDL_Window* window = nullptr;
   SDL_GPUDevice* dev = nullptr;
@@ -162,6 +185,13 @@ struct Renderer::Impl {
   Uint32 downloadCap = 0;
   PackGpu pack;
   RmlGpu rml;
+  RenderSettings settings;
+  PostGpu post;
+  // sombra do sol: profundidade vista do sol, amostrada com comparação (sampler2DShadow)
+  SDL_GPUTexture* shadowMap = nullptr;
+  int shadowMapSize = 0;
+  SDL_GPUTextureFormat shadowFmt = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
+  SDL_GPUSampler* shadowSampler = nullptr;
   // Sem janela nada limita a CPU: até 2 quadros em voo (senão a fila cresce sem fim no lavapipe).
   std::array<SDL_GPUFence*, 2> inFlight{};
   std::size_t frameSlot = 0;
@@ -173,6 +203,19 @@ struct Renderer::Impl {
                                 const std::vector<std::vector<const std::uint8_t*>>& data, int bytesPerPixel, bool generateMips);
   SDL_GPUGraphicsPipeline* packPipeline(const MaterialSetup& m, bool mirrored, bool skinned);
   void drawPack(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* rp, const PackFrame& f, bool transparent, FrameStats& stats);
+  void ensureShadowMap(int size);
+  SDL_GPUGraphicsPipeline* shadowPipeline(Cull cull, bool mirrored, bool skinned);
+  void drawShadows(SDL_GPUCommandBuffer* cmd, const Renderer::Frame& f, FrameStats& stats);
+
+  // RendererPost.cpp
+  void initPost();
+  void releasePost();
+  void ensurePostTargets(int w, int h);
+  SDL_GPUGraphicsPipeline* aoPipeline(Cull cull, bool mirrored, bool skinned);
+  void drawAo(SDL_GPUCommandBuffer* cmd, const Renderer::Frame& f, FrameStats& stats);
+  void drawBloom(SDL_GPUCommandBuffer* cmd, FrameStats& stats);
+  void fullscreen(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, SDL_GPUGraphicsPipeline* p,
+                  std::initializer_list<SDL_GPUTextureSamplerBinding> tex, const void* uniforms, Uint32 size, FrameStats& stats);
 
   // RendererRml.cpp
   void initRml();
@@ -346,7 +389,7 @@ struct Renderer::Impl {
     SDL_GPUShader* skyF = shader("sky.frag", SDL_GPU_SHADERSTAGE_FRAGMENT, 0, 1);
     SDL_GPUShader* starsV = shader("stars.vert", SDL_GPU_SHADERSTAGE_VERTEX, 0, 1);
     SDL_GPUShader* starsF = shader("stars.frag", SDL_GPU_SHADERSTAGE_FRAGMENT, 0, 0);
-    SDL_GPUShader* compF = shader("composite.frag", SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 1);
+    SDL_GPUShader* compF = shader("composite.frag", SDL_GPU_SHADERSTAGE_FRAGMENT, 7, 1);
     SDL_GPUShader* uiV = shader("ui.vert", SDL_GPU_SHADERSTAGE_VERTEX, 0, 1);
     SDL_GPUShader* uiF = shader("ui.frag", SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 0);
 
