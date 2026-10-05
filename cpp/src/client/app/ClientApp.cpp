@@ -148,6 +148,7 @@ struct ClientApp::Impl {
   std::unique_ptr<DebugTools> debug;  // F3 com --dev
 #endif
   std::optional<std::pair<glm::dvec3, glm::dvec3>> debugView;
+  std::optional<AimResult> portraitAim;  // --portrait: a mira congelada enquanto a câmera está de frente
   double frameMs = 16, fps = 60;
   std::unique_ptr<UiSystem> rmlUi;  // index.html da demo em RmlUi (assets/ui)
   std::unique_ptr<GameUi> gameUi;
@@ -743,7 +744,8 @@ struct ClientApp::Impl {
     }
     // retrato mirando: a câmera de mira roda até o aimT chegar a 1 (a câmera livre congela o aimT, como
     // o updateCamera da demo); depois vai para a frente
-    if (opt.portrait && !view && (!opt.portraitAim || cam.aimT() > 0.99)) {
+    const bool portraitCam = opt.portrait && !view && (!opt.portraitAim || cam.aimT() > 0.99);
+    if (portraitCam) {
       // de frente para o personagem, a 3,4 m, na altura do peito
       const glm::dvec3 at(me->x, me->y + 1.0, me->z), dir(std::sin(me->yaw), 0, std::cos(me->yaw));
       cam.setFreeCam(std::make_pair(at + dir * 3.4 + glm::dvec3(0, 0.5, 0), at));
@@ -758,7 +760,22 @@ struct ClientApp::Impl {
     const ViewCamera& vc = cam.view();
     const double cx = aiming ? in.width * 0.5 : in.mouseX, cy = aiming ? in.height * 0.5 : in.mouseY;
     const Ray ray = vc.ray(cx, cy, in.width, in.height);
-    const AimResult aim = computeAim(ray, subj.pos, cam.yaw(), world, data, map);
+    AimResult aim = computeAim(ray, subj.pos, cam.yaw(), world, data, map);
+    // o retrato não mira: o raio da câmera de frente atravessa o personagem e acerta o chão atrás dele,
+    // o servidor o vira para lá, a câmera vai para a nova frente e ele gira sem parar (a demo pausa a
+    // simulação antes de pôr a câmera na frente). Vale a última mira da câmera de jogo; sem ela, adiante.
+    if (portraitCam) {
+      if (!portraitAim) {
+        AimResult ahead;
+        ahead.yaw = me->yaw;
+        ahead.dist = 20;
+        ahead.point = subj.pos + glm::dvec3(std::sin(me->yaw) * ahead.dist, 1.45, std::cos(me->yaw) * ahead.dist);
+        portraitAim = ahead;
+      }
+      aim = *portraitAim;
+    } else {
+      portraitAim = aim;
+    }
     const bool downOrDead = P->state == static_cast<std::uint8_t>(proto::PlayerState::Down) ||
                             P->state == static_cast<std::uint8_t>(proto::PlayerState::Dead);
     std::optional<Hover> hover;
