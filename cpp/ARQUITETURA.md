@@ -517,7 +517,7 @@ a vegetação de verdade entram na fase 4.
 | Demo | Cliente C++ | Por quê |
 |---|---|---|
 | a UI pausa a simulação (`G.uiOpen`) | o painel manda `kHeldUiOpen` no comando; só o jogo local pausa (`ReqPause`) | servidor autoritativo |
-| o cursor sai da mira pelo Pointer Lock do navegador (e o Esc solta) | modo relativo da SDL enquanto o botão direito está apertado | mesmo efeito, sem o navegador |
+| o cursor sai da mira pelo Pointer Lock do navegador (e o Esc solta) | modo relativo da SDL enquanto o botão direito está apertado, com a escala do ponteiro do sistema (`SDL_HINT_MOUSE_RELATIVE_SYSTEM_SCALE`), em pixels como o `movementX` | mesmo efeito, sem o navegador |
 | Ctrl+W fecha a aba (keyguard.js) | não existe | app nativo |
 
 ## 10. O cliente com o pacote visual da demo (fase 4)

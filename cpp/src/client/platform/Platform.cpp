@@ -57,6 +57,10 @@ std::optional<Key> mapKey(SDL_Scancode s) {
 }  // namespace
 
 Platform::Platform(const PlatformOptions& o) : w_(o.width), h_(o.height) {
+  // mira: a câmera gira por pixel de tela, como o movementX da demo (velocidade e aceleração do
+  // ponteiro do sistema). Sem isso o modo relativo da SDL entrega contagens brutas do sensor, e um
+  // mouse de DPI alto vira a câmera várias vezes mais que na demo.
+  SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_SYSTEM_SCALE, "1");
   if (o.headless) {
     // sem janela: o SDL_GPU ainda precisa do vídeo para carregar o Vulkan; o driver "offscreen"
     // não precisa de servidor gráfico (CI, capturas automáticas)
