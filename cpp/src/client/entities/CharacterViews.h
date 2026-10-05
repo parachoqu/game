@@ -58,8 +58,6 @@ glm::vec2 raceScale(std::string_view origin);
 // Famílias que vão na mão esquerda (arco e tomos) e as que vão nas duas (manoplas e adaga).
 bool weaponInLeftHand(std::string_view family);
 bool weaponInBothHands(std::string_view family);
-// characters.js `standingDodgeFits`: as esquivas de pé só combinam com arco, punhos e besta.
-bool standingDodgeFits(std::string_view family);
 
 struct CharacterContext {
   const GameData* data = nullptr;

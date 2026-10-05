@@ -519,6 +519,7 @@ a vegetação de verdade entram na fase 4.
 | a UI pausa a simulação (`G.uiOpen`) | o painel manda `kHeldUiOpen` no comando; só o jogo local pausa (`ReqPause`) | servidor autoritativo |
 | o cursor sai da mira pelo Pointer Lock do navegador (e o Esc solta) | modo relativo da SDL enquanto o botão direito está apertado, com a escala do ponteiro do sistema (`SDL_HINT_MOUSE_RELATIVE_SYSTEM_SCALE`), em pixels como o `movementX` | mesmo efeito, sem o navegador |
 | Ctrl+W fecha a aba (keyguard.js) | não existe | app nativo |
+| com arco, besta ou sem arma, a esquiva (C) é em pé (`standingDodgeFits`: os clipes "Standing Dodge" do Mixamo) | toda arma rola (`roll`) | o corpo anda 4,8 m em 0,34 s, e num passo agachado parece deslizar |
 
 ## 10. O cliente com o pacote visual da demo (fase 4)
 

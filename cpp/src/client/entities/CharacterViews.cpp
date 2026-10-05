@@ -129,7 +129,6 @@ bool weaponInLeftHand(std::string_view f) {
   return f == "arco" || f == "tomo_fogo" || f == "tomo_vento" || f == "tomo_maldicao" || f == "tomo_sagrado";
 }
 bool weaponInBothHands(std::string_view f) { return f == "manoplas" || f == "adaga"; }
-bool standingDodgeFits(std::string_view f) { return f.empty() || f == "arco" || f == "punhos" || f == "besta"; }
 
 // ---------------------------------------------------------------- vistas
 
@@ -356,7 +355,9 @@ void CharacterViews::update(const ClientWorld& world, const CharacterContext& ct
         if (dodging && !v.dodging) {
           const rpg::anim::LocalDir d = rpg::anim::toLocal(v.yawBefore, std::sin(e.dodgeYaw), std::cos(e.dodgeYaw));
           const auto has = [&](rpg::anim::Clip c) { return v.human->hasClip(rpg::anim::clipKey(c)); };
-          const auto c = rpg::anim::dodgeClip(d.fwd, d.left, has, standingDodgeFits(v.family));
+          // desvio da demo: lá arco, besta e mãos vazias usam as esquivas em pé do Mixamo (standingDodgeFits),
+          // e o corpo andando 4,8 m num passo agachado parece deslizar; aqui toda arma rola
+          const auto c = rpg::anim::dodgeClip(d.fwd, d.left, has, false);
           v.dodgeKey = c ? std::string(rpg::anim::clipKey(*c)) : std::string();
           v.dodgeVis = e.dodgeYaw - (c ? rpg::anim::dodgeFacing(*c) : 0.0);
         }
