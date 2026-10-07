@@ -1,0 +1,263 @@
+{
+  "punhos": {
+    "basic": {
+      "type": "melee",
+      "dmg": 6,
+      "range": 1.9,
+      "arc": 1.7,
+      "windup": 0.08,
+      "recover": 0.28
+    },
+    "skills": []
+  },
+  "espada": {
+    "basic": {
+      "type": "melee",
+      "dmg": 14,
+      "range": 2.8,
+      "arc": 2,
+      "windup": 0.1,
+      "recover": 0.34
+    },
+    "skills": [
+      "investida",
+      "giro"
+    ]
+  },
+  "arco": {
+    "basic": {
+      "type": "ranged",
+      "dmg": 12,
+      "speed": 45,
+      "windup": 0.16,
+      "recover": 0.42
+    },
+    "skills": [
+      "tiroCarregado",
+      "recuo"
+    ]
+  },
+  "martelo": {
+    "basic": {
+      "type": "melee",
+      "dmg": 13,
+      "range": 2.5,
+      "arc": 1.6,
+      "windup": 0.2,
+      "recover": 0.48
+    },
+    "skills": [
+      "atordoar",
+      "reparoCampo"
+    ]
+  },
+  "manoplas": {
+    "basic": {
+      "type": "melee",
+      "dmg": 10,
+      "range": 2.1,
+      "arc": 1.8,
+      "windup": 0.06,
+      "recover": 0.22
+    },
+    "skills": [
+      "comboManopla",
+      "avancoImpacto"
+    ]
+  },
+  "maca": {
+    "basic": {
+      "type": "melee",
+      "dmg": 15,
+      "range": 2.5,
+      "arc": 1.7,
+      "windup": 0.18,
+      "recover": 0.44
+    },
+    "skills": [
+      "golpeEsmagador",
+      "ondaChoque"
+    ]
+  },
+  "machado": {
+    "basic": {
+      "type": "melee",
+      "dmg": 16,
+      "range": 2.6,
+      "arc": 1.9,
+      "windup": 0.17,
+      "recover": 0.42
+    },
+    "skills": [
+      "machadadaPesada",
+      "dilacerar"
+    ]
+  },
+  "adaga": {
+    "basic": {
+      "type": "melee",
+      "dmg": 9,
+      "range": 2.2,
+      "arc": 1.5,
+      "windup": 0.06,
+      "recover": 0.2
+    },
+    "skills": [
+      "passoSombras",
+      "golpePreciso"
+    ]
+  },
+  "lanca": {
+    "basic": {
+      "type": "melee",
+      "dmg": 13,
+      "range": 3.6,
+      "arc": 1.2,
+      "windup": 0.12,
+      "recover": 0.38
+    },
+    "skills": [
+      "estocadaLonga",
+      "varrerDistancia"
+    ]
+  },
+  "foice": {
+    "basic": {
+      "type": "melee",
+      "dmg": 14,
+      "range": 3,
+      "arc": 2.8,
+      "windup": 0.16,
+      "recover": 0.4
+    },
+    "skills": [
+      "ceifaCircular",
+      "puxaoFoice"
+    ]
+  },
+  "besta": {
+    "basic": {
+      "type": "ranged",
+      "dmg": 18,
+      "speed": 58,
+      "windup": 0.24,
+      "recover": 0.52
+    },
+    "skills": [
+      "tiroBesta",
+      "disparoRepulsao"
+    ]
+  },
+  "cajado_gelo": {
+    "basic": {
+      "type": "spell",
+      "school": "ice",
+      "dmg": 11,
+      "speed": 38,
+      "windup": 0.15,
+      "recover": 0.38
+    },
+    "skills": [
+      "setaGelo",
+      "prisaoGelo"
+    ]
+  },
+  "tomo_fogo": {
+    "basic": {
+      "type": "spell",
+      "school": "fire",
+      "dmg": 15,
+      "speed": 40,
+      "windup": 0.18,
+      "recover": 0.42
+    },
+    "skills": [
+      "bolaFogo",
+      "erupcaoFogo"
+    ]
+  },
+  "cajado_natureza": {
+    "basic": {
+      "type": "spell",
+      "school": "nature",
+      "dmg": 10,
+      "speed": 36,
+      "windup": 0.14,
+      "recover": 0.36
+    },
+    "skills": [
+      "enraizar",
+      "bencaoTerra"
+    ]
+  },
+  "tomo_vento": {
+    "basic": {
+      "type": "spell",
+      "school": "wind",
+      "dmg": 11,
+      "speed": 46,
+      "windup": 0.12,
+      "recover": 0.32
+    },
+    "skills": [
+      "lufadaVento",
+      "saltoVento"
+    ]
+  },
+  "tomo_maldicao": {
+    "basic": {
+      "type": "spell",
+      "school": "curse",
+      "dmg": 12,
+      "speed": 38,
+      "windup": 0.16,
+      "recover": 0.4
+    },
+    "skills": [
+      "marcaCorruptora",
+      "drenoVital"
+    ]
+  },
+  "metamorfose": {
+    "basic": {
+      "type": "melee",
+      "dmg": 17,
+      "range": 2.7,
+      "arc": 2.2,
+      "windup": 0.11,
+      "recover": 0.3
+    },
+    "skills": [
+      "formaFera",
+      "rugidoFera"
+    ]
+  },
+  "cajado_vital": {
+    "basic": {
+      "type": "spell",
+      "school": "vital",
+      "dmg": 9,
+      "speed": 36,
+      "windup": 0.14,
+      "recover": 0.35
+    },
+    "skills": [
+      "curaVital",
+      "auraRestauracao"
+    ]
+  },
+  "tomo_sagrado": {
+    "basic": {
+      "type": "spell",
+      "school": "holy",
+      "dmg": 13,
+      "speed": 42,
+      "windup": 0.16,
+      "recover": 0.38
+    },
+    "skills": [
+      "escudoRadiante",
+      "purificacaoSagrada"
+    ]
+  }
+}

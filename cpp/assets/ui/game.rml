@@ -1,0 +1,111 @@
+<rml>
+<head>
+  <title>Projeto Game</title>
+  <!-- demo/src/index.html portado: mesmos ids e classes; o que era ::before/::after virou elemento -->
+  <link type="text/rcss" href="game.rcss"/>
+</head>
+<body id="body">
+<div id="vignette"></div>
+<div id="crosshair" hidden=""><i class="ring"></i><i class="tk n"></i><i class="tk s"></i><i class="tk w"></i><i class="tk e"></i><i class="dot"></i><i class="bracket bl"></i><i class="bracket br"></i><div class="hitmarker" id="hitmarker"><i class="hm nw"></i><i class="hm ne"></i><i class="hm sw"></i><i class="hm se"></i></div><span class="range-tag" id="cross-range"></span></div>
+
+<div id="hud" hidden="">
+  <section id="vitals">
+    <i class="vitals-rule"></i>
+    <div class="who"><strong id="hud-name">—</strong><span id="hud-title"></span></div>
+    <div class="bar hp"><i id="hp-fill"></i><span id="hp-text"></span></div>
+    <div class="bar vg"><i id="vg-fill"></i><span id="vg-text"></span></div>
+    <div id="chips"></div>
+  </section>
+
+  <section id="zone">
+    <div class="zline" id="zone-line"><b id="zone-mark"></b><span id="zone-name"></span><em id="zone-place"></em></div>
+    <p id="zone-rule"></p>
+  </section>
+
+  <section id="corner">
+    <div class="mapwrap" id="mapwrap"><img id="minimap" src="dyn:minimap"/><div id="mini-labels"></div><span id="mini-noref" hidden="">sem referência</span><button class="north" id="cam-north" data-act="camNorth">N</button><button class="mini-size" id="mini-size" data-act="miniSize">+</button></div>
+    <div id="clock"></div>
+    <div id="widgets"></div>
+  </section>
+
+  <div id="toasts"></div>
+  <div id="prompt" hidden=""></div>
+  <div id="channel" hidden=""><span id="channel-label"></span><div class="track"><i id="channel-fill"></i></div></div>
+
+  <section id="actionbar">
+    <div class="slot wide"><kbd>Clique</kbd><span><span id="ab-basic">Atacar</span> e usar</span></div>
+    <div class="slot"><kbd>Direito</kbd><span>Mirar</span></div>
+    <div class="slot"><kbd>Espaço</kbd><span>Pular</span></div>
+    <div class="slot"><kbd>C</kbd><span>Esquivar</span></div>
+    <div class="slot skill" id="ab-q"><kbd>Q</kbd><span id="ab-q-name"></span><i class="cd" id="ab-q-cd"></i></div>
+    <div class="slot skill" id="ab-e"><kbd>E</kbd><span id="ab-e-name"></span><i class="cd" id="ab-e-cd"></i></div>
+    <button class="slot click" id="ab-pot" data-act="potion"><kbd>1</kbd><span>Poção <b id="ab-pot-count"></b></span><i class="cd" id="ab-pot-cd"></i></button>
+    <button class="slot click" id="ab-mount" data-act="mount"><kbd>R</kbd><span id="ab-mount-label">Montaria</span></button>
+    <div class="weapon" id="ab-weapon"></div>
+  </section>
+
+  <section id="load">
+    <div class="coins"><b id="coins"></b> moedas</div>
+    <div class="loadrow"><span>Bolsa</span><div class="lbar"><i id="load-fill"></i><em class="mark100"></em></div><span id="load-text"></span></div>
+    <div class="loadrow" id="saddle-row" hidden=""><span>Alforjes</span><div class="lbar saddle"><i id="saddle-fill"></i></div><span id="saddle-text"></span></div>
+    <div id="load-state"></div>
+  </section>
+
+  <nav id="keys">
+    <span><kbd>WASD</kbd>Andar</span><span><kbd>Shift</kbd>Correr</span><span><kbd>Ctrl</kbd>Agachar</span><span><kbd>Shift</kbd>+<kbd>Espaço</kbd>Salto</span><span><kbd>Direito</kbd>Mirar</span><span><kbd>Arraste</kbd>Girar a câmera</span><span><kbd>Tab</kbd>Menu</span><span><kbd>Tab</kbd>+<kbd>1</kbd><kbd>2</kbd><kbd>3</kbd>Câmera</span><span><kbd>I</kbd>Inventário</span><span><kbd>B</kbd>Livro</span><span><kbd>M</kbd>Ampliar minimapa</span><span><kbd>F</kbd>Interagir</span><span><kbd>Esc</kbd>Pausa</span>
+  </nav>
+</div>
+
+<div id="down" hidden=""><strong><span class="orn">❖</span>Derrubado<span class="orn">❖</span></strong><p id="down-text"></p><div class="track"><i id="down-fill"></i></div></div>
+<div id="caption" hidden=""><h3 id="cap-title"></h3><p id="cap-text"></p><button id="cap-close" class="btn" data-act="captionClose">Voltar <kbd>F</kbd></button></div>
+
+<div id="notice" class="forged" hidden=""></div>
+<nav id="menubar" hidden=""></nav>
+<div id="panel" hidden=""></div>
+<div id="book" hidden=""></div>
+
+<div id="screen-loading" class="screen">
+  <div class="lo">
+    <p class="eyebrow">Demo de recorte · Documento-Mestre v2.1</p>
+    <h2 class="lo-mark">Projeto Game</h2>
+    <p class="lo-sub">Montando o recorte do Vale.</p>
+    <div class="lo-frame">
+      <ol class="lo-phases" id="boot-phases"></ol>
+      <div id="boot-load">
+        <div class="track" id="boot-track"><i id="boot-fill"><i class="ember"></i></i><i class="sheen"></i></div>
+        <span id="boot-text">Preparando o mundo…</span>
+      </div>
+    </div>
+    <div id="boot-lore"></div>
+  </div>
+</div>
+
+<div id="screen-title" class="screen" hidden="">
+  <div class="title-inner">
+    <div class="corner tl"><i class="h"></i><i class="v"></i></div><div class="corner br"><i class="h"></i><i class="v"></i></div>
+    <p class="eyebrow">Demo de recorte · Documento-Mestre v2.1</p>
+    <h1>Projeto Game</h1>
+    <p class="promise">Escolha uma vida, assuma seus riscos e deixe uma história em um mundo que continua mudando.</p>
+    <div class="triad"><span><b>Trajetória</b>escolhas de vida</span><span><b>Consequência</b>mudanças no mundo</span><span><b>Memória</b>o Livro do personagem</span></div>
+    <div class="actions">
+      <button class="btn primary" id="btn-new" data-act="titleNew">Nova trajetória</button>
+      <button class="btn" id="btn-continue" data-act="titleContinue" hidden="">Continuar trajetória</button>
+    </div>
+    <p class="fine">Nomes, números e regras são provisórios: instrumentos para discutir o projeto, não decisões aprovadas.</p>
+    <p class="fine credits">Modelos 3D: Mixamo (personagens e caminhada) · cavalo e leoa por WildMesh 3D, CC BY-NC 4.0. Créditos completos no menu de pausa (Esc).</p>
+  </div>
+</div>
+
+<div id="screen-create" class="screen" hidden="">
+  <div class="create" id="create-form">
+    <p class="eyebrow">Nova trajetória</p>
+    <h2>Quem chega ao Entreposto do Vale?</h2>
+    <div class="field"><span>Nome</span><input id="c-name" type="text" maxlength="22" value=""/></div>
+    <fieldset><legend>Personagem <small>escolha o modelo 3D</small></legend><div class="cards" id="c-models"></div></fieldset>
+    <fieldset><legend>Origem <small>define história e traços, não profissão</small></legend><div class="cards" id="c-origins"></div></fieldset>
+    <fieldset><legend>Primeiro conhecimento <small>outros podem ser aprendidos depois</small></legend><div class="cards" id="c-starts"></div></fieldset>
+    <div class="actions"><button class="btn" id="c-back" data-act="createBack">Voltar</button><button class="btn primary" id="c-start" data-act="createStart">Começar no Vale</button></div>
+  </div>
+</div>
+</body>
+</rml>

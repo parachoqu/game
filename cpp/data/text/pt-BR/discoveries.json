@@ -1,0 +1,54 @@
+{
+  "bosque": {
+    "title": "Bosque das Forjas",
+    "text": "Encontrou o bosque a oeste do Vale: veios de minério, freixos marcados para corte e erva-lume."
+  },
+  "canteiro": {
+    "title": "Canteiro da Passagem",
+    "text": "Chegou ao canteiro montado junto à ponte principal, onde se reúnem materiais para reabrir a rota."
+  },
+  "passagem": {
+    "title": "Passagem Estreita",
+    "text": "Entrou na garganta entre a serra e o maciço. O caminho mais curto até o Alto — e o mais exposto."
+  },
+  "vigia": {
+    "title": "Ruína de vigia",
+    "text": "Uma torre antiga, parcialmente caída, ainda enxerga boa parte da Passagem."
+  },
+  "acampamento": {
+    "title": "Acampamento das Garras",
+    "text": "Viu o acampamento das Garras num vale lateral da rota segura: tendas, fogueira e patrulhas."
+  },
+  "observatorio": {
+    "title": "Uma estrutura antiga",
+    "text": "Encontrou uma estrutura antiga no alto de uma colina a oeste. Nenhum marcador indicava o caminho."
+  },
+  "ermos": {
+    "title": "Ermos Quebrados",
+    "text": "Chegou aos Ermos Quebrados: ruínas, cristais celestes e a regra de Full Loot."
+  },
+  "alto": {
+    "title": "Entreposto Alto",
+    "text": "Chegou ao Entreposto Alto, ao norte da serra, onde ferramentas valem mais."
+  },
+  "mina": {
+    "title": "Boca da Mina",
+    "text": "Encontrou a boca da mina, encravada na encosta oeste, com entulho e vigas de sustentação."
+  },
+  "caverna": {
+    "title": "Caverna do Oeste",
+    "text": "Chegou à caverna no extremo oeste, onde a trilha da mina termina."
+  },
+  "portal": {
+    "title": "Portal Instável",
+    "text": "Viu a estrutura permanente do portal instável, a nordeste, aberta sobre o planalto."
+  },
+  "ponte": {
+    "title": "Ponte Secundária",
+    "text": "Atravessou a ponte secundária, a leste, por onde passa a rota segura."
+  },
+  "estrada": {
+    "title": "Estrada Longa",
+    "text": "Percorreu a Estrada Longa, o caminho protegido e demorado que contorna o maciço."
+  }
+}

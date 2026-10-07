@@ -1,0 +1,14 @@
+{
+  "protegida": {
+    "loss": "wear"
+  },
+  "fronteira": {
+    "loss": "cargo"
+  },
+  "fullloot": {
+    "loss": "full"
+  },
+  "turbulenta": {
+    "loss": "full"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "garra": {
+    "name": "Garra"
+  },
+  "garraLider": {
+    "name": "Garra-líder"
+  },
+  "garraPalida": {
+    "name": "Garra pálida"
+  },
+  "saqueador": {
+    "name": "Saqueador"
+  },
+  "saqueadorArco": {
+    "name": "Saqueador arqueiro"
+  },
+  "saqueadorLanca": {
+    "name": "Saqueador lanceiro"
+  },
+  "sombraEspada": {
+    "name": "Figura desconhecida"
+  },
+  "sombraArco": {
+    "name": "Figura desconhecida"
+  },
+  "sombraMagica": {
+    "name": "Figura desconhecida"
+  },
+  "guarda": {
+    "name": "Guarda"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "clock": {
+    "dayLength": 420,
+    "startHour": 9
+  },
+  "movement": {
+    "walk": 3,
+    "run": 7.2,
+    "crouch": 0.45,
+    "gravity": 20,
+    "airControl": 0.35,
+    "jump": {
+      "vy": 5.2,
+      "vigor": 8
+    },
+    "boost": {
+      "vy": 7,
+      "vigor": 20,
+      "speed": 9
+    }
+  },
+  "collision": {
+    "cell": 12,
+    "maxSlope": 1.25,
+    "routeSlope": 1.9,
+    "routeLane": 3.2
+  },
+  "inventory": {
+    "baseCapacity": 30,
+    "overLimit": 1.3
+  },
+  "turbulent": {
+    "duration": 240
+  }
+}

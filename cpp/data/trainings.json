@@ -1,0 +1,35 @@
+{
+  "espadachim": {
+    "cost": 30
+  },
+  "arqueiro": {
+    "cost": 30
+  },
+  "artesao": {
+    "cost": 25
+  },
+  "alquimista": {
+    "cost": 20
+  },
+  "lutador": {
+    "cost": 30
+  },
+  "combatente_haste": {
+    "cost": 35
+  },
+  "concussao_corte": {
+    "cost": 35
+  },
+  "assassino": {
+    "cost": 35
+  },
+  "magia_elemental": {
+    "cost": 40
+  },
+  "magia_natural": {
+    "cost": 40
+  },
+  "artes_espirituais": {
+    "cost": 40
+  }
+}

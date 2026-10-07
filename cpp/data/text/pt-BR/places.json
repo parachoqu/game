@@ -1,0 +1,68 @@
+{
+  "vale": {
+    "name": "Entreposto do Vale"
+  },
+  "mercado": {
+    "name": "Mercado do Vale"
+  },
+  "alto": {
+    "name": "Entreposto Alto"
+  },
+  "canteiro": {
+    "name": "Canteiro da Passagem"
+  },
+  "passagem": {
+    "name": "Passagem Estreita"
+  },
+  "vigia": {
+    "name": "Ruína de vigia"
+  },
+  "acampamento": {
+    "name": "Acampamento das Garras"
+  },
+  "observatorio": {
+    "name": "Observatório Antigo"
+  },
+  "mina": {
+    "name": "Boca da Mina"
+  },
+  "caverna": {
+    "name": "Caverna do Oeste"
+  },
+  "portal": {
+    "name": "Portal Instável"
+  },
+  "ponte": {
+    "name": "Ponte Principal"
+  },
+  "ponteMenor": {
+    "name": "Ponte Secundária"
+  },
+  "ermos": {
+    "name": "Ermos Quebrados"
+  },
+  "bosque": {
+    "name": "Bosque das Forjas"
+  },
+  "turbulenta": {
+    "name": "Região Turbulenta"
+  },
+  "estradaLonga": {
+    "name": "Estrada Longa"
+  },
+  "rioLargo": {
+    "name": "Rio Largo"
+  },
+  "camposNorte": {
+    "name": "Campos do Norte"
+  },
+  "camposVale": {
+    "name": "Campos do Vale"
+  },
+  "colinasOeste": {
+    "name": "Colinas do Oeste"
+  },
+  "encostasSerra": {
+    "name": "Encostas da Serra"
+  }
+}

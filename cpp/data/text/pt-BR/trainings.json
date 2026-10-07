@@ -1,0 +1,46 @@
+{
+  "espadachim": {
+    "name": "Espadachim I",
+    "desc": "Libera espadas e suas técnicas de corte e estocada."
+  },
+  "arqueiro": {
+    "name": "Arqueiro I",
+    "desc": "Libera arcos e suas técnicas de tiro à distância."
+  },
+  "artesao": {
+    "name": "Artesão I",
+    "desc": "Receitas de forja de armas, armaduras e equipamentos."
+  },
+  "alquimista": {
+    "name": "Alquimista I",
+    "desc": "Preparo de poções e compostos alquímicos."
+  },
+  "lutador": {
+    "name": "Lutador I",
+    "desc": "Libera manoplas de batalha e combate de pressão corporal."
+  },
+  "combatente_haste": {
+    "name": "Mestre de Haste I",
+    "desc": "Libera lanças e foices de guerra para controle de área."
+  },
+  "concussao_corte": {
+    "name": "Impacto & Corte I",
+    "desc": "Libera maças contundentes e machados pesados de guerra."
+  },
+  "assassino": {
+    "name": "Batedor Furtivo I",
+    "desc": "Libera adagas ágeis e disparos perfurantes de besta."
+  },
+  "magia_elemental": {
+    "name": "Magia Elemental I",
+    "desc": "Tradições de Água/Gelo, Fogo/Lava e Vento/Ar."
+  },
+  "magia_natural": {
+    "name": "Tradição Natural I",
+    "desc": "Raízes da terra e metamorfose corporal na Forma da Fera."
+  },
+  "artes_espirituais": {
+    "name": "Artes Espirituais I",
+    "desc": "Bênçãos sagradas, recuperação vital e marcas de maldição."
+  }
+}

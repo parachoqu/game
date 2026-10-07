@@ -1,0 +1,22 @@
+{
+  "humano": {
+    "skin": "#c99a78",
+    "cloth": "#3f6f8f",
+    "trim": "#c9a25a"
+  },
+  "elfo": {
+    "skin": "#e2c2a4",
+    "cloth": "#476b4a",
+    "trim": "#d6c28a"
+  },
+  "anao": {
+    "skin": "#c08a6a",
+    "cloth": "#7a4a36",
+    "trim": "#d9a441"
+  },
+  "orc": {
+    "skin": "#7f9470",
+    "cloth": "#5b4a6e",
+    "trim": "#c7b07a"
+  }
+}
